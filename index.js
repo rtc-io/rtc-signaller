@@ -1,25 +1,50 @@
-var stream = require('stream'),
-	util = require('util'),
+var EventEmitter = require('events').EventEmitter,
+	pull = require('pull-stream'),
 	knownTransports = {};
 
+/**
+# Signaller()
+*/
 function Signaller() {
 	// init as a duplex stream
-	stream.Duplex.call(this);
+	EventEmitter.call(this);
+
+	// initialise the messages queue
+	this.messages = require('pull-pushable');
 
 	// initialise members
+	this.peers = [];
 	this.transport = null;
 }
 
-util.inherits(Signaller, stream.Duplex);
+util.inherits(Signaller, EventEmitter);
 
 /**
-## introduce(peer)
+## add(peer)
 */
-Signaller.prototype.introduce = function(peer) {
+Signaller.prototype.add = function(peer) {
 	if (! (peer instanceof RTCPeerConnection)) return;
 
+	// add the peer to the active peers list
+	this.peers.push(peer);
+
 	// TODO: connect to the relevant RTCPeerConnection events and respond accordingly
-	
+	peer.addEventListener('negotiationneeded', this._negotiate.bind(this, peer));
+};
+
+/**
+## remove(peer)
+*/
+Signaller.prototype.remove = function(peer) {
+	var index = this.peers.indexOf(peer);
+
+	// if we are managing the peer, then remove event listeners
+	if (index >= 0) {
+		// TODO: unbind event listeners
+
+		// remove the peer from the list
+		this.peers.splice(index, 1);		
+	}
 };
 
 /**
@@ -42,18 +67,19 @@ Signaller.prototype.use = function(transport, options) {
 		throw new Error('Invalid transport - cannot connect');
 	}
 
-	// if we have an existing transport, then disconnect it
+	// TODO: if we have an existing transport, then disconnect it
 	if (this.transport) {
-		this.transport.unpipe(this);
-		this.unpipe(this.transport);
-
-		// reset the transport
-		this.transport = null;
 	}
 
 	// create the transport
 	this.transport = transport(options);
 
-	// pipe ourselves to and from the transport
-	this.pipe(this.transport).pipe(this);
+	// push the messages to the transport
+	this.messages.pipe(pull.drain(this.transport.write.bind(this.transport)));
+
+	// listen for messages from the transport
+	pull(
+		this.transport.createReader(),
+		pull.drain(this.emit.bind(this, 'message'))
+	);
 };
