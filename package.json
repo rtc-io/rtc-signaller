@@ -5,6 +5,9 @@
   "tags": [
     "webrtc"
   ],
+  "engines": {
+    "node": ">= 0.10.x"
+  },
   "version": "0.0.0",
   "dependencies": {
   },

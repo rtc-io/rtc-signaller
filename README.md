@@ -18,9 +18,11 @@ The signaller is now ready to interact with an [RTCPeerConnection](http://dev.w3
 signaller.introduce(peer);
 ```
 
-Until such time that the signaller is connected to a transport though, no signalling will be done.  Connecting to the transport is as simple as what is displayed below:
+Until such time that the signaller is connected to a transport though, no signalling will be done.  Connecting to the transport is completed via the `use` method of the signaller, and an example is displayed below:
 
 ```js
-signaller.pipe(require('rtc-signaller-websocket')('rtc.io'));
+signaller.use('websocket', {
+	host: 'rtc.io'
+});
 ```
 
