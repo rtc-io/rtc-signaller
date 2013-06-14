@@ -11,32 +11,31 @@ This in turn reduces the overall effort required to implement WebRTC signalling 
 The first thing you will need to do is to include the `rtc-signaller` package in your application, and provide it a channel name that it will use to communicate with its peers.
 
 ```js
-var signaller = require('rtc-signaller')('channel-name');
+var signaller = require('rtc-signaller'),
+	channel = signaller('channel-name');
 ```
 
 The next thing to do is to tell the signaller which transport it is going to be using:
 
 ```js
-signaller.transport = require('rtc-signaller-socket.io')({ host: 'rtc.io' });
+channel.transport = require('rtc-signaller-socket.io')({ host: 'rtc.io' });
 ```
 
 ### Handling Events
 
-At the point at which the transport is associated with the signaller, the signaller will attempt to join the channel as specified when creating the signaller instance using the transport specified.
-
-Once this connection is established, the signaller will become aware of other peers (if any) that are currently connected to the room:
+At the point at which the transport is associated, the channel will attempt to connect. Once this connection is established, the signaller will become aware of other peers (if any) that are currently connected to the room:
 
 ```js
 // wait for ready event
-signaller.once('ready', function() {
-	console.log('connected to ' + signaller.channel + ' with ' + signaller.peers.length + ' other peers');
+channel.once('ready', function() {
+	console.log('connected to ' + channel.name + ' with ' + channel.peers.length + ' other peers');
 });
 ```
 
-In addition to the `ready` event, the signaller will also trigger a `peer:discover` event to signal the discovery of a new peer in the channel:
+In addition to the `ready` event, the channel will also trigger a `peer:discover` event to signal the discovery of a new peer in the channel:
 
 ```js
-signaller.on('peer:discover', function(peer) {
+channel.on('peer:discover', function(peer) {
 	console.log('discovered a new peer in the channel');
 });
 ```
@@ -54,8 +53,8 @@ So once we know about other peers in the current channel, we should probably loo
 In an application where we want to automatically connect to every other known peer in the channel, we could implement code similar to that shown below:
 
 ```js
-signaller.on('peer:discover', function(peer) {
-	var connection = signaller.connect(peer);
+channel.on('peer:discover', function(peer) {
+	var connection = channel.connect(peer);
 
 	// add a stream to the connection
 	connection.addStream(media.stream);
@@ -66,10 +65,10 @@ In the example above, once a peer is discovered our application will automatical
 
 Now in most circumstances using code like the sample above will result in two peers creating offers for each other and duplicating the connection requests.  In this situation, the [signaller will coordinate the connection requests](http://git-ent.research.nicta.com.au/doehlman/rtc-signaller/issues/1) and make sure that peers find each other correctly.
 
-Once two peers have established a working connection, the signaller will let you know:
+Once two peers have established a working connection, the channel will let you know:
 
 ```js
-signaller.on('peer:connect', function(connection) {
+channel.on('peer:connect', function(connection) {
 	
 });
 ```
