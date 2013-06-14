@@ -14,7 +14,7 @@ function Signaller() {
 
 	// initialise members
 	this.peers = [];
-	this.transport = null;
+	this._transport = null;
 }
 
 util.inherits(Signaller, EventEmitter);
@@ -48,38 +48,32 @@ Signaller.prototype.remove = function(peer) {
 };
 
 /**
-## use(transport, options)
-
-Connect the signaller to the specified transport.  
+## transport
 */
-Signaller.prototype.use = function(transport, options) {
-	// if the transport requested is a string, then attempt to load the relevant module
-	if (typeof transport == 'string' || (transport instanceof String)) {
-		// check to see if we have a known transport mapping
-		transport = knownTransports[transport] || transport;
+Object.defineProperty(Signaller.prototype, 'transport', {
+	get: function() {
+		return this._transport;
+	},
 
-		// require the transport module
-		transport = require(transport);
+	set: function(transport) {
+		// if this is the same transport, do nothing
+		if (this._transport === transport) return;
+
+		// if we have an existing transport, then disconnect
+		if (this._transport) {
+
+		}
+
+		// update the transport
+		this._transport = transport;
+
+		// push the messages to the transport
+		this.messages.pipe(pull.drain(transport.write.bind(transport)));
+
+		// listen for messages from the transport
+		pull(
+			transport.createReader(),
+			pull.drain(this.emit.bind(this, 'message'))
+		);
 	}
-
-	// if we do not have a valid transport, throw an error
-	if (typeof transport != 'function') {
-		throw new Error('Invalid transport - cannot connect');
-	}
-
-	// TODO: if we have an existing transport, then disconnect it
-	if (this.transport) {
-	}
-
-	// create the transport
-	this.transport = transport(options);
-
-	// push the messages to the transport
-	this.messages.pipe(pull.drain(this.transport.write.bind(this.transport)));
-
-	// listen for messages from the transport
-	pull(
-		this.transport.createReader(),
-		pull.drain(this.emit.bind(this, 'message'))
-	);
-};
+})

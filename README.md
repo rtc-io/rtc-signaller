@@ -21,8 +21,7 @@ signaller.introduce(peer);
 Until such time that the signaller is connected to a transport though, no signalling will be done.  Connecting to the transport is completed via the `use` method of the signaller, and an example is displayed below:
 
 ```js
-signaller.use('websocket', {
-	host: 'rtc.io'
-});
+// update the signaller transport
+signaller.transport = require('rtc-signaller-socket.io')({ host: 'rtc.io' });
 ```
 
