@@ -1,5 +1,6 @@
 var EventEmitter = require('events').EventEmitter,
     pull = require('pull-stream'),
+    pushable = require('pull-pushable'),
     util = require('util'),
     uuid = require('uuid'),
     knownTransports = {};
@@ -28,7 +29,7 @@ function SignallingChannel(opts) {
     this.name = opts.channel || uuid.v4();
 
     // initialise the messages queue
-    this.messages = require('pull-pushable');
+    this.messages = pushable();
 
     // initialise members
     this.peers = [];
