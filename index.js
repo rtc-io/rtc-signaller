@@ -1,13 +1,31 @@
 var EventEmitter = require('events').EventEmitter,
 	pull = require('pull-stream'),
+	util = require('util'),
+    uuid = require('uuid'),
 	knownTransports = {};
 
 /**
-# Signaller()
+# SignallingChannel()
 */
-function Signaller() {
+function SignallingChannel(opts) {
+	if (! (this instanceof SignallingChannel)) return new SignallingChannel(opts);
+
 	// init as a duplex stream
 	EventEmitter.call(this);
+
+	// if opts is a string, then we have a channel name
+	if (typeof opts == 'string' || (opts instanceof String)) {
+		opts = {
+			channel: opts
+		};
+	}
+
+	// ensure we have an opts hash
+	opts = opts || {};
+
+    // initialise the channel name
+    // TODO: investigate generating shorter unique channel names (uuids aren't easy to communicate)
+    this.name = opts.channel || uuid.v4();
 
 	// initialise the messages queue
 	this.messages = require('pull-pushable');
@@ -17,12 +35,13 @@ function Signaller() {
 	this._transport = null;
 }
 
-util.inherits(Signaller, EventEmitter);
+util.inherits(SignallingChannel, EventEmitter);
+module.exports = SignallingChannel;
 
 /**
 ## add(peer)
 */
-Signaller.prototype.add = function(peer) {
+SignallingChannel.prototype.add = function(peer) {
 	if (! (peer instanceof RTCPeerConnection)) return;
 
 	// add the peer to the active peers list
@@ -35,7 +54,7 @@ Signaller.prototype.add = function(peer) {
 /**
 ## remove(peer)
 */
-Signaller.prototype.remove = function(peer) {
+SignallingChannel.prototype.remove = function(peer) {
 	var index = this.peers.indexOf(peer);
 
 	// if we are managing the peer, then remove event listeners
@@ -50,7 +69,7 @@ Signaller.prototype.remove = function(peer) {
 /**
 ## transport
 */
-Object.defineProperty(Signaller.prototype, 'transport', {
+Object.defineProperty(SignallingChannel.prototype, 'transport', {
 	get: function() {
 		return this._transport;
 	},
@@ -67,8 +86,11 @@ Object.defineProperty(Signaller.prototype, 'transport', {
 		// update the transport
 		this._transport = transport;
 
+        // set the channel name in the transport
+        transport.setChannelName(this.name);
+
 		// push the messages to the transport
-		this.messages.pipe(pull.drain(transport.write.bind(transport)));
+		// this.messages.pipe(pull.drain(transport.write.bind(transport)));
 
 		// listen for messages from the transport
 		pull(

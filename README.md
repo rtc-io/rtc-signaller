@@ -40,7 +40,7 @@ channel.on('peer:discover', function(peer) {
 });
 ```
 
-### Differentiating Peers from Peer Connections
+### Peers vs Peer Connections
 
 When working with WebRTC and signalling concepts, it's important to differentiate between peers and actual `RTCPeerConnection` instances.  From a signalling perspective, a peer is someone (or something) out there that we can potentially connect with.
 
@@ -69,6 +69,5 @@ Once two peers have established a working connection, the channel will let you k
 
 ```js
 channel.on('peer:connect', function(connection) {
-	
 });
 ```
