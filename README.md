@@ -18,7 +18,7 @@ var signaller = require('rtc-signaller'),
 The next thing to do is to tell the signaller which transport it is going to be using:
 
 ```js
-channel.transport = require('rtc-signaller-socket.io')({ host: 'rtc.io' });
+channel.setTransport(require('rtc-signaller-socket.io')({ host: 'rtc.io' }));
 ```
 
 ### Handling Events
