@@ -26,7 +26,7 @@ function SignallingChannel(opts) {
     this.name = opts.channel || uuid.v4();
 
     // initialise the messages queue
-    this.messages = pushable();
+    this.outbound = pushable();
 
     // initialise members
     this.id = null;
@@ -39,10 +39,15 @@ function SignallingChannel(opts) {
 
     // when we receive an identity update, update our id
     this.on('identity', this.setIdentity.bind(this));
+    this.on('join:ok', this._joinChannel.bind(this));
+    this.on('peer:discover', this._peerDiscover.bind(this));
 }
 
 util.inherits(SignallingChannel, EventEmitter);
 module.exports = SignallingChannel;
+
+// patch the error codes into the SignallingChannel constructor
+SignallingChannel.errorcodes = require('./errorcodes');
 
 /**
 ## add(peer)
@@ -58,6 +63,25 @@ SignallingChannel.prototype.add = function(peer) {
 };
 
 /**
+## connect(peer)
+
+Create a connection to the specified peer
+*/
+SignallingChannel.prototype.connect = function(peer) {
+
+};
+
+/**
+## dial(peerId, callback)
+
+Attempt to initiate a connection with the specified peer id.
+*/
+SignallingChannel.prototype.dial = function(peerId) {
+    // push an outbound dial request for the peer
+    this.outbound.push('/dial ' + peerId);
+};
+
+/**
 ## remove(peer)
 */
 SignallingChannel.prototype.remove = function(peer) {
@@ -69,6 +93,17 @@ SignallingChannel.prototype.remove = function(peer) {
 
         // remove the peer from the list
         this.peers.splice(index, 1);        
+    }
+};
+
+/**
+## send(data)
+
+Send data across the line
+*/
+SignallingChannel.prototype.send = function(data) {
+    if (this.transport) {
+        this.outbound.push(data);
     }
 };
 
@@ -107,7 +142,7 @@ SignallingChannel.prototype.setTransport = function(transport) {
         if (err) return channel.emit('error', err);
 
         // pipe signaller messages to the transport
-        channel.messages.pipe(pull.drain(transport.createWriter()));
+        channel.outbound.pipe(pull.drain(transport.createWriter()));
 
         // listen for messages from the transport and emit them as messages
         pull(
@@ -115,9 +150,30 @@ SignallingChannel.prototype.setTransport = function(transport) {
             pull.drain(channel.emit.bind(channel, 'message'))
         );
 
-        channel.messages.push('/join ' + channel.name);            
+        channel.outbound.push('/join ' + channel.name);            
     });
 
+};
+
+/* "private" event handlers */
+
+SignallingChannel.prototype._peerDiscover = function(peer) {
+    // add the peer to the list of peers
+    this.peers.push(peer);
+};
+
+/**
+## _joinChannel(channelName)
+
+This is the event handler for the join:ok event
+*/
+SignallingChannel.prototype._joinChannel = function(channelName) {
+    // update the name with the specified channel name
+    // TODO: if channel changed, maybe emit another event?
+    this.name = channelName;
+
+    // emit the ready event
+    this.emit('ready');
 };
 
 /* internals */
