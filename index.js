@@ -47,7 +47,7 @@ util.inherits(SignallingChannel, EventEmitter);
 module.exports = SignallingChannel;
 
 // patch the error codes into the SignallingChannel constructor
-SignallingChannel.errorcodes = require('./errorcodes');
+SignallingChannel.errorcodes = require('rtc-core/errorcodes');
 
 /**
 ## add(peer)
@@ -60,15 +60,6 @@ SignallingChannel.prototype.add = function(peer) {
 
     // TODO: connect to the relevant RTCPeerConnection events and respond accordingly
     peer.addEventListener('negotiationneeded', this._negotiate.bind(this, peer));
-};
-
-/**
-## connect(peer)
-
-Create a connection to the specified peer
-*/
-SignallingChannel.prototype.connect = function(peer) {
-
 };
 
 /**
