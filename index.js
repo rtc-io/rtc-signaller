@@ -76,13 +76,19 @@ SignallingChannel.prototype.dial = function(peerId, callback) {
         callback.apply(channel, arguments);
     }
 
-    function handleDialInit() {
+    function handleDialInit(data) {
         console.log('handshake created');
-        finishDial();
+        finishDial(null, data);
     }
 
-    function handleDialError(code) {
-        finishDial(errorcodes.toError(code));
+    function handleDialError(code, tunnelid) {
+        var err = errorcodes.toError(code);
+
+        // add the tunnelid
+        err.tunnelid = tunnelid;
+
+        // finish with error
+        finishDial(err);
     }
 
     // push an outbound dial request for the peer
