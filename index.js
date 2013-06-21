@@ -2,7 +2,8 @@ var EventEmitter = require('events').EventEmitter,
     pull = require('pull-stream'),
     pushable = require('pull-pushable'),
     util = require('util'),
-    uuid = require('uuid');
+    uuid = require('uuid'),
+    errorcodes = require('rtc-core/errorcodes');
 
 /**
 # SignallingChannel()
@@ -46,9 +47,6 @@ function SignallingChannel(opts) {
 util.inherits(SignallingChannel, EventEmitter);
 module.exports = SignallingChannel;
 
-// patch the error codes into the SignallingChannel constructor
-SignallingChannel.errorcodes = require('rtc-core/errorcodes');
-
 /**
 ## add(peer)
 */
@@ -67,8 +65,29 @@ SignallingChannel.prototype.add = function(peer) {
 
 Attempt to initiate a connection with the specified peer id.
 */
-SignallingChannel.prototype.dial = function(peerId) {
+SignallingChannel.prototype.dial = function(peerId, callback) {
+    var channel = this;
+
+    function finishDial() {
+        // remove the event handlers
+        channel.removeListener('dial:init', handleDialInit);
+        channel.removeListener('dial:error', handleDialError);
+
+        callback.apply(channel, arguments);
+    }
+
+    function handleDialInit() {
+        console.log('handshake created');
+        finishDial();
+    }
+
+    function handleDialError(code) {
+        finishDial(errorcodes.toError(code));
+    }
+
     // push an outbound dial request for the peer
+    this.on('dial:init', handleDialInit);
+    this.on('dial:error', handleDialError);
     this.outbound.push('/dial ' + peerId);
 };
 
@@ -92,9 +111,17 @@ SignallingChannel.prototype.remove = function(peer) {
 
 Send data across the line
 */
-SignallingChannel.prototype.send = function(data) {
+SignallingChannel.prototype.send = function() {
+    var args = [].slice.call(arguments);
+
     if (this.transport) {
-        this.outbound.push(data);
+        // jsonify data as required
+        args = args.map(function(arg) {
+            return typeof arg == 'object' ? JSON.stringify(arg) : arg;
+        });
+
+        // send the message
+        this.outbound.push(args.join('|'));
     }
 };
 
