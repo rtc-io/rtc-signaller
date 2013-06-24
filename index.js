@@ -81,11 +81,11 @@ SignallingChannel.prototype.dial = function(peerId, callback) {
         finishDial(null, data);
     }
 
-    function handleDialError(code, tunnelid) {
+    function handleDialError(code, tunnelId) {
         var err = errorcodes.toError(code);
 
-        // add the tunnelid
-        err.tunnelid = tunnelid;
+        // add the tunnelId
+        err.tunnelId = tunnelId;
 
         // finish with error
         finishDial(err);
