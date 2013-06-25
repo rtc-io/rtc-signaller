@@ -216,7 +216,7 @@ function createMessageParser(signaller) {
             evtName = parts[0],
             args = parts.slice(1).map(function(arg) {
                 // if it looks like JSON then parse it
-                return arg.charAt(0) === '{' ? JSON.parse(arg) : arg;
+                return ['{', '['].indexOf(arg.charAt(0)) >= 0 ? JSON.parse(arg) : arg;
             });
 
         if (signaller.debug) {
