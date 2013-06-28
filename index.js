@@ -6,10 +6,10 @@ var EventEmitter = require('events').EventEmitter,
     errorcodes = require('rtc-core/errorcodes');
 
 /**
-# SignallingChannel()
+# SignallingPeer()
 */
-function SignallingChannel(opts) {
-    if (! (this instanceof SignallingChannel)) return new SignallingChannel(opts);
+function SignallingPeer(opts) {
+    if (! (this instanceof SignallingPeer)) return new SignallingPeer(opts);
     EventEmitter.call(this);
 
     // if opts is a string, then we have a channel name
@@ -44,63 +44,25 @@ function SignallingChannel(opts) {
     this.on('peer:discover', this._peerDiscover.bind(this));
 }
 
-util.inherits(SignallingChannel, EventEmitter);
-module.exports = SignallingChannel;
+util.inherits(SignallingPeer, EventEmitter);
+module.exports = SignallingPeer;
 
 /**
-## add(peer)
+## negotiate(targetId, sdp, callId, type)
+
+The negotiate function handles the process of sending an updated Session
+Description Protocol (SDP) description to the specified target signalling
+peer.  If this is an established connection, then a callId will be used to 
+ensure the sdp is deliver to the correct RTCPeerConnection instance
 */
-SignallingChannel.prototype.add = function(peer) {
-    if (! (peer instanceof RTCPeerConnection)) return;
-
-    // add the peer to the active peers list
-    this.peers.push(peer);
-
-    // TODO: connect to the relevant RTCPeerConnection events and respond accordingly
-    peer.addEventListener('negotiationneeded', this._negotiate.bind(this, peer));
-};
-
-/**
-## dial(peerId, callback)
-
-Attempt to initiate a connection with the specified peer id.
-*/
-SignallingChannel.prototype.dial = function(peerId, callback) {
-    var channel = this;
-
-    function finishDial() {
-        // remove the event handlers
-        channel.removeListener('dial:init', handleDialInit);
-        channel.removeListener('dial:error', handleDialError);
-
-        callback.apply(channel, arguments);
-    }
-
-    function handleDialInit(data) {
-        console.log('handshake created');
-        finishDial(null, data);
-    }
-
-    function handleDialError(code, tunnelId) {
-        var err = errorcodes.toError(code);
-
-        // add the tunnelId
-        err.tunnelId = tunnelId;
-
-        // finish with error
-        finishDial(err);
-    }
-
-    // push an outbound dial request for the peer
-    this.on('dial:init', handleDialInit);
-    this.on('dial:error', handleDialError);
-    this.outbound.push('/dial ' + peerId);
+SignallingPeer.prototype.negotiate = function(targetId, sdp, callId, type) {
+    this.send('/negotiate', targetId, sdp, callId || 0, type);
 };
 
 /**
 ## remove(peer)
 */
-SignallingChannel.prototype.remove = function(peer) {
+SignallingPeer.prototype.remove = function(peer) {
     var index = this.peers.indexOf(peer);
 
     // if we are managing the peer, then remove event listeners
@@ -117,7 +79,7 @@ SignallingChannel.prototype.remove = function(peer) {
 
 Send data across the line
 */
-SignallingChannel.prototype.send = function() {
+SignallingPeer.prototype.send = function() {
     var args = [].slice.call(arguments);
 
     if (this.transport) {
@@ -127,6 +89,7 @@ SignallingChannel.prototype.send = function() {
         });
 
         // send the message
+        console.log('--> ' + args.join('|'));
         this.outbound.push(args.join('|'));
     }
 };
@@ -134,7 +97,7 @@ SignallingChannel.prototype.send = function() {
 /**
 ## setIdentity
 */
-SignallingChannel.prototype.setIdentity = function(data) {
+SignallingPeer.prototype.setIdentity = function(data) {
     // update our id
     this.id = data && data.id;
 };
@@ -142,7 +105,7 @@ SignallingChannel.prototype.setIdentity = function(data) {
 /*
 ## setTransport
 */
-SignallingChannel.prototype.setTransport = function(transport) {
+SignallingPeer.prototype.setTransport = function(transport) {
     var channel = this;
 
     // if this is the same transport, do nothing
@@ -174,14 +137,14 @@ SignallingChannel.prototype.setTransport = function(transport) {
             pull.drain(channel.emit.bind(channel, 'message'))
         );
 
-        channel.outbound.push('/join ' + channel.name);            
+        channel.send('/join', channel.name);            
     });
 
 };
 
 /* "private" event handlers */
 
-SignallingChannel.prototype._peerDiscover = function(peer) {
+SignallingPeer.prototype._peerDiscover = function(peer) {
     // add the peer to the list of peers
     this.peers.push(peer);
 };
@@ -191,7 +154,7 @@ SignallingChannel.prototype._peerDiscover = function(peer) {
 
 This is the event handler for the join:ok event
 */
-SignallingChannel.prototype._joinChannel = function(channelName) {
+SignallingPeer.prototype._joinChannel = function(channelName) {
     // update the name with the specified channel name
     // TODO: if channel changed, maybe emit another event?
     this.name = channelName;
