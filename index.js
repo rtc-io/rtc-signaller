@@ -56,7 +56,7 @@ peer.  If this is an established connection, then a callId will be used to
 ensure the sdp is deliver to the correct RTCPeerConnection instance
 */
 SignallingPeer.prototype.negotiate = function(targetId, sdp, callId, type) {
-    this.send('/negotiate', targetId, sdp, callId || 0, type);
+    this.send('/negotiate', targetId, sdp, callId || '', type);
 };
 
 /**
@@ -89,7 +89,10 @@ SignallingPeer.prototype.send = function() {
         });
 
         // send the message
-        console.log('--> ' + args.join('|'));
+        if (this.debug) {
+            console.log('--> ' + args.join('|'));
+        }
+
         this.outbound.push(args.join('|'));
     }
 };
