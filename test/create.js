@@ -38,3 +38,30 @@ test('should be able to change the signaller channel', function(t) {
 		t.equal(signaller.channel, 'test', 'Signaller has joined the test channel');
 	});
 });
+
+test('should be able to create a signaller that auto connects', function(t) {
+	t.plan(2);
+
+	signaller = require('..')({
+		transport: require('./transports/dummy')
+	});
+
+	signaller.once('connect:ok', function(data) {
+		t.ok(data, 'Connnect and received data');
+		t.ok(data.id, 'Connected and received an id from the channel manager');
+	});
+});
+
+test('should be able to create a signaller that auto connects and joins', function(t) {
+	t.plan(2);
+
+	signaller = require('..')({
+		transport: require('./transports/dummy'),
+		channel: 'test'
+	});
+
+	signaller.once('join:ok', function(channel) {
+		t.equal(channel, 'test', 'Signaller created and joined the test channel');
+		t.equal(signaller.channel, channel, 'Signaller channel matches expected');
+	});
+});

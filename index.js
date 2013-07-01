@@ -48,9 +48,6 @@ function Signaller(opts) {
 
     // create the message parser for this signaller
     this.on('message', createMessageParser(this));
-
-    // when we receive an identity update, update our id
-    this.on('join:ok', this._joinChannel.bind(this));
 }
 
 util.inherits(Signaller, EventEmitter);
@@ -78,7 +75,13 @@ Signaller.prototype.connect = function(callback) {
     }
 
     // when we receive the connect:ok event trigger the callback
-    this.once('connect:ok', callback.bind(this, null));
+    this.once('connect:ok', function(data) {
+        // update the signaller id
+        signaller.id = data.id;
+
+        // trigger the callback
+        callback(null, data);
+    });
 
     // pipe signaller messages to the transport
     signaller.outbound.pipe(pull.drain(transport.createWriter()));
@@ -105,13 +108,14 @@ existing one if already joined.
 Signaller.prototype.join = function(name, callback) {
     var signaller = this;
 
-    this.once('join:ok', function(newChannel) {
+    // handle the pre:join:ok handler and update the channel name
+    this.once('pre:join:ok', function(newChannel) {
         signaller.channel = newChannel;
-
-        if (callback) {
-            callback();
-        }
     });
+
+    if (callback) {
+        this.once('join:ok', callback);
+    }
 
     return this.send('/join', name);
 };
@@ -145,22 +149,6 @@ Signaller.prototype.send = function() {
     return this;
 };
 
-/* "private" event handlers */
-
-/**
-## _joinChannel(channelName)
-
-This is the event handler for the join:ok event
-*/
-Signaller.prototype._joinChannel = function(channelName) {
-    // update the name with the specified channel name
-    // TODO: if channel changed, maybe emit another event?
-    this.name = channelName;
-
-    // emit the ready event
-    this.emit('ready');
-};
-
 /* internals */
 
 /**
@@ -190,7 +178,7 @@ triggering the relevant event.
 function createMessageParser(signaller) {
     return function(data) {
         var parts = (data || '').split('|'),
-            evtName = parts[0],
+            evtName = (parts[0] || '').toLowerCase(),
             args = parts.slice(1).map(function(arg) {
                 // if it looks like JSON then parse it
                 return ['{', '['].indexOf(arg.charAt(0)) >= 0 ? JSON.parse(arg) : arg;
@@ -202,6 +190,10 @@ function createMessageParser(signaller) {
 
         // trigger the event
         if (evtName) {
+            // trigger the message pre-processor
+            signaller.emit.apply(signaller, ['pre:' + evtName].concat(args));
+
+            // trigger the main processor
             signaller.emit.apply(signaller, [evtName].concat(args));
         }
     };
