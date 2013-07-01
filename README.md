@@ -1,5 +1,7 @@
 # rtc-signaller
 
+[![Build Status](http://etd-packaging.research.nicta.com.au/jenkins/view/rtc/job/rtc-signaller/badge/icon)](http://etd-packaging.research.nicta.com.au/jenkins/view/rtc/job/rtc-signaller/)
+
 The `rtc-signaller` package provides a simple interface for WebRTC Signalling that is protocol independent.  Rather than tie the implementation specifically to Websockets, XHR, etc. the signaller package allows you to implement signalling in your application and then `pipe` it to the appropriate output interface.
 
 This in turn reduces the overall effort required to implement WebRTC signalling over different protocols and also means that your application code is able to include different underlying transports with relative ease.
