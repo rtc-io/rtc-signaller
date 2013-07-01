@@ -1,16 +1,15 @@
 var pushable = require('pull-pushable'),
-	ChannelManager = require('rtc-channelmanager');
+	channelManager = require('rtc-channelmanager')();
 
 function DummyTransport(opts) {
-	this.channelManager = new ChannelManager();
 	this.messages = pushable();
 	this.peer = null;
 }
 
 DummyTransport.prototype.connect = function() {
-	var peer = this.peer = this.channelManager.connect();
+	var peer = this.peer = channelManager.connect();
 
-	this.channelManager.messages.on(
+	channelManager.messages.on(
 		'to.' + peer.id,
 		this.messages.push.bind(this.messages)
 	);
@@ -24,7 +23,7 @@ DummyTransport.prototype.createWriter = function() {
 	var transport = this;
 
     return function(data) {
-    	transport.channelManager.process(transport.peer, data);
+    	channelManager.process(transport.peer, data);
     };
 };
 
