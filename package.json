@@ -8,7 +8,7 @@
   "engines": {
     "node": ">= 0.8.x"
   },
-  "version": "0.0.1",
+  "version": "0.0.2",
   "dependencies": {
     "rtc-core": "git://github.it.nicta.com.au/doehlman/rtc-core.git",
     "pull-stream": "~2.20.0",
@@ -17,7 +17,7 @@
   "devDependencies": {
     "rtc-channelmanager": "git://github.it.nicta.com.au/doehlman/rtc-channelmanager.git",
     "tape": "~1.0.4",
-    "uuid": "~1.4.1"    
+    "uuid": "~1.4.1"
   },
   "scripts": {
     "test": "node test/all.js"
