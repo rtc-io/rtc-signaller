@@ -32,11 +32,9 @@ test('should be able to connect the signaller', function(t) {
 	});
 });
 
-/*
 test('should be able to change the signaller channel', function(t) {
 	t.plan(1);
 	signaller.join('test', function(err) {
 		t.equal(signaller.channel, 'test', 'Signaller has joined the test channel');
 	});
 });
-*/

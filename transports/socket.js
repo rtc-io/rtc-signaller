@@ -1,4 +1,6 @@
-var pull = require('pull-stream'),
+var EventEmitter = require('events').EventEmitter,
+    util = require('util'),
+    pull = require('pull-stream'),
     pushable = require('pull-pushable'),
 	reTrailingSlash = /^(.*)\/?$/;
 
@@ -6,7 +8,7 @@ function SocketConnection(opts) {
     if (! (this instanceof SocketConnection)) {
         return new SocketConnection(opts);
     }
-    
+
     // ensure we have opts
     opts = opts || {};
 
@@ -18,28 +20,22 @@ function SocketConnection(opts) {
         	.replace(reTrailingSlash, '$1/rtc-signaller')
         	.replace(/^http/, 'ws');
 
+
+    // create the messages pushable
+    this.messages = pushable();
+
     // set the socket to null
     this.socket = null;
 }
 
+util.inherits(SocketConnection, EventEmitter);
 module.exports = SocketConnection;
 
 /** 
 ## createReader()
 */
 SocketConnection.prototype.createReader = function() {
-	var messages = pushable();
-
-    this.socket.addEventListener('message', function(evt) {
-        messages.push(evt.data);
-    });
-
-    this.socket.addEventListener('close', function() {
-        messages.end();
-    });
-
-    // if we do not have the reader already created, create it now
-    return messages;
+    return this.messages;
 };
 
 /**
@@ -48,14 +44,19 @@ SocketConnection.prototype.createReader = function() {
 Create a writer function that will be used to write data to the socket.
 */
 SocketConnection.prototype.createWriter = function() {
-    var socket = this.socket;
+    var conn = this;
 
-    return function(data) {
-        // send the data to the socket
-        // TODO: handle when the socket is not open
-        if (socket.readyState === WebSocket.OPEN) {
-            socket.send(data);
+    return function writeData(data) {
+        var socket = conn.socket;
+
+        // if we don't have a socket (or an unopened socket)
+        // wait until open
+        if ((! socket) || socket.readyState !== WebSocket.OPEN) {
+            conn.once('open', writeData.bind(this, data));
         }
+
+        // send the data
+        socket.send(data);
     };
 };
 
@@ -64,20 +65,22 @@ SocketConnection.prototype.createWriter = function() {
 
 Connect to the server, once connected trigger the callback
 */
-SocketConnection.prototype.connect = function(callback) {
+SocketConnection.prototype.connect = function() {
+    var messages = this.messages;
+
     // initialise the socket
-    var socket = this.socket = new WebSocket(this.targetURI);
+    this.socket = new WebSocket(this.targetURI);
 
-    // create a dummy callback if none specified
-    callback = callback || function() {};
+    // once the socket is open, emit an open event
+    this.socket.addEventListener('open', this.emit.bind(this, 'open'));
 
-    // handle socket open events
-    socket.addEventListener('open', function handleOpen() {
-        socket.removeEventListener('open', handleOpen);
-
-        // trigger the callback
-        callback();
+    // when we receive a message, push to the upstream queue
+    this.socket.addEventListener('message', function(evt) {
+        messages.push(evt.data);
     });
 
-    // TODO: handle errors connecting
+    // TODO: handle socket close events and intelligentally reconnect if required
+    this.socket.addEventListener('close', function() {
+        messages.end();
+    });
 };

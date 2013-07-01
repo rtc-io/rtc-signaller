@@ -19,5 +19,8 @@
     "tape": "~1.0.4",
     "uuid": "~1.4.1"    
   },
+  "scripts": {
+    "test": "node test/all.js"
+  },
   "contributors": []
 }

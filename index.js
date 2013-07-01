@@ -33,7 +33,7 @@ function Signaller(opts) {
     this.debug = opts.debug && typeof console.log == 'function';
 
     // initialise the channel name
-    this.channel = opts.channel || '';
+    this.channel = '';
 
     // if the transport constructor is valid, create the transport
     if (typeof opts.transport == 'function') {
@@ -42,8 +42,8 @@ function Signaller(opts) {
 
     // if the autoconnect option is not false, and we have a transport
     // connect on next tick
-    if (this.transport && (typeof opts.autoConnect == 'undefined' || opts.autoConnect)) {
-        process.nextTick(this.connect.bind(this));
+    if (typeof opts.autoConnect == 'undefined' || opts.autoConnect) {
+        process.nextTick(this._autoConnect.bind(this, opts));
     }
 
     // create the message parser for this signaller
@@ -103,9 +103,15 @@ particular time, so joining a new channel will automatically mean leaving the
 existing one if already joined.
 */
 Signaller.prototype.join = function(name, callback) {
-    if (callback) {
-        this.once('join:ok', callback);
-    }
+    var signaller = this;
+
+    this.once('join:ok', function(newChannel) {
+        signaller.channel = newChannel;
+
+        if (callback) {
+            callback();
+        }
+    });
 
     return this.send('/join', name);
 };
@@ -156,6 +162,22 @@ Signaller.prototype._joinChannel = function(channelName) {
 };
 
 /* internals */
+
+/**
+## _autoConnect(opts)
+*/
+Signaller.prototype._autoConnect = function(opts) {
+    // if we have no transport, abort
+    if (! this.transport) return;
+
+    // connect
+    this.connect();
+
+    // if a channel has been specified, then update the channel name
+    if (opts.channel) {
+        this.join(opts.channel);
+    }
+};
 
 /**
 ## createMessageParser(signaller)

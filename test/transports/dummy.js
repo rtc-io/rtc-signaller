@@ -1,19 +1,19 @@
-var EventEmitter = require('events').EventEmitter,
-	util = require('util'),
-	pushable = require('pull-pushable'),
+var pushable = require('pull-pushable'),
 	ChannelManager = require('rtc-channelmanager');
 
 function DummyTransport(opts) {
 	this.channelManager = new ChannelManager();
 	this.messages = pushable();
+	this.peer = null;
 }
 
-util.inherits(DummyTransport, EventEmitter);
-
 DummyTransport.prototype.connect = function() {
-	var peer = this.channelManager.connect();
+	var peer = this.peer = this.channelManager.connect();
 
-	this.messages.push('connect:ok|' + JSON.stringify(peer));
+	this.channelManager.messages.on(
+		'to.' + peer.id,
+		this.messages.push.bind(this.messages)
+	);
 };
 
 DummyTransport.prototype.createReader = function() {
@@ -21,10 +21,10 @@ DummyTransport.prototype.createReader = function() {
 };
 
 DummyTransport.prototype.createWriter = function() {
-	var upstream = this.messages;
+	var transport = this;
 
     return function(data) {
-    	console.log(data);
+    	transport.channelManager.process(transport.peer, data);
     };
 };
 
