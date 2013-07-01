@@ -2,14 +2,13 @@ var EventEmitter = require('events').EventEmitter,
     pull = require('pull-stream'),
     pushable = require('pull-pushable'),
     util = require('util'),
-    uuid = require('uuid'),
     errorcodes = require('rtc-core/errorcodes');
 
 /**
-# SignallingPeer()
+# Signaller()
 */
-function SignallingPeer(opts) {
-    if (! (this instanceof SignallingPeer)) return new SignallingPeer(opts);
+function Signaller(opts) {
+    if (! (this instanceof Signaller)) return new Signaller(opts);
     EventEmitter.call(this);
 
     // if opts is a string, then we have a channel name
@@ -19,33 +18,97 @@ function SignallingPeer(opts) {
         };
     }
 
-    // ensure we have an opts hash
-    opts = opts || {};
-
-    // initialise the channel name
-    // TODO: investigate generating shorter unique channel names (uuids aren't easy to communicate)
-    this.name = opts.channel || uuid.v4();
-
     // initialise the messages queue
     this.outbound = pushable();
 
+    // ensure we have an opts hash
+    opts = opts || {};
+
+    // ensure we have a transport creator
+    opts.transport = opts.transport || 
+        opts.transportCreator || 
+        require('./transports/socket');
+
     // initialise members
-    this.id = null;
     this.debug = opts.debug && typeof console.log == 'function';
-    this.peers = [];
-    this.transport = null;
+
+    // initialise the channel name
+    this.channel = opts.channel || '';
+
+    // if the transport constructor is valid, create the transport
+    if (typeof opts.transport == 'function') {
+        this.transport = opts.transport(opts);
+    }
+
+    // if the autoconnect option is not false, and we have a transport
+    // connect on next tick
+    if (this.transport && (typeof opts.autoConnect == 'undefined' || opts.autoConnect)) {
+        process.nextTick(this.connect.bind(this));
+    }
 
     // create the message parser for this signaller
     this.on('message', createMessageParser(this));
 
     // when we receive an identity update, update our id
-    this.on('identity', this.setIdentity.bind(this));
     this.on('join:ok', this._joinChannel.bind(this));
-    this.on('peer:discover', this._peerDiscover.bind(this));
 }
 
-util.inherits(SignallingPeer, EventEmitter);
-module.exports = SignallingPeer;
+util.inherits(Signaller, EventEmitter);
+module.exports = Signaller;
+
+/**
+## connect(callback)
+*/
+Signaller.prototype.connect = function(callback) {
+    var signaller = this,
+        transport = this.transport;
+
+    // create a default callback
+    // TODO: make the default callback useful
+    callback = callback || function() {};
+
+    // if we don't have a transport, return an error
+    if (! transport) {
+        return callback(new Error('A transport is required to connect'));
+    }
+
+    // check for a connect method
+    if (typeof transport.connect != 'function') {
+        return callback(new Error('The current transport is invalid (no connect method)'));
+    }
+
+    // when we receive the connect:ok event trigger the callback
+    this.once('connect:ok', callback.bind(this, null));
+
+    // pipe signaller messages to the transport
+    signaller.outbound.pipe(pull.drain(transport.createWriter()));
+
+    // listen for messages from the transport and emit them as messages
+    pull(
+        transport.createReader(),
+        pull.drain(signaller.emit.bind(signaller, 'message'))
+    );
+
+    // connect the transport
+    transport.connect();
+};
+
+/**
+## join(name, callback)
+
+Send a join command to the signalling server, indicating that you would like 
+to join the current room.  In the current implementation of the rtc.io suite
+it is only possible for the signalling client to exist in one room at one
+particular time, so joining a new channel will automatically mean leaving the
+existing one if already joined.
+*/
+Signaller.prototype.join = function(name, callback) {
+    if (callback) {
+        this.once('join:ok', callback);
+    }
+
+    return this.send('/join', name);
+};
 
 /**
 ## negotiate(targetId, sdp, callId, type)
@@ -55,23 +118,8 @@ Description Protocol (SDP) description to the specified target signalling
 peer.  If this is an established connection, then a callId will be used to 
 ensure the sdp is deliver to the correct RTCPeerConnection instance
 */
-SignallingPeer.prototype.negotiate = function(targetId, sdp, callId, type) {
-    this.send('/negotiate', targetId, sdp, callId || '', type);
-};
-
-/**
-## remove(peer)
-*/
-SignallingPeer.prototype.remove = function(peer) {
-    var index = this.peers.indexOf(peer);
-
-    // if we are managing the peer, then remove event listeners
-    if (index >= 0) {
-        // TODO: unbind event listeners
-
-        // remove the peer from the list
-        this.peers.splice(index, 1);        
-    }
+Signaller.prototype.negotiate = function(targetId, sdp, callId, type) {
+    return this.send('/negotiate', targetId, sdp, callId || '', type);
 };
 
 /**
@@ -79,85 +127,26 @@ SignallingPeer.prototype.remove = function(peer) {
 
 Send data across the line
 */
-SignallingPeer.prototype.send = function() {
-    var args = [].slice.call(arguments);
-
-    if (this.transport) {
-        // jsonify data as required
-        args = args.map(function(arg) {
+Signaller.prototype.send = function() {
+    // get the args and jsonify as required
+    var args = [].slice.call(arguments).map(function(arg) {
             return typeof arg == 'object' ? JSON.stringify(arg) : arg;
         });
 
-        // send the message
-        if (this.debug) {
-            console.log('--> ' + args.join('|'));
-        }
+    this.outbound.push(args.join('|'));
 
-        this.outbound.push(args.join('|'));
-    }
-};
-
-/**
-## setIdentity
-*/
-SignallingPeer.prototype.setIdentity = function(data) {
-    // update our id
-    this.id = data && data.id;
-};
-
-/*
-## setTransport
-*/
-SignallingPeer.prototype.setTransport = function(transport) {
-    var channel = this;
-
-    // if this is the same transport, do nothing
-    if (this.transport === transport) return;
-
-    // if we have an existing transport, then disconnect
-    if (this.transport) {
-
-    }
-
-    // if the transport does not have an init function emit an error
-    if (typeof transport.connect != 'function') {
-        return this.emit('error', new Error('Cannot initialize transport, ensure transport has a connect method'));
-    }
-
-    // update the transport
-    this.transport = transport;
-
-    // connect the transport
-    transport.connect(function(err) {
-        if (err) return channel.emit('error', err);
-
-        // pipe signaller messages to the transport
-        channel.outbound.pipe(pull.drain(transport.createWriter()));
-
-        // listen for messages from the transport and emit them as messages
-        pull(
-            transport.createReader(),
-            pull.drain(channel.emit.bind(channel, 'message'))
-        );
-
-        channel.send('/join', channel.name);            
-    });
-
+    // chainable
+    return this;
 };
 
 /* "private" event handlers */
-
-SignallingPeer.prototype._peerDiscover = function(peer) {
-    // add the peer to the list of peers
-    this.peers.push(peer);
-};
 
 /**
 ## _joinChannel(channelName)
 
 This is the event handler for the join:ok event
 */
-SignallingPeer.prototype._joinChannel = function(channelName) {
+Signaller.prototype._joinChannel = function(channelName) {
     // update the name with the specified channel name
     // TODO: if channel changed, maybe emit another event?
     this.name = channelName;
