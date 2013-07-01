@@ -52,7 +52,7 @@ SocketConnection.prototype.createWriter = function() {
         // if we don't have a socket (or an unopened socket)
         // wait until open
         if ((! socket) || socket.readyState !== WebSocket.OPEN) {
-            conn.once('open', writeData.bind(this, data));
+            return conn.once('open', writeData.bind(this, data));
         }
 
         // send the data
