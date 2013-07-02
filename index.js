@@ -45,9 +45,6 @@ function Signaller(opts) {
     if (typeof opts.autoConnect == 'undefined' || opts.autoConnect) {
         process.nextTick(this._autoConnect.bind(this, opts));
     }
-
-    // create the message parser for this signaller
-    this.on('message', createMessageParser(this));
 }
 
 util.inherits(Signaller, EventEmitter);
@@ -89,7 +86,7 @@ Signaller.prototype.connect = function(callback) {
     // listen for messages from the transport and emit them as messages
     pull(
         transport.createReader(),
-        pull.drain(signaller.emit.bind(signaller, 'message'))
+        pull.drain(createMessageParser(signaller))
     );
 
     // connect the transport
@@ -194,7 +191,13 @@ function createMessageParser(signaller) {
             signaller.emit.apply(signaller, ['pre:' + evtName].concat(args));
 
             // trigger the main processor
-            signaller.emit.apply(signaller, [evtName].concat(args));
+            if (! signaller.emit.apply(signaller, [evtName].concat(args))) {
+                // if not handled by a specific message parser then emit
+                // as a raw message for something else to handle (potentially)
+                signaller.emit('message', data);
+            }
         }
+
+        // TODO: emit a data event regardless of being handled, evtName, etc?
     };
 }
