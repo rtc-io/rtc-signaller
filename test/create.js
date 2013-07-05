@@ -14,6 +14,7 @@ test('create a new signaller', function(t) {
 	// create a test signaller (using the dummy transport)
 	signaller = require('..')({
 		transport: require('./transports/dummy'),
+        debug: true,
 		autoConnect: false
 	});
 
@@ -40,15 +41,14 @@ test('should be able to change the signaller channel', function(t) {
 });
 
 test('should be able to create a signaller that auto connects', function(t) {
-	t.plan(2);
+	t.plan(1);
 
 	signaller = require('..')({
 		transport: require('./transports/dummy')
 	});
 
-	signaller.once('connect:ok', function(data) {
-		t.ok(data, 'Connnect and received data');
-		t.ok(data.id, 'Connected and received an id from the channel manager');
+	signaller.once('connect:ok', function(id) {
+		t.ok(id, 'Connnect and received id');
 	});
 });
 
