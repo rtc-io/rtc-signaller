@@ -1,86 +1,66 @@
-var EventEmitter = require('events').EventEmitter,
-    util = require('util'),
-    pull = require('pull-stream'),
-    pushable = require('pull-pushable'),
+var pull = require('pull-stream'),
+	pushable = require('pull-pushable'),
+	Peer = require('rtc-core/peer'),
 	reTrailingSlash = /^(.*)\/?$/;
 
-function SocketConnection(opts) {
-    if (! (this instanceof SocketConnection)) {
-        return new SocketConnection(opts);
-    }
+function WebSocketPeerProxy(opts) {
+	var host = opts && opts.host || 'http://rtc.io/';
 
-    // ensure we have opts
-    opts = opts || {};
-
-    // initialise the default host
-    opts.host = opts.host || 'http://rtc.io/';
-
-    // initialise the target uri
-	this.targetURI = opts.host
+	// cleanup the host
+	host = host
         	.replace(reTrailingSlash, '$1/rtc-signaller')
         	.replace(/^http/, 'ws');
 
-
-    // create the messages pushable
-    this.messages = pushable();
-
-    // set the socket to null
-    this.socket = null;
+	// create the websocket connection
+	this.socket = new WebSocket(host);
 }
 
-util.inherits(SocketConnection, EventEmitter);
-module.exports = SocketConnection;
+/**
+## inbound()
 
-/** 
-## createReader()
+The inbound function creates a pull-stream sink that will accept the 
+outbound messages from the signaller and route them to the server.
 */
-SocketConnection.prototype.createReader = function() {
-    return this.messages;
+WebSocketPeerProxy.prototype.inbound = function() {
+	var socket = this.socket,
+		sink;
+
+	sink = pull.Sink(function(read) {
+		socket.addEventListener('open', function() {
+			read(null, function next(end, data) {
+				if (end) return false;
+				if (socket.readyState !== WebSocket.OPEN) return false;
+
+				socket.send(data);
+				read(null, next);			 
+			});
+		});
+	});
+
+	return sink();
 };
 
 /**
-## createWriter()
+## outbound()
 
-Create a writer function that will be used to write data to the socket.
+The outbound function creates a pull-stream source that will be fed into 
+the signaller input.  The source will be populated as messages are received
+from the websocket and closed if the websocket connection is closed.
 */
-SocketConnection.prototype.createWriter = function() {
-    var conn = this;
+WebSocketPeerProxy.prototype.outbound = function() {
+	var messages = pushable();
 
-    return function writeData(data) {
-        var socket = conn.socket;
+	this.socket.addEventListener('message', function(evt) {
+		messages.push(evt.data);
+	});
 
-        // if we don't have a socket (or an unopened socket)
-        // wait until open
-        if ((! socket) || socket.readyState !== WebSocket.OPEN) {
-            return conn.once('open', writeData.bind(this, data));
-        }
+	this.socket.addEventListener('close', function() {
+		messages.end();
+	});
 
-        // send the data
-        socket.send(data);
-    };
+	return messages;
 };
 
-/**
-## connect(callback)
-
-Connect to the server, once connected trigger the callback
-*/
-SocketConnection.prototype.connect = function() {
-    var messages = this.messages;
-
-    // initialise the socket
-    this.socket = new WebSocket(this.targetURI);
-
-    // once the socket is open, emit an open event
-    this.socket.addEventListener('open', this.emit.bind(this, 'open'));
-
-    // when we receive a message, push to the upstream queue
-    this.socket.addEventListener('message', function(evt) {
-        messages.push(evt.data);
-    });
-
-    // TODO: handle socket close events and intelligentally reconnect if required
-    this.socket.addEventListener('close', function() {
-        messages.end();
-    });
+module.exports = function(opts) {
+	return new WebSocketPeerProxy(opts);
 };

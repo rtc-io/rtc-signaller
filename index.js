@@ -22,7 +22,7 @@ function Signaller(opts) {
     this._outboundMessages = pushable();
 
     // ensure we have an opts hash
-    opts = opts || {};
+    this.opts = opts = opts || {};
 
     // ensure we have a transport creator
     this.transport = opts.transport || 
@@ -71,13 +71,13 @@ Signaller.prototype.connect = function(callback) {
     });
 
     // create the new peer proxy
-    peer = this.transport();
+    proxy = this.transport(this.opts);
 
     // pipe signaller messages to the peer proxy
-    signaller.outbound().pipe(peer.inbound());
+    signaller.outbound().pipe(proxy.inbound());
 
     // listen for messages from the peer proxy and parse those messages
-    peer.outbound().pipe(signaller.inbound());
+    proxy.outbound().pipe(signaller.inbound());
 };
 
 /**
