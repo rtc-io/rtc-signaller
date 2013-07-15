@@ -1,12 +1,7 @@
 # rtc-signaller
 
-[!
-[Build Status]
-(http://etd-packaging.research.nicta.com.au/jenkins/view/rtc/job/
-rtc-signaller/badge/icon)
-]
-(http://etd-packaging.research.nicta.com.au/jenkins/view/rtc/job/
-rtc-signaller/)
+[![Build Status](http://etd-packaging.research.nicta.com.au/jenkins/view/rtc/job/rtc-signaller/badge/icon)]
+(http://etd-packaging.research.nicta.com.au/jenkins/view/rtc/job/rtc-signaller/)
 
 The `rtc-signaller` package provides a simple interface for WebRTC Signalling
 that is protocol independent.  Rather than tie the implementation
@@ -90,13 +85,9 @@ connection.addStream(media.stream);
 ```
 
 In the example above, once a peer is discovered our application will
-automatically attempt to connect with the peer by
-[creating an offer]
-(http://dev.w3.org/2011/webrtc/editor/webrtc.html
-#widl-RTCPeerConnection-createOffer-void-RTCSessionDescriptionCallback
--successCallback-RTCPeerConnectionErrorCallback-
-failureCallback-MediaConstraints-constraints) and then sending that offer
-using the signaller transport.
+automatically attempt to connect with the peer by [creating an offer]
+(http://dev.w3.org/2011/webrtc/editor/webrtc.html#widl-RTCPeerConnection-createOffer-void-RTCSessionDescriptionCallback-successCallback-RTCPeerConnectionErrorCallback-failureCallback-MediaConstraints-constraints)
+and then sending that offer using the signaller transport.
 
 Now in most circumstances using code like the sample above will result in
 two peers creating offers for each other and duplicating the connection
