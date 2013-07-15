@@ -20,6 +20,7 @@
     "uuid": "~1.4.1"
   },
   "scripts": {
+    "readme": "emu < index.js > README.md",
     "test": "node test/all.js"
   },
   "contributors": []
