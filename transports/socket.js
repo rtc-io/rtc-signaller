@@ -1,6 +1,5 @@
 var pull = require('pull-stream'),
 	pushable = require('pull-pushable'),
-	Peer = require('rtc-core/peer'),
 	reTrailingSlash = /^(.*)\/?$/;
 
 function WebSocketPeerProxy(opts) {
