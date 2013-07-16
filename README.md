@@ -147,3 +147,14 @@ This is used to create a function handler that will operate more quickly that
 when using bind.  The parser will pull apart a message into parts (splitting 
 on the pipe character), parsing those parts where appropriate and then
 triggering the relevant event.
+
+### inbound()
+
+The inbound function creates a pull-stream sink that will accept the 
+outbound messages from the signaller and route them to the server.
+
+### outbound()
+
+The outbound function creates a pull-stream source that will be fed into 
+the signaller input.  The source will be populated as messages are received
+from the websocket and closed if the websocket connection is closed.

@@ -143,7 +143,7 @@ function Signaller(opts) {
   // ensure we have a transport creator
   this.transport = opts.transport ||
     opts.transportCreator ||
-    require('./transports/socket');
+    require('./transport-socket');
 
   // initialise members
   this.debug = opts.debug && typeof console.log == 'function';

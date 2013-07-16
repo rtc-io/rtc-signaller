@@ -20,7 +20,7 @@
     "uuid": "~1.4.1"
   },
   "scripts": {
-    "gendocs": "emu < index.js > README.md",
+    "gendocs": "cat index.js transport-socket.js | emu > README.md",
     "test": "node test/all.js"
   },
   "contributors": []
