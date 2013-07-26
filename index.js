@@ -10,11 +10,6 @@ var util = require('util');
 /**
   # rtc-signaller
 
-  [
-  ![Build Status]
-  (https://travis-ci.org/rtc-io/rtc-signaller.png?branch=master)
-  ](https://travis-ci.org/rtc-io/rtc-signaller)
-
   The `rtc-signaller` package provides a simple interface for WebRTC 
   Signalling that is protocol independent.  Rather than tie the 
   implementation specifically to Websockets, XHR, etc. the signaller package
@@ -24,6 +19,11 @@ var util = require('util');
   This in turn reduces the overall effort required to implement WebRTC
   signalling over different protocols and also means that your application
   code is able to include different underlying transports with relative ease.
+
+  [
+  ![Build Status]
+  (https://travis-ci.org/rtc-io/rtc-signaller.png?branch=master)
+  ](https://travis-ci.org/rtc-io/rtc-signaller)
 
   ## Getting Started (Client)
 
