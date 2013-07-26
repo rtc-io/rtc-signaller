@@ -8,7 +8,7 @@ var pushable = require('pull-pushable');
 var reTrailingSlash = /^(.*)\/?$/;
 
 /**
-## WebSocketPeerProxy prototype
+  ## WebSocketPeerProxy prototype
 */
 
 function WebSocketPeerProxy(opts) {
@@ -30,10 +30,10 @@ function WebSocketPeerProxy(opts) {
 module.exports = WebSocketPeerProxy;
 
 /**
-### inbound()
+  ### inbound()
 
-The inbound function creates a pull-stream sink that will accept the 
-outbound messages from the signaller and route them to the server.
+  The inbound function creates a pull-stream sink that will accept the 
+  outbound messages from the signaller and route them to the server.
 **/
 WebSocketPeerProxy.prototype.inbound = function() {
   var socket = this.socket;
@@ -58,11 +58,11 @@ WebSocketPeerProxy.prototype.inbound = function() {
 };
 
 /**
-### outbound()
+  ### outbound()
 
-The outbound function creates a pull-stream source that will be fed into 
-the signaller input.  The source will be populated as messages are received
-from the websocket and closed if the websocket connection is closed.
+  The outbound function creates a pull-stream source that will be fed into 
+  the signaller input.  The source will be populated as messages are received
+  from the websocket and closed if the websocket connection is closed.
 **/
 WebSocketPeerProxy.prototype.outbound = function() {
   var messages = pushable();

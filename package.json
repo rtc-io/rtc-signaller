@@ -5,23 +5,37 @@
   "tags": [
     "webrtc"
   ],
-  "engines": {
-    "node": ">= 0.8.x"
-  },
   "version": "0.1.1",
   "dependencies": {
-    "rtc-core": "git://github.it.nicta.com.au/doehlman/rtc-core.git",
+    "rtc-core": "~0.1.2",
     "pull-stream": "~2.20.0",
     "pull-pushable": "~1.1.3"
   },
   "devDependencies": {
-    "rtc-channelmanager": "git://github.it.nicta.com.au/doehlman/rtc-channelmanager.git",
+    "rtc-channelmanager": "~0.1.3",
     "tape": "~1.0.4",
-    "uuid": "~1.4.1"
+    "uuid": "~1.4.1",
+    "emu": "0.0.2",
+    "jshint": "~2.1.4"
   },
   "scripts": {
-    "gendocs": "cat index.js transport-socket.js | emu > README.md",
-    "test": "node test/all.js"
+    "gendocs": "cat index.js transport-socket.js | $(npm bin)/emu > README.md",
+    "test": "$(npm bin)/jshint *.js && node test/all.js"
   },
-  "contributors": []
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rtc-io/rtc-signaller.git"
+  },
+  "keywords": [
+    "webrtc",
+    "rtc.io"
+  ],
+  "license": "Apache2",
+  "bugs": {
+    "url": "https://github.com/rtc-io/rtc-signaller/issues"
+  }
 }

@@ -1,36 +1,38 @@
 # rtc-signaller
 
-[![Build Status](http://etd-packaging.research.nicta.com.au/jenkins/view/rtc/job/rtc-signaller/badge/icon)]
-(http://etd-packaging.research.nicta.com.au/jenkins/view/rtc/job/rtc-signaller/)
+[
+![Build Status]
+(https://travis-ci.org/rtc-io/rtc-signaller.png?branch=master)
+](https://travis-ci.org/rtc-io/rtc-signaller)
 
-The `rtc-signaller` package provides a simple interface for WebRTC Signalling
-that is protocol independent.  Rather than tie the implementation
-specifically to Websockets, XHR, etc. the signaller package allows you to
-implement signalling in your application and then `pipe` it to the
-appropriate output interface.
+The `rtc-signaller` package provides a simple interface for WebRTC 
+Signalling that is protocol independent.  Rather than tie the 
+implementation specifically to Websockets, XHR, etc. the signaller package
+allows you to implement signalling in your application and then `pipe` it 
+to the appropriate output interface.
 
 This in turn reduces the overall effort required to implement WebRTC
-signalling over different protocols and also means that your application code
-is able to include different underlying transports with relative ease.
+signalling over different protocols and also means that your application
+code is able to include different underlying transports with relative ease.
 
 ## Getting Started (Client)
 
 ### Creating a Signaller and Associating a Transport
 
-The first thing you will need to do is to include the `rtc-signaller`package
-in your application, and provide it a channel name that it will use to
-communicate with its peers.
+The first thing you will need to do is to include the `rtc-signaller`
+package in your application, and provide it a channel name that it will use
+to communicate with its peers.
 
 ```js
-var signaller = require('rtc-signaller'),
-channel = signaller('channel-name');
+var signaller = require('rtc-signaller');
+var channel = signaller('channel-name');
 ```
 
 The next thing to do is to tell the signaller which transport it is
 going to be using:
 
 ```js
-channel.setTransport(require('rtc-signaller-socket.io')({ host: 'rtc.io' }));
+channel.setTransport(require('rtc-signaller-ws')({ host: 'rtc.io' }));
 ```
 
 ### Handling Events
@@ -42,7 +44,7 @@ aware of other peers (if any) that are currently connected to the room:
 ```js
 // wait for ready event
 channel.once('ready', function() {
-console.log('connected to ' + channel.name);
+  console.log('connected to ' + channel.name);
 });
 ```
 
@@ -51,7 +53,7 @@ In addition to the `ready` event, the channel will also trigger a
 
 ```js
 channel.on('peer:discover', function(peer) {
-console.log('discovered a new peer in the channel');
+  console.log('discovered a new peer in the channel');
 });
 ```
 
@@ -77,24 +79,21 @@ below:
 
 ```js
 channel.on('peer:discover', function(peer) {
-var connection = channel.connect(peer);
+  var connection = channel.connect(peer);
 
-// add a stream to the connection
-connection.addStream(media.stream);
+  // add a stream to the connection
+  connection.addStream(media.stream);
 });
 ```
 
 In the example above, once a peer is discovered our application will
-automatically attempt to connect with the peer by [creating an offer]
-(http://dev.w3.org/2011/webrtc/editor/webrtc.html#widl-RTCPeerConnection-createOffer-void-RTCSessionDescriptionCallback-successCallback-RTCPeerConnectionErrorCallback-failureCallback-MediaConstraints-constraints)
+automatically attempt to connect with the peer by creating an offer
 and then sending that offer using the signaller transport.
 
 Now in most circumstances using code like the sample above will result in
 two peers creating offers for each other and duplicating the connection
-requests.  In this situation, the
-[signaller will coordinate the connection requests]
-(http://git-ent.research.nicta.com.au/doehlman/rtc-signaller/issues/1)
-and make sure that peers find each other correctly.
+requests.  In this situation, the signaller will coordinate the connection
+requests and make sure that peers find each other correctly.
 
 Once two peers have established a working connection, the channel
 will let you know:
