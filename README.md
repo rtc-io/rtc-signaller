@@ -103,9 +103,26 @@ channel.on('peer:connect', function(connection) {
 });
 ```
 
-## Signaller prototype
+## Signaller reference
 
-An instance of a Signaller prototype supports the following methods:
+The Signaller constructor accepts an `opts` object, with the option
+of simply providing a channel name.
+
+For example:
+
+```js
+var Signaller = require('rtc-signaller');
+var signaller;
+
+// create a signaller for channel, using rtc.io as the signalling endpoint
+signaller = new Signaller('test');
+
+// or, create a signaller with an alternative signalling server
+signaller = new Signaller({
+  channel: 'test',
+  host: 'http://anotherserver.com'
+});
+```
 
 ### connect(callback)
 
