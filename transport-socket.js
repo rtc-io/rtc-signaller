@@ -5,7 +5,7 @@
 
 var pull = require('pull-stream');
 var pushable = require('pull-pushable');
-var reTrailingSlash = /^(.*)\/?$/;
+var reTrailingSlash = /\/(rtc-signaller)?$/;
 
 /**
   ## WebSocketPeerProxy prototype
@@ -19,12 +19,12 @@ function WebSocketPeerProxy(opts) {
   }
 
   // cleanup the host
-  host = (opts && opts.host || 'http://rtc.io/')
-    .replace(reTrailingSlash, '$1/rtc-signaller')
-    .replace(/^http/, 'ws');
+  this.host = (opts && opts.host || 'http://rtc.io/')
+    .replace(reTrailingSlash, '')
+    .replace(/^http/, 'ws') + '/rtc-signaller';
 
   // create the websocket connection
-  this.socket = new WebSocket(host);
+  this.socket = typeof WebSocket != 'undefined' && new WebSocket(host);
 }
 
 module.exports = WebSocketPeerProxy;

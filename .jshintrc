@@ -3,6 +3,7 @@
   "indent": 2,
   "undef": true,
   "unused": true,
+  "eqeqeq": false,
   "quotmark": "single",
   "maxlen": 80,
   "trailing": true,
