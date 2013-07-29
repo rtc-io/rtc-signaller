@@ -24,7 +24,7 @@ function WebSocketPeerProxy(opts) {
     .replace(/^http/, 'ws') + '/rtc-signaller';
 
   // create the websocket connection
-  this.socket = typeof WebSocket != 'undefined' && new WebSocket(host);
+  this.socket = typeof WebSocket != 'undefined' && new WebSocket(this.host);
 }
 
 module.exports = WebSocketPeerProxy;
