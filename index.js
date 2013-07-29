@@ -135,6 +135,13 @@ var util = require('util');
     host: 'http://anotherserver.com'
   });
   ```
+
+  It should be noted, that it is also possible and acceptable to create a 
+  new signaller instance simply by calling the constructor as a function:
+
+  ```js
+  var signaller = require('rtc-signaller')('test');
+  ```
 **/
 function Signaller(opts) {
   if (! (this instanceof Signaller)) {
