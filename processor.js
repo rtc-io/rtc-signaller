@@ -27,6 +27,12 @@ module.exports = function(scope, matchers) {
 
     // if we have a match, then acknowledge the request
     if (match) {
+      // if there are active blocks, return
+      if (scope.blocks.length) {
+        // TODO: wait for the block to clear
+        return false;
+      }
+
       return scope.send('/to', data.__srcid, '/ackreq', data.__reqid);
     }
 

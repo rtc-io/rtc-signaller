@@ -47,7 +47,10 @@ var extend = require('cog/extend');
 module.exports = function(messenger) {
 
   // create the signalling scope
-  var scope = {};
+  var scope = {
+    blocks: [],
+    matchers: []
+  };
 
   // initialise the id
   var id = scope.id = uuid.v4();
@@ -56,9 +59,6 @@ module.exports = function(messenger) {
   var attributes = scope.attributes = {
     id: id
   };
-
-  // create the message matchers array
-  scope.matchers = [];
 
   function createChannel(targetId) {
     return {
@@ -125,6 +125,34 @@ module.exports = function(messenger) {
 
     // send the attributes over the network
     return send('/announce', attributes);
+  };
+
+  /**
+    ### scope.block()
+
+    Prevent the scope from responding to requests until the block
+    is cleared with a clearBlock call.
+  **/
+  scope.block = function() {
+    // create a block id
+    var id = uuid.v4();
+
+    // add the active block
+    scope.blocks.push(id);
+
+    // return the id
+    return id;
+  };
+
+  /**
+    ### scope.clearBlock(id)
+
+    Clear the specified block id
+  **/
+  scope.clearBlock = function(id) {
+    scope.blocks = scope.blocks.filter(function(blockId) {
+      return blockId !== id;
+    });
   };
 
   /**
