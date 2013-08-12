@@ -52,6 +52,58 @@ module.exports = function(messenger) {
   // initialise the id
   var id = scope.id = uuid.v4();
 
+  // initialise the attributes
+  var attributes = {
+    id: id
+  };
+
+  // create the message matchers array
+  var matchers = [];
+
+  function createChannel(targetId) {
+    return {
+      send: function() {
+        send.apply(['/to', targetId].concat([].slice.call(arguments)));
+      }
+    };
+  }
+
+  function once(prefix, handler) {
+    matchers.push({
+      prefix: prefix,
+      handler: handler
+    });
+  }
+
+  function processData(data) {
+    var isMatch = true;
+
+    // process /to messages
+    if (data.slice(0, 3) === '/to') {
+      isMatch = data.slice(4, id.length + 4) === id;
+      if (isMatch) {
+        data = data.slice(5 + id.length);
+      }
+    }
+
+    // if this is not a match, then bail
+    if (! isMatch) {
+      return;
+    }
+
+    // process matchers
+    matchers = matchers.filter(function(rule) {
+      var exec = data.slice(0, rule.prefix.length) === rule.prefix;
+
+      if (exec && typeof rule.handler == 'function') {
+        rule.handler(data);
+      }
+
+      // only keep if not executed
+      return !exec;
+    });
+  }
+
   /**
     ### scope.send(data)
 
@@ -97,7 +149,11 @@ module.exports = function(messenger) {
     information that limits the messaging scope.
   **/
   scope.announce = function(data) {
-    return send('/announce', extend({}, data, { id: id }));
+    // update internal attributes
+    extend(attributes, data, { id: id });
+
+    // send the attributes over the network
+    return send('/announce', attributes);
   };
 
   /**
@@ -108,6 +164,50 @@ module.exports = function(messenger) {
   scope.leave = function() {
     return send('/leave', { id: id });
   };
+
+  /**
+    ### scope.request(data)
+
+    The `scope.request` call is where one peer goes looking for a target
+    peer that satisfies specific search parameters.  This may be a search
+    for a peer with a particular id, or something more general such as
+    a request for a peer with a particular name or role.
+
+    Once a suitable match has been found from within the messenging network
+    the callback will fire and provide a discrete messaging channel to that
+    particular peer.
+
+    __NOTE:__ The discreteness of the message needs to be programmed at the
+    mesh level if required. Signallers will not attempt to parse a message
+    destined for another signaller, but they are visible by default.  This
+    can easily be handled however, by filtering `/to` messages.
+  **/
+  scope.request = function(data, opts, callback) {
+    // initialise a request id
+    var reqid = uuid.v4();
+
+    // handle 2 arg form
+    if (typeof opts == 'function') {
+      callback = opts;
+      opts = {};
+    }
+
+    // TODO: inspect known peers for a match
+
+    // handle request acknowledge
+    once('/ackreq|' + reqid, function(data) {
+      var targetId = data.split('|')[2];
+
+      // trigger the callback with the send function wired
+      callback(null, createChannel(targetId));
+    });
+
+    // send out a request across the network
+    send('/request', extend({}, data, { __reqid: reqid }));
+  };
+
+  // handle message data events
+  messenger.on('data', processData);
 
   return scope;
 };

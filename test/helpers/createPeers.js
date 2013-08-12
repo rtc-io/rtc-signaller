@@ -16,7 +16,7 @@ module.exports = function(count) {
       });
     };
 
-    peer.expect = function(t, result) {
+    peer.expect = function(t, result, cb) {
       t._plan = (t._plan || 0) + 1;
       peer.once('data', function(data) {
         if (typeof result == 'string' || (result instanceof String)) {
@@ -25,9 +25,20 @@ module.exports = function(count) {
         else {
           var parts = data.split('|');
           var data = JSON.parse(parts[1]);
+          var matches = true;
 
           data.type = parts[0].slice(1);
-          t.deepEqual(data, result);
+
+          // iterate through the expected result and match 
+          Object.keys(result).forEach(function(key) {
+            matches = matches && data[key] === result[key];
+          });
+
+          t.ok(matches, 'all keys matched');
+        }
+
+        if (typeof cb == 'function') {
+          cb(data);
         }
       });
     };

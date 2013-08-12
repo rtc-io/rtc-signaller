@@ -1,26 +1,42 @@
 var test = require('tape');
-var Signaller = require('..');
+var signaller = require('..');
 
-module.exports = function(messenger, peers) {
-  var signaller;
+var runTest = module.exports = function(messenger, peers) {
+  var scope;
 
   test('create', function(t) {
     t.plan(2);
-    t.ok(signaller = new Signaller(messenger), 'created');
-    t.ok(signaller.id, 'have id');
+    t.ok(scope = signaller(messenger), 'created');
+    t.ok(scope.id, 'have id');
   });
 
   test('announce', function(t) {
-    peers.expect(t, '/announce {"id":"' + signaller.id + '"}');
-    signaller.announce();
+    peers.expect(t, '/announce|{"id":"' + scope.id + '"}');
+    scope.announce();
   });
 
   test('request dialog', function(t) {
-    peers.head().expect(t, {
-      type: 'request'
+    var target = peers.first();
+
+    target.expect(t, { type: 'request' });
+    scope.request({ id: peers.first().id });
+  });
+
+  test('request dialog and handle response', function(t) {
+    var target = peers.first();
+
+    t.plan(1);
+    target.expect(t, { type: 'request' }, function(data) {
+      messenger.emit('data', '/to|' + scope.id + '|/ackreq|' + data.__reqid);
     });
 
-    signaller.request({ id: peers.head().id });
+    scope.request({ id: peers.first().id }, function(err, channel) {
+      t.ok(channel, 'got channel');
+    });
   });
 };
 
+if (typeof document == 'undefined' && (! module.parent)) {
+  var peers = require('./helpers/createPeers')(2);
+  runTest(peers.shift(), peers);
+}
