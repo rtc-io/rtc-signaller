@@ -1,48 +1,12 @@
-module.exports = function(scope, matchers) {
-  var attributes = scope.attributes;
+module.exports = function(scope) {
   var id = scope.id;
-
-  function checkRequest(data) {
-    var match = true;
-    var testKeys;
-
-    try {
-      // convert to JSON
-      data = JSON.parse(data);
-    }
-    catch (e) {
-      return false;
-    }
-
-    // get the testkeys
-    testKeys = Object.keys(data).filter(function(key) {
-      return key.charAt(0) !== '_';
-    });
-
-    // iterate through the test keys and look for a match
-    match = testKeys.reduce(function(memo, key) {
-      // check for a match
-      return memo && attributes[key] === data[key];
-    }, match);
-
-    // if we have a match, then acknowledge the request
-    if (match) {
-      // if there are active blocks, return
-      if (scope.blocks.length) {
-        return scope.on('unblock', function() {
-          scope.send('/to', data.__srcid, '/ackreq', data.__reqid);
-        });
-
-      }
-
-      return scope.send('/to', data.__srcid, '/ackreq', data.__reqid);
-    }
-
-    return false;
-  }
+  var handlers = {
+    request: require('./handlers/request')(scope)
+  };
 
   return function(data) {
     var isMatch = true;
+    var parts;
 
     // process /to messages
     if (data.slice(0, 3) === '/to') {
@@ -57,9 +21,16 @@ module.exports = function(scope, matchers) {
       return;
     }
 
-    // check for request, um, requests
-    if (data.slice(0, 8) === '/request') {
-      return checkRequest(data.slice(9));
+    // chop the data into parts
+    parts = data.split('|');
+
+    // if we have a specific handler for the action, then invoke
+    if (parts[0].charAt(0) === '/') {
+      handler = handlers[parts[0].slice(1)];
+
+      if (typeof handler == 'function') {
+        handler(parts.slice(1));
+      }
     }
 
     // process matchers
