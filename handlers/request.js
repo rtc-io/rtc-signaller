@@ -1,5 +1,9 @@
 /**
-  ### /request
+  ### request
+
+  ```
+  /request|{"key":"value","__srcid": "", "__reqid": ""}
+  ```
 
   A request is basically a "search for a friend" message.  This is where one
   peer in the mesh is searching for another peer based on particular criteria.
