@@ -1,0 +1,12 @@
+{
+  "name": "signaller-socket.io-demo",
+  "description": "Demonstration of the rtc-signaller via socket.io",
+  "private": true,
+  "dependencies": {
+    "socket.io": "~0.9.16",
+    "st": "~0.2.1"
+  },
+
+  "scripts": {
+  }
+}
