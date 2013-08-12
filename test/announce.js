@@ -1,7 +1,7 @@
 var test = require('tape');
 var createSignaller = require('..');
 
-module.exports = function(messenger, peers) {
+var runTest = module.exports = function(messenger, peers) {
   var s;
 
   test('create', function(t) {
@@ -46,3 +46,7 @@ module.exports = function(messenger, peers) {
   });
 };
 
+if (! module.parent) {
+  var peers = require('./helpers/createPeers')(2);
+  runTest(peers.shift(), peers);
+}
