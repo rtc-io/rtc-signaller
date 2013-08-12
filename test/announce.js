@@ -1,48 +1,48 @@
 var test = require('tape');
-var Signaller = require('..');
+var createSignaller = require('..');
 
 module.exports = function(messenger, peers) {
-  var signaller;
+  var s;
 
   test('create', function(t) {
     t.plan(2);
-    t.ok(signaller = new Signaller(messenger), 'created');
-    t.ok(signaller.id, 'have id');
+    t.ok(s = createSignaller(messenger), 'created');
+    t.ok(s.id, 'have id');
   });
 
   test('announce', function(t) {
-    peers.expect(t, '/announce {"id":"' + signaller.id + '"}');
-    signaller.announce();
+    peers.expect(t, '/announce|{"id":"' + s.id + '"}');
+    s.announce();
   });
 
   test('disconnect', function(t) {
-    peers.expect(t, '/leave {"id":"' + signaller.id + '"}');
-    signaller.leave();
+    peers.expect(t, '/leave|{"id":"' + s.id + '"}');
+    s.leave();
   });
 
   test('announce with attributes', function(t) {
     peers.expect(t, {
       type: 'announce',
-      id: signaller.id,
+      id: s.id,
       name: 'Bob'
     });
 
-    signaller.announce({ name: 'Bob' });
+    s.announce({ name: 'Bob' });
   });
 
   test('announce with different attributes', function(t) {
     peers.expect(t, {
       type: 'announce',
-      id: signaller.id,
+      id: s.id,
       name: 'Fred'
     });
 
-    signaller.announce({ name: 'Fred' });
+    s.announce({ name: 'Fred' });
   });
 
   test('disconnect', function(t) {
-    peers.expect(t, '/leave {"id":"' + signaller.id + '"}');
-    signaller.leave();
+    peers.expect(t, '/leave|{"id":"' + s.id + '"}');
+    s.leave();
   });
 };
 
