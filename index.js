@@ -1,6 +1,7 @@
 /* jshint node: true */
 'use strict';
 
+var EventEmitter = require('events').EventEmitter;
 var uuid = require('uuid');
 var extend = require('cog/extend');
 
@@ -47,10 +48,7 @@ var extend = require('cog/extend');
 module.exports = function(messenger) {
 
   // create the signalling scope
-  var scope = {
-    blocks: [],
-    matchers: []
-  };
+  var scope = new EventEmitter();
 
   // initialise the id
   var id = scope.id = uuid.v4();
@@ -59,6 +57,9 @@ module.exports = function(messenger) {
   var attributes = scope.attributes = {
     id: id
   };
+
+  scope.blocks = [];
+  scope.matchers = [];
 
   function createChannel(targetId) {
     return {
@@ -150,9 +151,17 @@ module.exports = function(messenger) {
     Clear the specified block id
   **/
   scope.clearBlock = function(id) {
+    var wasBlocked = scope.blocks.length > 0;
+
+    // remove blocks matching the id
     scope.blocks = scope.blocks.filter(function(blockId) {
       return blockId !== id;
     });
+
+    // if unblocked, trigger the unblock event
+    if (wasBlocked && scope.blocks.length === 0) {
+      scope.emit('unblock');
+    }
   };
 
   /**

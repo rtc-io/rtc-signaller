@@ -29,26 +29,49 @@ var runTest = module.exports = function(messenger, peers) {
     });
   });
 
-  test('request and handle response (wait for block to clear)', function(t) {
+  test('block prevents request response', function(t) {
+    var passed;
+
     blockId = altScopes[0].block();
 
     t.plan(2);
     t.equal(altScopes[0].blocks.length, 1, 'have one active block');
     scope.request({ id: altScopes[0].id }, function(err, channel) {
+      // if this test has already passed, then go through
+      if (passed) return;
+
       t.fail('should not have received request response');
     });
 
     setTimeout(function() {
+      passed = true;
       t.pass('did not ack request');
-      t.end();
     }, 500);
   });
 
   test('clear the block', function(t) {
-    t.plan(1);
+    t.plan(2);
+    altScopes[0].once('unblock', function() {
+      t.pass('got unblock event');
+    });
+
     altScopes[0].clearBlock(blockId);
     t.equal(altScopes[0].blocks.length, 0, '0 active blocks');
   });
+
+  test('request completes after block is cleared', function(t) {
+    blockId = altScopes[0].block();
+
+    t.plan(2);
+    t.equal(altScopes[0].blocks.length, 1, 'have one active block');
+    scope.request({ id: altScopes[0].id }, function(err, channel) {
+      t.pass('got request');
+    });
+
+    setTimeout(function() {
+      altScopes[0].clearBlock(blockId);
+    }, 500);
+  });  
 };
 
 if (typeof document == 'undefined' && (! module.parent)) {

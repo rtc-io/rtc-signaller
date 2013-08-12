@@ -29,8 +29,10 @@ module.exports = function(scope, matchers) {
     if (match) {
       // if there are active blocks, return
       if (scope.blocks.length) {
-        // TODO: wait for the block to clear
-        return false;
+        return scope.on('unblock', function() {
+          scope.send('/to', data.__srcid, '/ackreq', data.__reqid);
+        });
+
       }
 
       return scope.send('/to', data.__srcid, '/ackreq', data.__reqid);
