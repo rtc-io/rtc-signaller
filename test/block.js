@@ -38,7 +38,10 @@ var runTest = module.exports = function(messenger, peers) {
       t.fail('should not have received request response');
     });
 
-    setTimeout(t.pass.bind(t, 'did not ack request'), 500);
+    setTimeout(function() {
+      t.pass('did not ack request');
+      t.end();
+    }, 500);
   });
 
   test('clear the block', function(t) {
