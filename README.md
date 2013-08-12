@@ -61,6 +61,15 @@ additional data during the announce phase.  For instance, socket.io
 connections are generally organised into rooms which is inferred
 information that limits the messaging scope.
 
+### scope.block()
+
+Prevent the scope from responding to requests until the block
+is cleared with a clearBlock call.
+
+### scope.clearBlock(id)
+
+Clear the specified block id
+
 ### scope.leave()
 
 Leave the messenger mesh
@@ -80,3 +89,30 @@ __NOTE:__ The discreteness of the message needs to be programmed at the
 mesh level if required. Signallers will not attempt to parse a message
 destined for another signaller, but they are visible by default.  This
 can easily be handled however, by filtering `/to` messages.
+
+## signaller process handling
+
+When a signaller's underling messenger emits a `data` event this is
+delegated to a simple message parser, which applies the following simple
+logic:
+
+- Is the message a `/to` message. If so, see if the message is for this
+  signaller scope (checking the target id - 2nd arg).  If so pass the
+  remainder of the message onto the standard processing chain.  If not,
+  discard the message.
+
+- Is the message a command message (prefixed with a forward slash). If so,
+  look for an appropriate message handler and pass the message payload on
+  to it.
+
+- Finally, does the message match any patterns that we are listening for?
+  If so, then pass the entire message contents onto the registered handler.
+
+## signaller message handlers
+
+### /request
+
+A request is basically a "search for a friend" message.  This is where one
+peer in the mesh is searching for another peer based on particular criteria.
+In general, a request message is delivered to all peers within the mesh 
+and then those peers that are not in a blocked state will respond.
