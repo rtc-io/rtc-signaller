@@ -2,22 +2,22 @@ var EventEmitter = require('events').EventEmitter;
 
 module.exports = function(count) {
   // create the required number of event emitters
-  var peers = [];
+  var allPeers = [];
+  var testPeers = [];
 
   function createPeer() {
     var peer = new EventEmitter();
 
     peer.send = function(data) {
       // emit data on the other peers
-      peers.filter(function(other) {
-        return other !== peers[ii];
+      allPeers.filter(function(other) {
+        return other !== peer;
       }).forEach(function(other) {
         other.emit('data', data);
       });
     };
 
     peer.expect = function(t, result, cb) {
-      t._plan = (t._plan || 0) + 1;
       peer.once('data', function(data) {
         if (typeof result == 'string' || (result instanceof String)) {
           t.equal(data, result);
@@ -47,21 +47,29 @@ module.exports = function(count) {
   }
 
   for (var ii = 0; ii < count; ii++) {
-    peers[ii] = createPeer();
+    allPeers[ii] = testPeers[ii] = createPeer();
   }
 
-  return {
-    shift: function() {
-      return peers.shift();
-    },
+  var result = {
+    shift: testPeers.shift.bind(testPeers),
+    map: testPeers.map.bind(testPeers),
+
     first: function() {
-      return peers[0];
+      return testPeers[0];
     },
 
     expect: function(t, result) {
-      peers.forEach(function(peer) {
+      testPeers.forEach(function(peer) {
         peer.expect(t, result);
       });
     }
   };
+
+  Object.defineProperty(result, 'length', {
+    get: function() {
+      return testPeers.length;
+    }
+  });
+
+  return result;
 };

@@ -53,12 +53,12 @@ module.exports = function(messenger) {
   var id = scope.id = uuid.v4();
 
   // initialise the attributes
-  var attributes = {
+  var attributes = scope.attributes = {
     id: id
   };
 
   // create the message matchers array
-  var matchers = [];
+  scope.matchers = [];
 
   function createChannel(targetId) {
     return {
@@ -69,38 +69,9 @@ module.exports = function(messenger) {
   }
 
   function once(prefix, handler) {
-    matchers.push({
+    scope.matchers.push({
       prefix: prefix,
       handler: handler
-    });
-  }
-
-  function processData(data) {
-    var isMatch = true;
-
-    // process /to messages
-    if (data.slice(0, 3) === '/to') {
-      isMatch = data.slice(4, id.length + 4) === id;
-      if (isMatch) {
-        data = data.slice(5 + id.length);
-      }
-    }
-
-    // if this is not a match, then bail
-    if (! isMatch) {
-      return;
-    }
-
-    // process matchers
-    matchers = matchers.filter(function(rule) {
-      var exec = data.slice(0, rule.prefix.length) === rule.prefix;
-
-      if (exec && typeof rule.handler == 'function') {
-        rule.handler(data);
-      }
-
-      // only keep if not executed
-      return !exec;
     });
   }
 
@@ -203,11 +174,14 @@ module.exports = function(messenger) {
     });
 
     // send out a request across the network
-    send('/request', extend({}, data, { __reqid: reqid }));
+    send('/request', extend({}, data, {
+      __srcid: id,
+      __reqid: reqid
+    }));
   };
 
   // handle message data events
-  messenger.on('data', processData);
+  messenger.on('data', require('./processor')(scope));
 
   return scope;
 };

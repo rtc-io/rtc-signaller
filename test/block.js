@@ -3,6 +3,7 @@ var signaller = require('..');
 
 var runTest = module.exports = function(messenger, peers) {
   var scope;
+  var altScopes;
 
   test('create', function(t) {
     t.plan(2);
@@ -10,28 +11,20 @@ var runTest = module.exports = function(messenger, peers) {
     t.ok(scope.id, 'have id');
   });
 
-  test('announce', function(t) {
-    peers.expect(t, '/announce|{"id":"' + scope.id + '"}');
-    scope.announce();
+  test('convert other peers to signaller scopes', function(t) {
+    t.plan(peers.length);
+
+    altScopes = peers.map(signaller);
+    altScopes.forEach(function(peer) {
+      t.ok(typeof altScopes.request, 'function', 'have a request function');
+    })
   });
 
-  test('request dialog', function(t) {
-    var target = peers.first();
-
-    target.expect(t, { type: 'request' });
-    scope.request({ id: peers.first().id });
-  });
-
-  test('request dialog and handle response', function(t) {
-    var target = peers.first();
-
-    t.plan(1);
-    target.expect(t, { type: 'request' }, function(data) {
-      messenger.emit('data', '/to|' + scope.id + '|/ackreq|' + data.__reqid);
-    });
-
+  test('request and handle response', function(t) {
+    t.plan(2);
     scope.request({ id: peers.first().id }, function(err, channel) {
       t.ok(channel, 'got channel');
+      t.equal(typeof channel.send, 'function', 'got a send function');
     });
   });
 };
