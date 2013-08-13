@@ -29,6 +29,7 @@ module.exports = function(scope) {
   return function(data) {
     var isMatch = true;
     var parts;
+    var handler;
 
     // process /to messages
     if (data.slice(0, 3) === '/to') {

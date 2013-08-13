@@ -1,3 +1,6 @@
+/* jshint node: true */
+'use strict';
+
 /**
   ### request
 
@@ -19,6 +22,8 @@ module.exports = function(scope) {
     var listeners = scope.listeners('request');
 
     // TODO: trigger listeners, wait for completion
+    if (listeners && listeners.length > 0) {
+    }
 
     // send the ack request
     scope.send('/to', data.__srcid, '/ackreq', data.__reqid);
