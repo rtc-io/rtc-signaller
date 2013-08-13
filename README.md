@@ -5,6 +5,16 @@ mechanism for WebRTC.  This is the second implementation of a signaller
 in the rtc.io suite, where we have moving away from a central
 processing model to a pure P2P signalling implementation.
 
+[
+![Build Status]
+(https://travis-ci.org/rtc-io/rtc-signaller.png?branch=master)
+](https://travis-ci.org/rtc-io/rtc-signaller)
+
+[
+![experimental]
+(http://hughsk.github.io/stability-badges/dist/experimental.svg)
+](http://github.com/hughsk/stability-badges)
+
 All that is required for the signaller to operate is a suitable messenger.
 
 A messenger is a simple object that implements node

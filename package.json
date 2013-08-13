@@ -16,9 +16,7 @@
     "uglify-js": "~2.3.6"
   },
   "scripts": {
-    "build": "make",
-    "test": "node test/all.js",
-    "gendocs": "sourcecat | emu > README.md"
+    "test": "node test/all.js"
   },
   "repository": {
     "type": "git",
