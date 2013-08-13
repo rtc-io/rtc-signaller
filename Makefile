@@ -10,7 +10,7 @@ lint:
 
 build:
 	@echo "browserifying"
-	@${LOCAL_BIN}/browserify --standalone signaller index.js > dist/signaller.js
+	node build.js > dist/signaller.js
 
 min:
 	@echo "uglifying"

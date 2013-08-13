@@ -22,9 +22,27 @@
 **/
 module.exports = function(scope) {
   var id = scope.id;
-  var handlers = {
-    request: require('./handlers/request')(scope)
-  };
+  var handlers = require('./handlers')(scope);
+
+  function sendEvent(parts) {
+    // initialise the event name
+    var evtName = parts[0].slice(1);
+
+    // convert any valid json objects to json
+    var args = parts.slice(1).map(function(part) {
+      if (part.charAt(0) === '{') {
+        try {
+          part = JSON.parse(part);
+        }
+        catch (e) {
+        }
+      }
+
+      return part;
+    });
+
+    scope.emit.apply(scope, [evtName].concat(args));
+  }
 
   return function(data) {
     var isMatch = true;
@@ -53,6 +71,9 @@ module.exports = function(scope) {
 
       if (typeof handler == 'function') {
         handler(parts.slice(1));
+      }
+      else {
+        sendEvent(parts);
       }
     }
 

@@ -55,7 +55,7 @@ var extend = require('cog/extend');
   ```
 
 **/
-module.exports = function(messenger) {
+module.exports = function(messenger, opts) {
 
   // create the signalling scope
   var scope = new EventEmitter();
@@ -68,13 +68,16 @@ module.exports = function(messenger) {
     id: id
   };
 
+  // initialise the data event name
+  var dataEvent = (opts || {}).dataEvent || 'data';
+
   scope.blocks = [];
   scope.matchers = [];
 
   function createChannel(targetId) {
     return {
       send: function() {
-        send.apply(['/to', targetId].concat([].slice.call(arguments)));
+        send.apply(null, ['/to', targetId].concat([].slice.call(arguments)));
       }
     };
   }
@@ -215,7 +218,7 @@ module.exports = function(messenger) {
     // handle request acknowledge
     once('/ackreq|' + reqid, function(data) {
       var targetId = data.split('|')[2];
-
+      
       // trigger the callback with the send function wired
       callback(null, createChannel(targetId));
     });
@@ -228,7 +231,7 @@ module.exports = function(messenger) {
   };
 
   // handle message data events
-  messenger.on('data', require('./processor')(scope));
+  messenger.on(dataEvent, require('./processor')(scope));
 
   return scope;
 };

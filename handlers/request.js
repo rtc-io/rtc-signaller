@@ -26,7 +26,10 @@ module.exports = function(scope) {
     }
 
     // send the ack request
-    scope.send('/to', data.__srcid, '/ackreq', data.__reqid);
+    scope.send(
+      '/to', data.__srcid, 
+      '/ackreq', data.__reqid, scope.id
+    );
   }
 
   return function(data) {
