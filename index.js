@@ -70,6 +70,7 @@ module.exports = function(messenger, opts) {
 
   // initialise the data event name
   var dataEvent = (opts || {}).dataEvent || 'data';
+  var openEvent = (opts || {}).openEvent || 'open';
 
   scope.blocks = [];
   scope.matchers = [];
@@ -232,6 +233,11 @@ module.exports = function(messenger, opts) {
 
   // handle message data events
   messenger.on(dataEvent, require('./processor')(scope));
+
+  // handle open / connect events
+  messenger.on(openEvent, function() {
+    scope.emit('open');
+  });
 
   return scope;
 };

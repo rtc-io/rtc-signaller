@@ -120,6 +120,15 @@ logic:
 
 ## signaller message handlers
 
+### announce
+
+```
+/announce|{}
+```
+
+When an announce message is received by the socket scope, the attached
+object data is decoded and the scope emits an `announce` message.
+
 ### request
 
 ```

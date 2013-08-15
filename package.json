@@ -8,15 +8,14 @@
   },
   "dependencies": {
     "uuid": "~1.4.1",
-    "cog": "~0.1.6"
+    "cog": "~0.2.0"
   },
   "devDependencies": {
-    "tape": "~1.0.4",
-    "browserify": "~2.26.0",
-    "uglify-js": "~2.3.6"
+    "tape": "~1.0.4"
   },
   "scripts": {
-    "test": "node test/all.js"
+    "test": "node test/all.js",
+    "gendocs": "sourcecat | emu > README.md"
   },
   "repository": {
     "type": "git",
