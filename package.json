@@ -15,7 +15,7 @@
   },
   "scripts": {
     "test": "node test/all.js",
-    "gendocs": "sourcecat | emu > README.md"
+    "gendocs": "gendocs > README.md"
   },
   "repository": {
     "type": "git",
