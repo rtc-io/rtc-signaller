@@ -98,6 +98,10 @@ mesh level if required. Signallers will not attempt to parse a message
 destined for another signaller, but they are visible by default.  This
 can easily be handled however, by filtering `/to` messages.
 
+### scope.to(targetId)
+
+The to method returns an encapsulated
+
 ## signaller process handling
 
 When a signaller's underling messenger emits a `data` event this is
