@@ -11,19 +11,19 @@ var runTest = module.exports = function(messenger, peers) {
   });
 
   test('announce', function(t) {
-    t.plan(1);
+    t.plan(2);
     peers.expect(t, '/announce|{"id":"' + s.id + '"}');
     s.announce();
   });
 
   test('disconnect', function(t) {
-    t.plan(1);
+    t.plan(2);
     peers.expect(t, '/leave|{"id":"' + s.id + '"}');
     s.leave();
   });
 
   test('announce with attributes', function(t) {
-    t.plan(1);
+    t.plan(2);
     peers.expect(t, {
       type: 'announce',
       id: s.id,
@@ -34,7 +34,7 @@ var runTest = module.exports = function(messenger, peers) {
   });
 
   test('announce with different attributes', function(t) {
-    t.plan(1);
+    t.plan(2);
     peers.expect(t, {
       type: 'announce',
       id: s.id,
@@ -45,13 +45,13 @@ var runTest = module.exports = function(messenger, peers) {
   });
 
   test('disconnect', function(t) {
-    t.plan(1);
+    t.plan(2);
     peers.expect(t, '/leave|{"id":"' + s.id + '"}');
     s.leave();
   });
 };
 
 if (typeof document == 'undefined' && (! module.parent)) {
-  var peers = require('./helpers/createPeers')(2);
+  var peers = require('./helpers/createPeers')(3);
   runTest(peers.shift(), peers);
 }

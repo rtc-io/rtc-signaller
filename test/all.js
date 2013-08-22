@@ -1,4 +1,4 @@
-var peers = require('./helpers/createPeers')(2);
+var peers = require('./helpers/createPeers')(3);
 var messenger = peers.shift();
 
 require('./announce')(messenger, peers);

@@ -12,7 +12,7 @@ var runTest = module.exports = function(messenger, peers) {
   });
 
   test('announce', function(t) {
-    t.plan(1);
+    t.plan(2);
     peers.expect(t, '/announce|{"id":"' + scope.id + '"}');
     scope.announce();
   });
@@ -59,6 +59,6 @@ var runTest = module.exports = function(messenger, peers) {
 };
 
 if (typeof document == 'undefined' && (! module.parent)) {
-  var peers = require('./helpers/createPeers')(2);
+  var peers = require('./helpers/createPeers')(3);
   runTest(peers.shift(), peers);
 }

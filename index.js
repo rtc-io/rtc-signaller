@@ -75,6 +75,17 @@ module.exports = function(messenger, opts) {
     };
   }
 
+  function prepareArg(arg) {
+    if (typeof arg == 'object' && (! (arg instanceof String))) {
+      return JSON.stringify(arg);
+    }
+    else if (typeof arg == 'function') {
+      return null;
+    }
+
+    return arg;
+  }
+
   function once(prefix, handler) {
     scope.matchers.push({
       prefix: prefix,
@@ -89,19 +100,10 @@ module.exports = function(messenger, opts) {
   **/
   var send = scope.send = function() {
     // iterate over the arguments and stringify as required
-    var params = [].slice.call(arguments).map(function(data) {
-      if (typeof data == 'object' && (! (data instanceof String))) {
-        return JSON.stringify(data);
-      }
-      else if (typeof data == 'function') {
-        return null;
-      }
-
-      return data;
-    }).filter(Boolean);
+    var args = [].slice.call(arguments);
 
     // send the data over the messenger
-    return messenger.send(params.join('|'));
+    return messenger.send(args.map(prepareArg).filter(Boolean).join('|'));
   };
 
   /**
@@ -126,12 +128,12 @@ module.exports = function(messenger, opts) {
     connections are generally organised into rooms which is inferred
     information that limits the messaging scope.
   **/
-  scope.announce = function(data) {
+  scope.announce = function(data, sender) {
     // update internal attributes
     extend(attributes, data, { id: id });
 
     // send the attributes over the network
-    return send('/announce', attributes);
+    return (sender || send)('/announce', attributes);
   };
 
   /**
@@ -221,6 +223,28 @@ module.exports = function(messenger, opts) {
       __srcid: id,
       __reqid: reqid
     }));
+  };
+
+  /**
+    ### scope.to(targetId)
+
+    The to method returns an encapsulated 
+
+  **/
+  scope.to = function(targetId) {
+    // create a sender that will prepend messages with /to|targetId|
+    var sender = function() {
+      var args = ['/to', targetId].concat([].slice.call(arguments));
+      return messenger.send(args.map(prepareArg).filter(Boolean).join('|'));
+    };
+
+    return {
+      announce: function(data) {
+        return scope.announce(data, sender);
+      },
+
+      send: sender,
+    }
   };
 
   // handle message data events
