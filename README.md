@@ -99,7 +99,7 @@ mesh level if required. Signallers will not attempt to parse a message
 destined for another signaller, but they are visible by default.  This
 can easily be handled however, by filtering `/to` messages.
 
-### scope.to(targetId)
+### signaller#to(targetId)
 
 The to method returns an encapsulated
 
