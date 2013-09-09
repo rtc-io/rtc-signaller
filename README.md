@@ -36,24 +36,24 @@ To be completed.
 ## Reference
 
 The `rtc-signaller` module is designed to be used primarily in a functional
-way and when called it creates a new signalling scope that will enable
+way and when called it creates a new signaller that will enable
 you to communicate with other peers via your messaging network.
 
 ```js
-var signaller = require('rtc-signaller');
-var scope = signaller(messenger);
+// create a signaller from something that knows how to send messages
+var signaller = require('rtc-signaller')(messenger);
 ```
 
-### scope.send(data)
+### signaller#send(data)
 
 Send data over the messenging interface.
 
-### scope.announce(data?)
+### signaller#announce(data?)
 
-The `announce` function of the scope will a scope message through the
-messenger network.  When no additional data is supplied to this function
-then only the id of the scope is sent to all active members of the
-messenging network.
+The `announce` function of the signaller will pass an `/announce` message
+through the messenger network.  When no additional data is supplied to
+this function then only the id of the signaller is sent to all active
+members of the messenging network.
 
 As a unique it is generally insufficient information to determine whether
 a peer is a good match for another (for instance,  you might be looking
@@ -61,7 +61,7 @@ for other parties by name or role) it is generally a good idea to provide
 some additional information during this announce call:
 
 ```js
-scope.announce({ role: 'translator' });
+signaller.announce({ role: 'translator' });
 ```
 
 __NOTE:__ In some particular messenger types may attach or infer
@@ -69,22 +69,23 @@ additional data during the announce phase.  For instance, socket.io
 connections are generally organised into rooms which is inferred
 information that limits the messaging scope.
 
-### scope.block()
+### signaller#block()
 
-Prevent the scope from responding to requests until the block
+Prevent the signaller from responding to requests until the block
 is cleared with a clearBlock call.
 
-### scope.clearBlock(id)
+### signaller#clearBlock(id)
 
-Clear the specified block id
+Clear the specified block id.  Think `clearTimeout` but for signalling
+blocks
 
-### scope.leave()
+### signaller#leave()
 
 Leave the messenger mesh
 
-### scope.request(data)
+### signaller#request(data)
 
-The `scope.request` call is where one peer goes looking for a target
+The `signaller.request` call is where one peer goes looking for a target
 peer that satisfies specific search parameters.  This may be a search
 for a peer with a particular id, or something more general such as
 a request for a peer with a particular name or role.
