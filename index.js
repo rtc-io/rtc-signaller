@@ -38,25 +38,25 @@ var extend = require('cog/extend');
   ## Reference
 
   The `rtc-signaller` module is designed to be used primarily in a functional
-  way and when called it creates a new signalling scope that will enable
+  way and when called it creates a new signaller that will enable
   you to communicate with other peers via your messaging network.
 
   ```js
-  var signaller = require('rtc-signaller');
-  var scope = signaller(messenger);
+  // create a signaller from something that knows how to send messages
+  var signaller = require('rtc-signaller')(messenger);
   ```
 
 **/
 module.exports = function(messenger, opts) {
 
-  // create the signalling scope
-  var scope = new EventEmitter();
+  // create the signaller
+  var signaller = new EventEmitter();
 
   // initialise the id
-  var id = scope.id = uuid.v4();
+  var id = signaller.id = uuid.v4();
 
   // initialise the attributes
-  var attributes = scope.attributes = {
+  var attributes = signaller.attributes = {
     id: id
   };
 
@@ -64,8 +64,8 @@ module.exports = function(messenger, opts) {
   var dataEvent = (opts || {}).dataEvent || 'data';
   var openEvent = (opts || {}).openEvent || 'open';
 
-  scope.blocks = [];
-  scope.matchers = [];
+  signaller.blocks = [];
+  signaller.matchers = [];
 
   function createChannel(targetId) {
     return {
@@ -87,18 +87,18 @@ module.exports = function(messenger, opts) {
   }
 
   function once(prefix, handler) {
-    scope.matchers.push({
+    signaller.matchers.push({
       prefix: prefix,
       handler: handler
     });
   }
 
   /**
-    ### scope.send(data)
+    ### signaller#send(data)
 
     Send data over the messenging interface.
   **/
-  var send = scope.send = function() {
+  var send = signaller.send = function() {
     // iterate over the arguments and stringify as required
     var args = [].slice.call(arguments);
 
@@ -107,12 +107,12 @@ module.exports = function(messenger, opts) {
   };
 
   /**
-    ### scope.announce(data?)
+    ### signaller#announce(data?)
 
-    The `announce` function of the scope will a scope message through the
-    messenger network.  When no additional data is supplied to this function
-    then only the id of the scope is sent to all active members of the
-    messenging network.
+    The `announce` function of the signaller will pass an `/announce` message
+    through the messenger network.  When no additional data is supplied to
+    this function then only the id of the signaller is sent to all active
+    members of the messenging network.
 
     As a unique it is generally insufficient information to determine whether
     a peer is a good match for another (for instance,  you might be looking
@@ -120,7 +120,7 @@ module.exports = function(messenger, opts) {
     some additional information during this announce call:
 
     ```js
-    scope.announce({ role: 'translator' });
+    signaller.announce({ role: 'translator' });
     ```
 
     __NOTE:__ In some particular messenger types may attach or infer
@@ -128,7 +128,7 @@ module.exports = function(messenger, opts) {
     connections are generally organised into rooms which is inferred
     information that limits the messaging scope.
   **/
-  scope.announce = function(data, sender) {
+  signaller.announce = function(data, sender) {
     // update internal attributes
     extend(attributes, data, { id: id });
 
@@ -137,54 +137,55 @@ module.exports = function(messenger, opts) {
   };
 
   /**
-    ### scope.block()
+    ### signaller#block()
 
-    Prevent the scope from responding to requests until the block
+    Prevent the signaller from responding to requests until the block
     is cleared with a clearBlock call.
   **/
-  scope.block = function() {
+  signaller.block = function() {
     // create a block id
     var id = uuid.v4();
 
     // add the active block
-    scope.blocks.push(id);
+    signaller.blocks.push(id);
 
     // return the id
     return id;
   };
 
   /**
-    ### scope.clearBlock(id)
+    ### signaller#clearBlock(id)
 
-    Clear the specified block id
+    Clear the specified block id.  Think `clearTimeout` but for signalling
+    blocks
   **/
-  scope.clearBlock = function(id) {
-    var wasBlocked = scope.blocks.length > 0;
+  signaller.clearBlock = function(id) {
+    var wasBlocked = signaller.blocks.length > 0;
 
     // remove blocks matching the id
-    scope.blocks = scope.blocks.filter(function(blockId) {
+    signaller.blocks = signaller.blocks.filter(function(blockId) {
       return blockId !== id;
     });
 
     // if unblocked, trigger the unblock event
-    if (wasBlocked && scope.blocks.length === 0) {
-      scope.emit('unblock');
+    if (wasBlocked && signaller.blocks.length === 0) {
+      signaller.emit('unblock');
     }
   };
 
   /**
-    ### scope.leave()
+    ### signaller#leave()
 
     Leave the messenger mesh
   **/
-  scope.leave = function() {
+  signaller.leave = function() {
     return send('/leave', { id: id });
   };
 
   /**
-    ### scope.request(data)
+    ### signaller#request(data)
 
-    The `scope.request` call is where one peer goes looking for a target
+    The `signaller.request` call is where one peer goes looking for a target
     peer that satisfies specific search parameters.  This may be a search
     for a peer with a particular id, or something more general such as
     a request for a peer with a particular name or role.
@@ -198,7 +199,7 @@ module.exports = function(messenger, opts) {
     destined for another signaller, but they are visible by default.  This
     can easily be handled however, by filtering `/to` messages.
   **/
-  scope.request = function(data, opts, callback) {
+  signaller.request = function(data, opts, callback) {
     // initialise a request id
     var reqid = uuid.v4();
 
@@ -226,12 +227,12 @@ module.exports = function(messenger, opts) {
   };
 
   /**
-    ### scope.to(targetId)
+    ### signaller#to(targetId)
 
     The to method returns an encapsulated 
 
   **/
-  scope.to = function(targetId) {
+  signaller.to = function(targetId) {
     // create a sender that will prepend messages with /to|targetId|
     var sender = function() {
       var args = ['/to', targetId].concat([].slice.call(arguments));
@@ -240,7 +241,7 @@ module.exports = function(messenger, opts) {
 
     return {
       announce: function(data) {
-        return scope.announce(data, sender);
+        return signaller.announce(data, sender);
       },
 
       send: sender,
@@ -248,12 +249,12 @@ module.exports = function(messenger, opts) {
   };
 
   // handle message data events
-  messenger.on(dataEvent, require('./processor')(scope));
+  messenger.on(dataEvent, require('./processor')(signaller));
 
   // handle open / connect events
   messenger.on(openEvent, function() {
-    scope.emit('open');
+    signaller.emit('open');
   });
 
-  return scope;
+  return signaller;
 };
