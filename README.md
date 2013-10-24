@@ -7,7 +7,7 @@ mechanism for WebRTC.
 [![NPM](https://nodei.co/npm/rtc-signaller.png)](https://nodei.co/npm/rtc-signaller/)
 
 [![Build Status](https://travis-ci.org/rtc-io/rtc-signaller.png?branch=master)](https://travis-ci.org/rtc-io/rtc-signaller)
-[![experimental](http://hughsk.github.io/stability-badges/dist/experimental.svg)](http://github.com/hughsk/stability-badges)
+[![unstable](http://hughsk.github.io/stability-badges/dist/unstable.svg)](http://github.com/hughsk/stability-badges)
 
 ## Purpose
 
@@ -142,3 +142,21 @@ A request is basically a "search for a friend" message.  This is where one
 peer in the mesh is searching for another peer based on particular criteria.
 In general, a request message is delivered to all peers within the mesh 
 and then those peers that are not in a blocked state will respond.
+
+## License(s)
+
+### Apache 2.0
+
+Copyright 2013 National ICT Australia Limited (NICTA)
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
