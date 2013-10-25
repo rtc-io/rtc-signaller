@@ -64,6 +64,11 @@ module.exports = function(messenger, opts) {
   var dataEvent = (opts || {}).dataEvent || 'data';
   var openEvent = (opts || {}).openEvent || 'open';
 
+  // determine whether we should use a write or send function
+  var write = typeof messenger.write == 'function' ?
+                messenger.write :
+                messenger.send;
+
   signaller.blocks = [];
   signaller.matchers = [];
 
@@ -101,9 +106,10 @@ module.exports = function(messenger, opts) {
   var send = signaller.send = function() {
     // iterate over the arguments and stringify as required
     var args = [].slice.call(arguments);
+    var dataline = args.map(prepareArg).filter(Boolean).join('|');
 
     // send the data over the messenger
-    return messenger.send(args.map(prepareArg).filter(Boolean).join('|'));
+    return write.call(messenger, dataline);
   };
 
   /**
