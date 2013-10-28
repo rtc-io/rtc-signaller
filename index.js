@@ -69,6 +69,12 @@ module.exports = function(messenger, opts) {
                 messenger.write :
                 messenger.send;
 
+  // determine a close handler
+  var close = typeof messenger.close == 'function' ?
+                messenger.close :
+                messenger.end;
+
+  // initialise blocks and matchers
   signaller.blocks = [];
   signaller.matchers = [];
 
@@ -185,7 +191,13 @@ module.exports = function(messenger, opts) {
     Leave the messenger mesh
   **/
   signaller.leave = function() {
-    return send('/leave', { id: id });
+    // send the leave signal
+    send('/leave', { id: id });
+
+    // call the close method
+    if (typeof close == 'function') {
+      close.call(messenger);
+    }
   };
 
   /**
