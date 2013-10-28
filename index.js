@@ -19,14 +19,14 @@ var extend = require('cog/extend');
 
   A messenger is a simple object that implements node
   [EventEmitter](http://nodejs.org/api/events.html) style `on` events for
-  `open`, `close`, `message` events, and also a `send` method by which 
+  `open`, `close`, `message` events, and also a `send` method by which
   data will be send "over-the-wire".
 
-  By using this approach, we can conduct signalling over any number of 
+  By using this approach, we can conduct signalling over any number of
   mechanisms:
 
   - local, in memory message passing
-  - via WebSockets and higher level abstractions (such as 
+  - via WebSockets and higher level abstractions (such as
     [socket.io](http://socket.io) and friends)
   - also over WebRTC data-channels (very meta, and admittedly a little
     complicated).
@@ -220,7 +220,7 @@ module.exports = function(messenger, opts) {
     // handle request acknowledge
     once('/ackreq|' + reqid, function(data) {
       var targetId = data.split('|')[2];
-      
+
       // trigger the callback with the send function wired
       callback(null, createChannel(targetId));
     });
@@ -235,7 +235,7 @@ module.exports = function(messenger, opts) {
   /**
     ### signaller#to(targetId)
 
-    The to method returns an encapsulated 
+    The to method returns an encapsulated
 
   **/
   signaller.to = function(targetId) {

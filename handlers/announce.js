@@ -18,6 +18,7 @@ module.exports = function(scope) {
       scope.emit('announce', JSON.parse(args[0]));
     }
     catch (e) {
+      scope.emit('error', 'Unable to announce, invalid JSON: ' + args[0]);
     }
   };
 };

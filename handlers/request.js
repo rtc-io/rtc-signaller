@@ -10,7 +10,7 @@
 
   A request is basically a "search for a friend" message.  This is where one
   peer in the mesh is searching for another peer based on particular criteria.
-  In general, a request message is delivered to all peers within the mesh 
+  In general, a request message is delivered to all peers within the mesh
   and then those peers that are not in a blocked state will respond.
 
 **/
@@ -27,7 +27,7 @@ module.exports = function(scope) {
 
     // send the ack request
     scope.send(
-      '/to', data.__srcid, 
+      '/to', data.__srcid,
       '/ackreq', data.__reqid, scope.id
     );
   }
