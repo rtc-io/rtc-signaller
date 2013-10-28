@@ -242,7 +242,7 @@ module.exports = function(messenger, opts) {
     // create a sender that will prepend messages with /to|targetId|
     var sender = function() {
       var args = ['/to', targetId].concat([].slice.call(arguments));
-      return messenger.send(args.map(prepareArg).filter(Boolean).join('|'));
+      return write.call(messenger, args.map(prepareArg).filter(Boolean).join('|'));
     };
 
     return {
