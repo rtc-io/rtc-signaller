@@ -14,11 +14,18 @@
 **/
 module.exports = function(scope) {
   return function(args) {
+    var payload;
+
     try {
-      scope.emit('announce', JSON.parse(args[0]));
+      payload = JSON.parse(args[0]);
     }
     catch (e) {
-      scope.emit('error', 'Unable to announce, invalid JSON: ' + args[0]);
     }
+
+    if (! payload) {
+      return scope.emit('error', 'Unable to announce, invalid JSON: ' + args[0]);
+    }
+
+    return scope.emit('announce', payload);
   };
 };
