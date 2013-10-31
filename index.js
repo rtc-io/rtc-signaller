@@ -14,7 +14,7 @@ var extend = require('cog/extend');
   ## Purpose
 
   The signaller provides set of client-side tools that assist with the
-  setting up `RTCPeerConnections` and helping them communicate. All that is
+  setting up an `PeerConnection` and helping them communicate. All that is
   required for the signaller to operate is a suitable messenger.
 
   A messenger is a simple object that implements node
@@ -27,13 +27,25 @@ var extend = require('cog/extend');
 
   - local, in memory message passing
   - via WebSockets and higher level abstractions (such as
-    [socket.io](http://socket.io) and friends)
+    [primus](https://github.com/primus/primus))
   - also over WebRTC data-channels (very meta, and admittedly a little
     complicated).
 
   ## Getting Started
 
-  To be completed.
+  To work with the signaller, you first need a messenger of some kind. If you
+  have run up a version of the
+  [rtc-switchboard](https://github.com/rtc-io/rtc-switchboard) somewhere then
+  the following example should work:
+
+  <<< examples/signalling-via-switchboard.js
+
+  While the example above demonstrates communication between two endpoints
+  via websockets, it does not go into detail on setting up a WebRTC peer
+  connection (as that is significantly more involved).  If you are looking for
+  an easy way to do this, I'd recommend checking out
+  [rtc-quickconnect](https://github.com/rtc-io/rtc-quickconnect) or
+  [rtc-glue](https://github.com/rtc-io/rtc-glue).
 
   ## Reference
 
