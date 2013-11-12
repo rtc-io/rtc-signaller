@@ -11,7 +11,8 @@
     "cog": "~0.3.1"
   },
   "devDependencies": {
-    "tape": "~2.1.0"
+    "tape": "~2.1.0",
+    "rtc-switchboard": "~0.4.0"
   },
   "scripts": {
     "test": "node test/all.js",
@@ -33,8 +34,13 @@
   },
   "testling": {
     "files": "test/all.js",
+    "server": "test/server.js",
     "browsers": [
-      "*"
+      "firefox/23..latest",
+      "chrome/30..latest",
+      "chrome/canary",
+      "opera/14..latest",
+      "opera/next"
     ]
   }
 }

@@ -59,7 +59,7 @@ var extend = require('cog/extend');
   ```
 
 **/
-module.exports = function(messenger, opts) {
+var sig = module.exports = function(messenger, opts) {
 
   // create the signaller
   var signaller = new EventEmitter();
@@ -288,3 +288,5 @@ module.exports = function(messenger, opts) {
 
   return signaller;
 };
+
+sig.loadPrimus = require('./primus-loader');
