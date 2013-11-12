@@ -7,5 +7,7 @@ require('./request')(messenger, peers);
 require('./block')(messenger, peers);
 require('./to')(messenger, peers);
 
-// test primus loading
-require('./load-primus');
+if (typeof window != 'undefined') {
+  // test primus loading
+  require('./load-primus');
+}
