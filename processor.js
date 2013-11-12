@@ -24,7 +24,7 @@ module.exports = function(scope) {
   var id = scope.id;
   var handlers = require('./handlers')(scope);
 
-  function sendEvent(parts) {
+  function sendEvent(parts, data) {
     // initialise the event name
     var evtName = parts[0].slice(1);
 
@@ -39,12 +39,13 @@ module.exports = function(scope) {
       }
 
       return part;
-    });
+    }).concat(data);
 
     scope.emit.apply(scope, [evtName].concat(args));
   }
 
-  return function(data) {
+  return function(originalData) {
+    var data = originalData;
     var isMatch = true;
     var parts;
     var handler;
@@ -73,7 +74,7 @@ module.exports = function(scope) {
         handler(parts.slice(1));
       }
       else {
-        sendEvent(parts);
+        sendEvent(parts, originalData);
       }
     }
 

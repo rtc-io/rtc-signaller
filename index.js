@@ -86,6 +86,9 @@ var sig = module.exports = function(messenger, opts) {
                 messenger.close :
                 messenger.end;
 
+  // create the processor
+  var processor = require('./processor')(signaller);
+
   // initialise blocks and matchers
   signaller.blocks = [];
   signaller.matchers = [];
@@ -279,7 +282,7 @@ var sig = module.exports = function(messenger, opts) {
   };
 
   // handle message data events
-  messenger.on(dataEvent, require('./processor')(signaller));
+  messenger.on(dataEvent, processor);
 
   // handle open / connect events
   messenger.on(openEvent, function() {
