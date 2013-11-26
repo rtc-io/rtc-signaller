@@ -164,43 +164,6 @@ var sig = module.exports = function(messenger, opts) {
   };
 
   /**
-    ### signaller#block()
-
-    Prevent the signaller from responding to requests until the block
-    is cleared with a clearBlock call.
-  **/
-  signaller.block = function() {
-    // create a block id
-    var id = uuid.v4();
-
-    // add the active block
-    signaller.blocks.push(id);
-
-    // return the id
-    return id;
-  };
-
-  /**
-    ### signaller#clearBlock(id)
-
-    Clear the specified block id.  Think `clearTimeout` but for signalling
-    blocks
-  **/
-  signaller.clearBlock = function(id) {
-    var wasBlocked = signaller.blocks.length > 0;
-
-    // remove blocks matching the id
-    signaller.blocks = signaller.blocks.filter(function(blockId) {
-      return blockId !== id;
-    });
-
-    // if unblocked, trigger the unblock event
-    if (wasBlocked && signaller.blocks.length === 0) {
-      signaller.emit('unblock');
-    }
-  };
-
-  /**
     ### signaller#leave()
 
     Leave the messenger mesh

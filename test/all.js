@@ -4,7 +4,6 @@ var messenger = peers.shift();
 // test signalling logic
 require('./announce')(messenger, peers);
 require('./request')(messenger, peers);
-require('./block')(messenger, peers);
 require('./to')(messenger, peers);
 
 if (typeof window != 'undefined') {

@@ -57,13 +57,6 @@ module.exports = function(scope) {
 
     // if we have a match, then acknowledge the request
     if (match) {
-      // if there are active blocks, return
-      if (scope.blocks.length) {
-        return scope.on('unblock', function() {
-          ackRequest(data);
-        });
-      }
-
       return ackRequest(data);
     }
 
