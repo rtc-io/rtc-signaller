@@ -19,15 +19,35 @@ function Channel(signaller, targetId) {
 
 module.exports = Channel;
 
-Channel.prototype.send = function() {
+Channel.prototype.send = function(command) {
+  var payload = [].slice.call(arguments, 1);
+
   return this.signaller.send.apply(
     this.signaller,
-    ['/to', this.targetId].concat([].slice.call(arguments))
+    ['/to', this.targetId, command, this.sourceId].concat(payload)
   );
 };
 
 ['on', 'once'].forEach(function(fn) {
-  Channel.prototype[fn] = function() {
-    this.signaller[fn].apply(this.signaller, arguments);
+  Channel.prototype[fn] = function(command, handler) {
+    var channel = this;
+
+    // if not handler has been supplied, then abort
+    if (typeof handler != 'function') {
+      return this;
+    }
+
+    this.signaller[fn](command, function(sourceId) {
+      var payload;
+
+      // if the source is invalid, abort further processing
+      if (sourceId !== channel.targetId) {
+        return;
+      }
+
+      handler.apply(this, [].slice.call(arguments, 1));
+    });
+
+    return this;
   };
 });
