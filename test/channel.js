@@ -1,12 +1,14 @@
 var test = require('tape');
 var signaller = require('..');
 var Channel = require('../channel');
+var WriteLock = require('../writelock');
 
 var runTest = module.exports = function(peers) {
   var scopes;
   var altScopes;
   var channelA;
   var channelB;
+  var writeLock;
 
   test('create', function(t) {
     t.plan(peers.length * 3);
@@ -59,6 +61,64 @@ var runTest = module.exports = function(peers) {
 
     channelB.send('/ho', 'hi');
   });
+
+  test('can aquire a namespace lock', function(t) {
+    t.plan(2);
+    channelA.writeLock(function(err, lock) {
+      t.ifError(err, 'write lock acquired');
+      t.ok(lock instanceof WriteLock, 'valid writelock');
+
+      // save a reference to the lock
+      writeLock = lock;
+    });
+  });
+
+  test('cannot acquire another forward lock', function(t) {
+    t.plan(1);
+    channelA.writeLock(function(err) {
+      t.ok(err instanceof Error, 'got expected error');
+    });
+  });
+
+  test('cannot acquire a reverse lock', function(t) {
+    t.plan(1);
+    channelB.writeLock(function(err) {
+      t.ok(err instanceof Error, 'got expected error');
+    });
+  });
+
+  test('releasing the lock triggers a writelock:release event', function(t) {
+    t.plan(3);
+    channelB.once('writelock:release', function() {
+      t.pass('got writelock:release event');
+      t.equal(channelB.lock, null, 'channel b lock removed');
+      t.equal(channelA.lock, null, 'channel a lock removed');
+    });
+
+    writeLock.release();
+    writeLock = null;
+  });
+
+  test('can acquire a reverse lock', function(t) {
+    t.plan(2);
+    channelB.writeLock(function(err, lock) {
+      t.ifError(err, 'acquired reverse lock');
+      t.ok(lock instanceof WriteLock);
+
+      writeLock = lock;
+    });
+  });
+
+  test('can release the reverse lock', function(t) {
+    t.plan(1);
+    channelA.once('writelock:release', function() {
+      t.pass('got writelock:release event');
+    });
+
+    writeLock.release();
+    writeLock = null;
+  });
+
 
   // test('announce', function(t) {
   //   t.plan(2);
