@@ -123,22 +123,22 @@ var runTest = module.exports = function(peers) {
     t.plan(3);
 
     channelA.writeLock(function(err, lock) {
-      if (channelA.lock.id > channelB.lock.id) {
+      if ((! channelB.lock.id) || channelA.lock.id > channelB.lock.id) {
         t.ifError(err, 'no error');
         t.ok(lock instanceof WriteLock, 'a got lock');
       }
       else {
-        t.ok(err instanceof Error, 'got error as expected');
+        t.ok(err instanceof Error, 'got error as expected (b locked)');
       }
     });
 
     channelB.writeLock(function(err, lock) {
-      if (channelB.lock.id > channelA.lock.id) {
+      if ((! channelA.lock.id) || channelB.lock.id > channelA.lock.id) {
         t.ifError(err, 'no error');
         t.ok(lock instanceof WriteLock, 'b got lock');
       }
       else {
-        t.ok(err instanceof Error, 'got error as expected');
+        t.ok(err instanceof Error, 'got error as expected (a locked)');
       }
     });
   });
