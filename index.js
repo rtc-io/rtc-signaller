@@ -4,6 +4,7 @@
 var EventEmitter = require('events').EventEmitter;
 var uuid = require('uuid');
 var extend = require('cog/extend');
+var Channel = require('./channel');
 
 /**
   # rtc-signaller
@@ -92,14 +93,6 @@ var sig = module.exports = function(messenger, opts) {
   // initialise blocks and matchers
   signaller.blocks = [];
   signaller.matchers = [];
-
-  function createChannel(targetId) {
-    return {
-      send: function() {
-        send.apply(null, ['/to', targetId].concat([].slice.call(arguments)));
-      }
-    };
-  }
 
   function prepareArg(arg) {
     if (typeof arg == 'object' && (! (arg instanceof String))) {
@@ -212,7 +205,7 @@ var sig = module.exports = function(messenger, opts) {
       var targetId = data.split('|')[2];
 
       // trigger the callback with the send function wired
-      callback(null, createChannel(targetId));
+      callback(null, new Channel(signaller, targetId));
     });
 
     // send out a request across the network
