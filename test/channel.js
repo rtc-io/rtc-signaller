@@ -119,6 +119,30 @@ var runTest = module.exports = function(peers) {
     writeLock = null;
   });
 
+  test('attempting to create concurrent locks will result in one successful lock', function(t) {
+    t.plan(3);
+
+    channelA.writeLock(function(err, lock) {
+      if (channelA.lock.id > channelB.lock.id) {
+        t.ifError(err, 'no error');
+        t.ok(lock instanceof WriteLock, 'a got lock');
+      }
+      else {
+        t.ok(err instanceof Error, 'got error as expected');
+      }
+    });
+
+    channelB.writeLock(function(err, lock) {
+      if (channelB.lock.id > channelA.lock.id) {
+        t.ifError(err, 'no error');
+        t.ok(lock instanceof WriteLock, 'b got lock');
+      }
+      else {
+        t.ok(err instanceof Error, 'got error as expected');
+      }
+    });
+  });
+
 
   // test('announce', function(t) {
   //   t.plan(2);

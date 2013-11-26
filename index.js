@@ -122,8 +122,6 @@ var sig = module.exports = function(messenger, opts) {
     var args = [].slice.call(arguments);
     var dataline = args.map(prepareArg).filter(Boolean).join('|');
 
-    console.log('sending: ' + dataline);
-
     // send the data over the messenger
     return write.call(messenger, dataline);
   };

@@ -13,7 +13,10 @@ module.exports = function(count) {
       allPeers.filter(function(other) {
         return other !== peer;
       }).forEach(function(other) {
-        other.emit('data', data);
+        // send the data at a random interval
+        setTimeout(function() {
+          other.emit('data', data);
+        }, (Math.random() * 500) | 0);
       });
     };
 

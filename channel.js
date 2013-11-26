@@ -55,8 +55,9 @@ Channel.prototype.writeLock = function(callback) {
   }
 
   function removeListeners() {
-    channel.signaller.removeListener('/writelock:reject', lockReject);
-    channel.signaller.removeListener('/writelock:ok', lockOK);
+    // TODO: be more targeted removing listeners
+    channel.signaller.removeAllListeners('writelock:reject');
+    channel.signaller.removeAllListeners('writelock:ok');
   }
 
   if (this.lock instanceof WriteLock) {
@@ -86,7 +87,12 @@ Channel.prototype._handleWriteLock = function(id) {
     if (this.lock.active) {
       return this.send('/writelock:reject', this.lock.id);
     }
+    else if (id > this.lock.id) {
+      return this.send('/writelock:ok', id);
+    }
   }
+
+  return this.send('/writelock:reject', this.lock.id || this.lock);
 };
 
 Channel.prototype._handleReleaseLock = function(id) {
