@@ -205,7 +205,7 @@ var sig = module.exports = function(messenger, opts) {
       var targetId = data.split('|')[2];
 
       // trigger the callback with the send function wired
-      callback(null, new Channel(signaller, targetId));
+      callback(null, new Channel(signaller, targetId, opts));
     });
 
     // send out a request across the network
