@@ -56,6 +56,28 @@ var runTest = module.exports = function(messenger, peers) {
       t.equal(typeof channel.send, 'function', 'got a send function');
     });
   });
+
+  test('request fails when a channel is already active', function(t) {
+    t.plan(1);
+    scope.request({ id: altScopes[0].id }, function(err) {
+      t.ok(err instanceof Error, 'got expected error');
+    })
+  });
+
+  test('can close a channel using the target id', function(t) {
+    t.plan(1);
+    scope.closeChannel(altScopes[0].id);
+    t.pass('call succeeded');
+  });
+
+  test('can now request a new channel', function(t) {
+    t.plan(2);
+    scope.request({ id: altScopes[0].id }, function(err, channel) {
+      t.ok(channel, 'got channel');
+      t.equal(typeof channel.send, 'function', 'got a send function');
+      scope.closeChannel(channel);
+    });
+  });
 };
 
 if (typeof document == 'undefined' && (! module.parent)) {

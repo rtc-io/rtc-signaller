@@ -73,6 +73,9 @@ var sig = module.exports = function(messenger, opts) {
     id: id
   };
 
+  // initialise the open channel registry
+  var activeChannels = {};
+
   // initialise the data event name
   var dataEvent = (opts || {}).dataEvent || 'data';
   var openEvent = (opts || {}).openEvent || 'open';
@@ -156,6 +159,19 @@ var sig = module.exports = function(messenger, opts) {
     return (sender || send)('/announce', attributes);
   };
 
+  signaller.closeChannel = function(channel) {
+    if (channel instanceof Channel) {
+      channel._close();
+
+      if (channel === activeChannels[channel.targetId]) {
+        activeChannels[channel.targetId] = undefined;
+      }
+    }
+    else if (typeof channel == 'string' || (channel instanceof String)) {
+      signaller.closeChannel(activeChannels[channel]);
+    }
+  };
+
   /**
     ### signaller#leave()
 
@@ -204,8 +220,16 @@ var sig = module.exports = function(messenger, opts) {
     once('/ackreq|' + reqid, function(data) {
       var targetId = data.split('|')[2];
 
+      // if we have an existing channel active, then return an error
+      if (activeChannels[targetId]) {
+        return callback(new Error('channel active for peer: ' + targetId));
+      }
+
       // trigger the callback with the send function wired
-      callback(null, new Channel(signaller, targetId, opts));
+      callback(
+        null,
+        activeChannels[targetId] = new Channel(signaller, targetId, opts)
+      );
     });
 
     // send out a request across the network

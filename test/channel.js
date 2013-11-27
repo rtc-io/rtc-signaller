@@ -159,7 +159,7 @@ var runTest = module.exports = function(peers) {
 
   test('close b', function(t) {
     t.plan(1);
-    channelB.close();
+    scopes[1].closeChannel(channelB);
     t.pass('b closed');
   });
 

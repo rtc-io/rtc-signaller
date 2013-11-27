@@ -36,18 +36,6 @@ function Channel(signaller, targetId, opts) {
 
 module.exports = Channel;
 
-Channel.prototype.close = function() {
-  var proxies = this._proxies;
-  var signaller = this.signaller;
-
-  // iterate through the proxies and close
-  Object.keys(proxies).forEach(function(eventName) {
-    proxies[eventName].forEach(function(handler) {
-      signaller.removeListener(eventName, handler);
-    });
-  });
-};
-
 Channel.prototype.ping = function(callback) {
   var signaller = this.signaller;
   var testId = uuid.v4();
@@ -117,6 +105,18 @@ Channel.prototype.writeLock = function(callback) {
 Channel.prototype._handlePing = function(id) {
   // send a response to the ping
   this.send('/pong:' + id);
+};
+
+Channel.prototype._close = function() {
+  var proxies = this._proxies;
+  var signaller = this.signaller;
+
+  // iterate through the proxies and close
+  Object.keys(proxies).forEach(function(eventName) {
+    proxies[eventName].forEach(function(handler) {
+      signaller.removeListener(eventName, handler);
+    });
+  });
 };
 
 Channel.prototype._handleWriteLock = function(id) {
