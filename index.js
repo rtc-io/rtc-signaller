@@ -207,7 +207,7 @@ var sig = module.exports = function(messenger, opts) {
   signaller.request = function(data, opts, callback) {
     // initialise a request id
     var reqid = uuid.v4();
-    var timeout;
+    var timeoutTimer;
 
     // handle 2 arg form
     if (typeof opts == 'function') {
@@ -215,20 +215,22 @@ var sig = module.exports = function(messenger, opts) {
       opts = {};
     }
 
-    // timeout the request after 1s
-    timeout = setTimeout(function() {
-      callback(new Error('request timed out'));
-    }, parseInt((opts || {}).timeout, 10) || 1000);
-
     // handle request acknowledge
     once('/ackreq|' + reqid, function(data) {
       var targetId = data.split('|')[2];
 
-      // clear the timeout
-      clearTimeout(timeout);
+      clearTimeout(timeoutTimer);
+
+      // if we have an existing channel active, then return an error
+      if (activeChannels[targetId]) {
+        return callback(new Error('channel active for peer: ' + targetId));
+      }
 
       // trigger the callback with the send function wired
-      callback(null, new Channel(signaller, targetId));
+      callback(
+        null,
+        activeChannels[targetId] = new Channel(signaller, targetId, opts)
+      );
     });
 
     // send out a request across the network
@@ -236,6 +238,13 @@ var sig = module.exports = function(messenger, opts) {
       __srcid: id,
       __reqid: reqid
     }));
+
+    // TODO: inspect known peers for a match
+    if (typeof callback == 'function') {
+      timeoutTimer = setTimeout(function() {
+        callback(new Error('request timed out'));
+      }, (opts || {}).timeout || 3000);
+    }
   };
 
   /**
