@@ -86,16 +86,6 @@ additional data during the announce phase.  For instance, socket.io
 connections are generally organised into rooms which is inferred
 information that limits the messaging scope.
 
-### signaller#block()
-
-Prevent the signaller from responding to requests until the block
-is cleared with a clearBlock call.
-
-### signaller#clearBlock(id)
-
-Clear the specified block id.  Think `clearTimeout` but for signalling
-blocks
-
 ### signaller#leave()
 
 Leave the messenger mesh
