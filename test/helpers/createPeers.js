@@ -16,7 +16,7 @@ module.exports = function(count) {
         // send the data at a random interval
         setTimeout(function() {
           other.emit('data', data);
-        }, (Math.random() * 500) | 0);
+        }, (Math.random() * 100) | 0);
       });
     };
 
