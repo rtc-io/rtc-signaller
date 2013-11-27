@@ -30,7 +30,7 @@ module.exports = function(scope) {
 
     // convert any valid json objects to json
     var args = parts.slice(1).map(function(part) {
-      if (part.charAt(0) === '{') {
+      if (part.charAt(0) === '{' || part.charAt(0) === '[') {
         try {
           part = JSON.parse(part);
         }
