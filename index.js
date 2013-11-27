@@ -242,7 +242,10 @@ var sig = module.exports = function(messenger, opts) {
     // TODO: inspect known peers for a match
     if (typeof callback == 'function') {
       timeoutTimer = setTimeout(function() {
-        callback(new Error('request timed out'));
+        var err = new Error('request timed out');
+        err.timeout = true;
+
+        callback(err);
       }, (opts || {}).timeout || 3000);
     }
   };
