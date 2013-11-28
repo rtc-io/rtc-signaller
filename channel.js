@@ -25,13 +25,15 @@ function Channel(signaller, targetId, opts) {
   // initialise the writelock to null
   this.lock = null;
 
-  // initialise the proxy event listeners
-  this._proxies = {};
+  // create bound handlers
+  this._handleWriteLock = handleWriteLock.bind(this);
+  this._handleReleaseLock = handleReleaseLock.bind(this);
+  this._handlePing = handlePing.bind(this);
 
   // handle lock messages
-  this.on('writelock', this._handleWriteLock.bind(this));
-  this.on('writelock:release', this._handleReleaseLock.bind(this));
-  this.on('ping', this._handlePing.bind(this));
+  this.signaller.on('writelock', this._handleWriteLock);
+  this.signaller.on('writelock:release', this._handleReleaseLock);
+  this.signaller.on('ping', this._handlePing);
 }
 
 module.exports = Channel;
@@ -42,7 +44,7 @@ Channel.prototype.ping = function(callback) {
   var pingTimeout = 0;
 
   this.send('/ping', testId);
-  this.once('pong:' + testId, function() {
+  this.signaller.once('pong:' + testId, function(srcId) {
     clearTimeout(pingTimeout);
     callback();
   });
@@ -65,7 +67,11 @@ Channel.prototype.send = function(command) {
 Channel.prototype.writeLock = function(callback) {
   var channel = this;
 
-  function lockOK() {
+  function lockOK(srcId) {
+    if (srcId !== channel.targetId) {
+      return;
+    }
+
     // flag the lock as active
     channel.lock.active = true;
 
@@ -73,7 +79,11 @@ Channel.prototype.writeLock = function(callback) {
     callback(null, channel.lock);
   }
 
-  function lockReject(existingLockId) {
+  function lockReject(srcId, existingLockId) {
+    if (srcId !== channel.targetId) {
+      return;
+    }
+
     removeListeners();
     channel.lock = existingLockId;
     callback(new Error('unable to lock existing lock already in place'));
@@ -81,8 +91,8 @@ Channel.prototype.writeLock = function(callback) {
 
   function removeListeners() {
     // TODO: be more targeted removing listeners
-    channel.signaller.removeAllListeners('writelock:reject');
-    channel.signaller.removeAllListeners('writelock:ok');
+    channel.signaller.removeListener('writelock:reject', lockReject);
+    channel.signaller.removeListener('writelock:ok', lockOK);
   }
 
   if (this.lock instanceof WriteLock) {
@@ -95,31 +105,35 @@ Channel.prototype.writeLock = function(callback) {
   // create the new writelock attempt
   this.lock = new WriteLock(this);
 
-  this.once('writelock:reject', lockReject);
-  this.once('writelock:ok', lockOK);
+  this.signaller.on('writelock:reject', lockReject);
+  this.signaller.on('writelock:ok', lockOK);
 
   // send a writelock message with the id of the lock through
   this.send('/writelock', this.lock.id);
 };
 
-Channel.prototype._handlePing = function(id) {
+Channel.prototype._close = function() {
+  this.signaller.removeListener('writelock', this._handleWriteLock);
+  this.signaller.removeListener('writelock:release', this._handleReleaseLock);
+  this.signaller.removeListener('ping', this._handlePing);
+};
+
+/* event handler functions (designed for bound invocation) */
+
+function handlePing(srcId, id) {
+  if (srcId !== this.targetId) {
+    return;
+  }
+
   // send a response to the ping
   this.send('/pong:' + id);
-};
+}
 
-Channel.prototype._close = function() {
-  var proxies = this._proxies;
-  var signaller = this.signaller;
+function handleWriteLock(srcId, id) {
+  if (srcId !== this.targetId) {
+    return;
+  }
 
-  // iterate through the proxies and close
-  Object.keys(proxies).forEach(function(eventName) {
-    proxies[eventName].forEach(function(handler) {
-      signaller.removeListener(eventName, handler);
-    });
-  });
-};
-
-Channel.prototype._handleWriteLock = function(id) {
   if (! this.lock) {
     this.lock = id;
     return this.send('/writelock:ok', id);
@@ -137,39 +151,12 @@ Channel.prototype._handleWriteLock = function(id) {
   return this.send('/writelock:reject', this.lock.id || this.lock);
 };
 
-Channel.prototype._handleReleaseLock = function(id) {
+function handleReleaseLock(srcId, id) {
+  if (srcId !== this.targetId) {
+    return;
+  }
+
   if (this.lock === id) {
     this.lock = null;
   }
 };
-
-['on', 'once'].forEach(function(fn) {
-  Channel.prototype[fn] = function(command, handler) {
-    var channel = this;
-
-    function proxyEvent(sourceId) {
-      var payload;
-
-      // if the source is invalid, abort further processing
-      if (sourceId !== channel.targetId) {
-        return;
-      }
-
-      handler.apply(this, [].slice.call(arguments, 1));
-    }
-
-    // if not handler has been supplied, then abort
-    if (typeof handler != 'function') {
-      return this;
-    }
-
-    // register the event proxy
-    this.signaller[fn](command, proxyEvent);
-
-    // add the proxy to the list of proxies
-    this._proxies[command] = this._proxies[command] || [];
-    this._proxies[command].push(proxyEvent);
-
-    return this;
-  };
-});

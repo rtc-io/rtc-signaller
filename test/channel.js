@@ -46,7 +46,7 @@ var runTest = module.exports = function(peers) {
 
   test('can send message from a to b', function(t) {
     t.plan(1);
-    channelB.once('hi', function(data) {
+    channelB.signaller.once('hi', function(srcId, data) {
       t.equal(data, 'ho', 'got expected message');
     });
 
@@ -55,7 +55,7 @@ var runTest = module.exports = function(peers) {
 
   test('can send message from b to a', function(t) {
     t.plan(1);
-    channelA.once('ho', function(data) {
+    channelA.signaller.once('ho', function(srcId, data) {
       t.equal(data, 'hi', 'got expected message');
     });
 
@@ -89,8 +89,8 @@ var runTest = module.exports = function(peers) {
 
   test('releasing the lock triggers a writelock:release event', function(t) {
     t.plan(3);
-    channelB.once('writelock:release', function() {
-      t.pass('got writelock:release event');
+    channelB.signaller.once('writelock:release', function(srcId) {
+      t.equal(srcId, channelB.targetId, 'got writelock:release event');
       t.equal(channelB.lock, null, 'channel b lock removed');
       t.equal(channelA.lock, null, 'channel a lock removed');
     });
@@ -111,8 +111,8 @@ var runTest = module.exports = function(peers) {
 
   test('can release the reverse lock', function(t) {
     t.plan(1);
-    channelA.once('writelock:release', function() {
-      t.pass('got writelock:release event');
+    channelA.signaller.once('writelock:release', function(srcId) {
+      t.equal(srcId, channelA.targetId, 'got writelock:release event');
     });
 
     writeLock.release();
