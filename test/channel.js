@@ -110,10 +110,14 @@ var runTest = module.exports = function(peers) {
   });
 
   test('can release the reverse lock', function(t) {
-    t.plan(1);
-    channelA.signaller.once('writelock:release', function(srcId) {
-      t.equal(srcId, channelA.targetId, 'got writelock:release event');
+    t.plan(2);
+    channelA.once('writelock:release', function() {
+      t.pass('got writelock:release event');
     });
+
+    channelB.once('writelock:release', function() {
+      t.pass('got writelock:release event');
+    })
 
     writeLock.release();
     writeLock = null;

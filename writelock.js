@@ -18,6 +18,7 @@ module.exports = WriteLock;
 WriteLock.prototype.release = function() {
   // clear the lock on the local channel
   this.channel.lock = null;
+  this.channel.emit('writelock:release');
 
   // send the writelock release message to the other end
   this.channel.send('/writelock:release', this.id);

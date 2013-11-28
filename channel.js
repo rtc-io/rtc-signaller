@@ -3,11 +3,15 @@
 
 var uuid = require('uuid');
 var WriteLock = require('./writelock');
+var EventEmitter = require('events').EventEmitter;
+var util = require('util');
 
 function Channel(signaller, targetId, opts) {
   if (! (this instanceof Channel)) {
     return new Channel(signaller, targetId);
   }
+
+  EventEmitter.call(this);
 
   // save the signaller for internal use
   this.signaller = signaller;
@@ -37,6 +41,7 @@ function Channel(signaller, targetId, opts) {
 }
 
 module.exports = Channel;
+util.inherits(Channel, EventEmitter);
 
 Channel.prototype.ping = function(callback) {
   var signaller = this.signaller;
@@ -158,5 +163,6 @@ function handleReleaseLock(srcId, id) {
 
   if (this.lock === id) {
     this.lock = null;
+    this.emit('writelock:release');
   }
 };
