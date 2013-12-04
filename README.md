@@ -7,9 +7,6 @@ mechanism for WebRTC.
 [![NPM](https://nodei.co/npm/rtc-signaller.png)](https://nodei.co/npm/rtc-signaller/)
 
 [![Build Status](https://travis-ci.org/rtc-io/rtc-signaller.png?branch=master)](https://travis-ci.org/rtc-io/rtc-signaller)
-
-[![browser support](https://ci.testling.com/rtc-io/rtc-signaller.png)](https://ci.testling.com/rtc-io/rtc-signaller)
-
 [![unstable](http://hughsk.github.io/stability-badges/dist/unstable.svg)](http://github.com/hughsk/stability-badges)
 
 ## Purpose
