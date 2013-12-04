@@ -31,7 +31,7 @@ var runTest = module.exports = function(messenger, peers) {
     t.plan(3);
 
     target.expect(t, { type: 'request' }, function(data) {
-      target.send('/to|' + scope.id + '|/ackreq|' + data.__reqid);
+      target.write('/to|' + scope.id + '|/ackreq|' + data.__reqid);
     });
 
     scope.request({ id: 'doesnotmatter' }, function(err, channel) {
