@@ -1,0 +1,19 @@
+msc {
+  A, B, C;
+
+  |||;
+
+  --- [label=" A announces via the switchboard (server side signaller) "];
+  A->* [label="/announce|{\"id\":\"A\"}"];
+
+  |||;
+
+  --- [label=" B and C announce back to A (via switchboard) "];
+  B->A [label="/to|A|/announce|{\"id\":\"B\"}"];
+  C->A [label="/to|A|/announce|{\"id\":\"C\"}"];
+
+  |||;
+
+  --- [label=" B & C are now aware of A, and A also of B and C" ];
+
+}
