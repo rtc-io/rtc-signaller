@@ -110,19 +110,26 @@ var sig = module.exports = function(messenger, opts) {
   // initialise the data event name
   var dataEvent = (opts || {}).dataEvent || 'data';
   var openEvent = (opts || {}).openEvent || 'open';
+  var writeMethod = (opts || {}).writeMethod || 'write';
+  var closeMethod = (opts || {}).closeMethod || 'close';
 
-  // determine whether we should use a write or send function
-  var write = typeof messenger.write == 'function' ?
-                messenger.write :
-                messenger.send;
-
-  // determine a close handler
-  var close = typeof messenger.close == 'function' ?
-                messenger.close :
-                messenger.end;
+  // extract the write and close function references
+  var write = messenger[writeMethod];
+  var close = messenger[closeMethod];
 
   // create the processor
   var processor = require('./processor')(signaller);
+
+  // if the messenger doesn't provide a valid write method, then complain
+  if (typeof write != 'function') {
+    throw new Error('provided messenger does not implement a "' +
+      writeMethod + '" write method');
+  }
+
+  if (typeof close != 'function') {
+    throw new Error('provided messenger does not implement a "' +
+      closeMethod + '" close method');
+  }
 
   // initialise blocks and matchers
   signaller.matchers = [];
