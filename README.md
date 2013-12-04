@@ -67,6 +67,9 @@ pass on broadcast messages, etc.  This is done for two reasons:
 
 ### Peer Discovery / Announcement
 
+This diagram illustrates the process of how peer `A` announces itself to
+peers `B` and `C`, and in turn they announce themselves.
+
 ![](https://raw.github.com/rtc-io/rtc-signaller/master/docs/announce.png)
 
 ### Editing / Updating the Diagrams
