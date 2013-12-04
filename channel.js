@@ -1,6 +1,7 @@
 /* jshint node: true */
 'use strict';
 
+var debug = require('cog/logger')('signaller-channel');
 var uuid = require('uuid');
 var WriteLock = require('./writelock');
 var EventEmitter = require('events').EventEmitter;
@@ -139,20 +140,25 @@ function handleWriteLock(srcId, id) {
     return;
   }
 
+  debug('received writelock request');
   if (! this.lock) {
     this.lock = id;
+    debug('no existing writelock in place, sending /writelock:ok');
     return this.send('/writelock:ok', id);
   }
 
   if (this.lock instanceof WriteLock) {
     if (this.lock.active) {
+      debug('existing active writelock in place, sending /writelock:reject');
       return this.send('/writelock:reject', this.lock.id);
     }
     else if (id > this.lock.id) {
+      debug('writelock request approved (remote beat local), sending /writelock:ok');
       return this.send('/writelock:ok', id);
     }
   }
 
+  debug('existing reverse writelock in place, sending /writelock:reject');
   return this.send('/writelock:reject', this.lock.id || this.lock);
 };
 
