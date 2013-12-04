@@ -125,7 +125,6 @@ var sig = module.exports = function(messenger, opts) {
   var processor = require('./processor')(signaller);
 
   // initialise blocks and matchers
-  signaller.blocks = [];
   signaller.matchers = [];
 
   function prepareArg(arg) {
