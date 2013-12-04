@@ -8,7 +8,7 @@ module.exports = function(count) {
   function createPeer() {
     var peer = new EventEmitter();
 
-    peer.send = function(data) {
+    peer.write = function(data) {
       // emit data on the other peers
       allPeers.filter(function(other) {
         return other !== peer;
