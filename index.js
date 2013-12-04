@@ -126,11 +126,6 @@ var sig = module.exports = function(messenger, opts) {
       writeMethod + '" write method');
   }
 
-  if (typeof close != 'function') {
-    throw new Error('provided messenger does not implement a "' +
-      closeMethod + '" close method');
-  }
-
   // initialise blocks and matchers
   signaller.matchers = [];
 
