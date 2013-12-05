@@ -8,11 +8,11 @@
   /announce|{}
   ```
 
-  When an announce message is received by the socket scope, the attached
-  object data is decoded and the scope emits an `announce` message.
+  When an announce message is received by the signaller, the attached
+  object data is decoded and the signaller emits an `announce` message.
 
 **/
-module.exports = function(scope) {
+module.exports = function(signaller) {
   return function(args) {
     var payload;
 
@@ -23,9 +23,9 @@ module.exports = function(scope) {
     }
 
     if (! payload) {
-      return scope.emit('error', 'Unable to announce, invalid JSON: ' + args[0]);
+      return signaller.emit('error', 'Unable to announce, invalid JSON: ' + args[0]);
     }
 
-    return scope.emit('announce', payload);
+    return signaller.emit('announce', payload);
   };
 };
