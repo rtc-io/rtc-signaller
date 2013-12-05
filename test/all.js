@@ -1,9 +1,14 @@
-var peers = require('./helpers/createPeers')(3);
+var createPeers = require('./helpers/createPeers');
+var peers = createPeers(3);
 var messenger = peers.shift();
 
 // test signalling logic
-require('./announce')(messenger, peers);
-require('./to')(messenger, peers);
+// require('./announce-raw')(messenger, peers);
+// require('./to')(messenger, peers);
+
+require('./announce-events');
+
+// test announce
 
 if (typeof window != 'undefined') {
   // test primus loading

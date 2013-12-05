@@ -32,7 +32,7 @@ module.exports = function(count) {
 
           data.type = parts[0].slice(1);
 
-          // iterate through the expected result and match 
+          // iterate through the expected result and match
           Object.keys(result).forEach(function(key) {
             matches = matches && data[key] === result[key];
           });
