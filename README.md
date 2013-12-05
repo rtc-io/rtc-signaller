@@ -118,6 +118,11 @@ information that limits the messaging scope.
 
 Leave the messenger mesh
 
+### signaller#lock(targetId, callback)
+
+Attempt to get a temporary exclusive lock on the communication
+channel between the local signaller and the specified target peer id.
+
 ### signaller#to(targetId)
 
 The to method returns an encapsulated
@@ -190,6 +195,22 @@ from a peer signaller:
   from a peer.  Prior to the event being dispatched, the internal peers
   data in the signaller is removed but can be accessed in 2nd argument
   of the event handler.
+
+### lock
+
+```
+/lock
+```
+
+A `/lock` request can only be sent within the context of a `/to` message
+and thus must contain source data to be processed correctly.  The `/lock`
+message is used to coordinate betwen two remote peers in the case that
+both peers which to commence renegotiation at the same time.
+
+In the case that two peers attempt to renegotiate with each other at the
+same time, then the peer that has been identified as party `a` in the peer
+relationship will take on the role of the initiator in the negotiation and
+party `b` will respond to the offer sdp.
 
 ## License(s)
 
