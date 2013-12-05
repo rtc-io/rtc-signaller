@@ -1,6 +1,8 @@
 /* jshint node: true */
 'use strict';
 
+var jsonparse = require('cog/jsonparse');
+
 /**
   ## signaller process handling
 
@@ -64,14 +66,15 @@ module.exports = function(signaller) {
     }
 
     // chop the data into parts
-    parts = data.split('|');
+    parts = data.split('|').map(jsonparse);
 
     // if we have a specific handler for the action, then invoke
     if (parts[0].charAt(0) === '/') {
+      // look for a handler for the message type
       handler = handlers[parts[0].slice(1)];
 
       if (typeof handler == 'function') {
-        handler(parts.slice(1));
+        handler(parts.slice(1), parts[0].slice(1));
       }
       else {
         sendEvent(parts, originalData);

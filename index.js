@@ -4,6 +4,7 @@
 var EventEmitter = require('events').EventEmitter;
 var uuid = require('uuid');
 var extend = require('cog/extend');
+var FastMap = require('collections/fast-map');
 
 /**
   # rtc-signaller
@@ -102,6 +103,9 @@ var sig = module.exports = function(messenger, opts) {
   var attributes = signaller.attributes = {
     id: id
   };
+
+  // create the peers map
+  var peers = signaller.peers = new FastMap();
 
   // initialise the data event name
   var dataEvent = (opts || {}).dataEvent || 'data';

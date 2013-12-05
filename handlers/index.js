@@ -6,8 +6,9 @@
 
 **/
 
-module.exports = function(scope) {
+module.exports = function(signaller) {
   return {
-    announce: require('./announce')(scope)
+    announce: require('./announce')(signaller),
+    leave: require('./leave')(signaller)
   };
 };
