@@ -1,6 +1,7 @@
 /* jshint node: true */
 'use strict';
 
+var debug = require('cog/logger')('rtc-signaller-announce');
 var extend = require('cog/extend');
 var roles = ['a', 'b'];
 
@@ -44,6 +45,8 @@ module.exports = function(signaller) {
 
       // if the peer is existing, then update the data
       if (peer) {
+        debug('signaller: ' + signaller.id + ' received update, data: ', data);
+
         // update the data
         peer.data = data;
 
@@ -72,8 +75,12 @@ module.exports = function(signaller) {
       // set the peer data
       signaller.peers.set(data.id, peer);
 
-      // send an announce reply
-      signaller.to(data.id).send('/announce', signaller.attributes);
+      // send an announce reply (if not actually a reply itself)
+      if (! data.__reply) {
+        signaller
+          .to(data.id)
+          .send('/announce', extend({ __reply: true }, signaller.attributes));
+      }
 
       // emit a new peer announce event
       return signaller.emit('peer:announce', data);
