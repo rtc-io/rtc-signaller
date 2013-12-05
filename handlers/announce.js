@@ -33,7 +33,20 @@ var roles = ['a', 'b'];
 
 **/
 module.exports = function(signaller) {
-  return function(args) {
+
+  function copyData(target, source) {
+    if (target && source) {
+      for (var key in source) {
+        if (key != 'clock') {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  }
+
+  return function(args, messageType, clock) {
     var data = args[0];
     var peer;
     var ids;
@@ -48,7 +61,7 @@ module.exports = function(signaller) {
         debug('signaller: ' + signaller.id + ' received update, data: ', data);
 
         // update the data
-        peer.data = data;
+        copyData(peer.data, data);
 
         // trigger the peer update event
         return signaller.emit('peer:update', data);
@@ -66,20 +79,24 @@ module.exports = function(signaller) {
         remote: roles[ids.indexOf(data.id)],
 
         // initialise the vector clock
-        clock: { a: 0, b: 0 },
+        clock: clock || { a: 0, b: 0 },
 
         // initialise the peer data
-        data: data
+        data: {}
       };
+
+      // initialise the peer data
+      copyData(peer.data, data);
 
       // set the peer data
       signaller.peers.set(data.id, peer);
 
-      // send an announce reply (if not actually a reply itself)
-      if (! data.__reply) {
+      // if this is an initial announce message (no vector clock attached)
+      // then send a announce reply
+      if (! clock) {
         signaller
           .to(data.id)
-          .send('/announce', extend({ __reply: true }, signaller.attributes));
+          .send('/announce', signaller.attributes);
       }
 
       // emit a new peer announce event

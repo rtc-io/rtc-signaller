@@ -5,6 +5,7 @@ var EventEmitter = require('events').EventEmitter;
 var uuid = require('uuid');
 var extend = require('cog/extend');
 var FastMap = require('collections/fast-map');
+var vc = require('vectorclock');
 
 /**
   # rtc-signaller
@@ -125,9 +126,6 @@ var sig = module.exports = function(messenger, opts) {
       writeMethod + '" write method');
   }
 
-  // initialise blocks and matchers
-  signaller.matchers = [];
-
   function prepareArg(arg) {
     if (typeof arg == 'object' && (! (arg instanceof String))) {
       return JSON.stringify(arg);
@@ -137,13 +135,6 @@ var sig = module.exports = function(messenger, opts) {
     }
 
     return arg;
-  }
-
-  function once(prefix, handler) {
-    signaller.matchers.push({
-      prefix: prefix,
-      handler: handler
-    });
   }
 
   /**
@@ -214,8 +205,26 @@ var sig = module.exports = function(messenger, opts) {
   signaller.to = function(targetId) {
     // create a sender that will prepend messages with /to|targetId|
     var sender = function() {
-      var args = ['/to', targetId].concat([].slice.call(arguments));
-      return write.call(messenger, args.map(prepareArg).filter(Boolean).join('|'));
+      // get the peer (yes when send is called to make sure it hasn't left)
+      var peer = signaller.peers.get(targetId);
+      var args = [
+        '/to',
+        targetId,
+        peer.clock
+      ].concat([].slice.call(arguments));
+
+      if (! peer) {
+        return;
+      }
+
+      // increment the peer clock
+      vc.increment(peer, peer.local);
+
+      // include the current clock value in with the payload
+      return write.call(
+        messenger,
+        args.map(prepareArg).filter(Boolean).join('|')
+      );
     };
 
     return {
