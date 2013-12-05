@@ -12,6 +12,18 @@
   a peer that we are managing state information for and if we are then the
   peer state is removed.
 
+  #### Events triggered in response to `/leave` messages
+
+  The following event(s) are triggered when a `/leave` action is received
+  from a peer signaller:
+
+  - `peer:leave`
+
+    The `peer:leave` event is emitted once a `/leave` message is captured
+    from a peer.  Prior to the event being dispatched, the internal peers
+    data in the signaller is removed but can be accessed in 2nd argument
+    of the event handler.
+
 **/
 module.exports = function(signaller) {
   return function(args) {
@@ -27,6 +39,6 @@ module.exports = function(signaller) {
     signaller.peers.delete(data.id);
 
     // emit the event
-    signaller.emit('peer:leave', data);
+    signaller.emit('peer:leave', peer.data, peer);
   };
 };
