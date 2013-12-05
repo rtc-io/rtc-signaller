@@ -9,8 +9,8 @@ msc {
   |||;
 
   --- [label=" B and C announce back to A (via switchboard) "];
-  B->A [label="/to|A|/announce|{\"id\":\"B\"}"];
-  C->A [label="/to|A|/announce|{\"id\":\"C\"}"];
+  B->A [label="/to|A|/announce:reply|{\"id\":\"B\"}"];
+  C->A [label="/to|A|/announce:reply|{\"id\":\"C\"}"];
 
   |||;
 
