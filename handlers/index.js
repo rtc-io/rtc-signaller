@@ -9,6 +9,7 @@
 module.exports = function(signaller) {
   return {
     announce: require('./announce')(signaller),
-    leave: require('./leave')(signaller)
+    leave: require('./leave')(signaller),
+    lock: require('./lock')(signaller)
   };
 };

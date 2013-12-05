@@ -197,6 +197,20 @@ var sig = module.exports = function(messenger, opts) {
   };
 
   /**
+    ### signaller#lock(targetId, callback)
+
+    Attempt to get a temporary exclusive lock on the communication
+    channel between the local signaller and the specified target peer id.
+  **/
+  signaller.lock = function(targetId, callback) {
+    signaller.once('lockresult', function(result) {
+      callback(result.fail && new Error('Could not acquire lock'));
+    });
+
+    signaller.to(targetId).send('/lock');
+  };
+
+  /**
     ### signaller#to(targetId)
 
     The to method returns an encapsulated
@@ -210,7 +224,7 @@ var sig = module.exports = function(messenger, opts) {
       var args = [
         '/to',
         targetId,
-        peer.clock
+        { id: signaller.id, clock: peer.clock }
       ].concat([].slice.call(arguments));
 
       if (! peer) {
@@ -220,11 +234,14 @@ var sig = module.exports = function(messenger, opts) {
       // increment the peer clock
       vc.increment(peer, peer.local);
 
-      // include the current clock value in with the payload
-      return write.call(
-        messenger,
-        args.map(prepareArg).filter(Boolean).join('|')
-      );
+      // write on next tick to ensure clock updates are handled correctly
+      setTimeout(function() {
+        // include the current clock value in with the payload
+        write.call(
+          messenger,
+          args.map(prepareArg).filter(Boolean).join('|')
+        );
+      }, 0);
     };
 
     return {

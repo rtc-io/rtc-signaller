@@ -72,6 +72,8 @@ module.exports = function(signaller) {
 
       // create a new peer
       peer = {
+        id: data.id,
+
         // determine the roles of the local vs remote
         // participant a: is the lower of the two ids
         // participant b: is the higher of the two ids

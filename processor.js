@@ -3,6 +3,7 @@
 
 var debug = require('cog/logger')('rtc-signaller-processor');
 var jsonparse = require('cog/jsonparse');
+var vc = require('vectorclock');
 
 /**
   ## signaller process handling
@@ -32,17 +33,7 @@ module.exports = function(signaller) {
     var evtName = parts[0].slice(1);
 
     // convert any valid json objects to json
-    var args = parts.slice(1).map(function(part) {
-      if (part.charAt(0) === '{' || part.charAt(0) === '[') {
-        try {
-          part = JSON.parse(part);
-        }
-        catch (e) {
-        }
-      }
-
-      return part;
-    }).concat(data);
+    var args = parts.slice(1).map(jsonparse).concat(data);
 
     signaller.emit.apply(signaller, [evtName].concat(args));
   }
@@ -52,7 +43,8 @@ module.exports = function(signaller) {
     var isMatch = true;
     var parts;
     var handler;
-    var clock;
+    var srcData;
+    var srcState;
 
     debug('signaller ' + signaller.id + ' received data: ' + originalData);
 
@@ -62,11 +54,12 @@ module.exports = function(signaller) {
       if (isMatch) {
         parts = data.slice(5 + id.length).split('|').map(jsonparse);
 
-        // extract the vector clock and update the parts
-        clock = parts[0];
-        parts = parts.slice(1).map(jsonparse);
+        // get the source data
+        srcData = parts[0];
+        srcState = signaller.peers.get(srcData && srcData.id);
 
-        // TODO: compare the clock value
+        // extract the vector clock and update the parts
+        parts = parts.slice(1).map(jsonparse);
       }
     }
 
@@ -84,11 +77,21 @@ module.exports = function(signaller) {
       handler = handlers[parts[0].slice(1)];
 
       if (typeof handler == 'function') {
-        handler(parts.slice(1), parts[0].slice(1), clock);
+        handler(
+          parts.slice(1),
+          parts[0].slice(1),
+          srcData && srcData.clock,
+          srcState
+        );
       }
       else {
         sendEvent(parts, originalData);
       }
+    }
+
+    // if we have a clock value (and a source peer), then merge the clock
+    if (srcData && srcData.clock && srcState) {
+      srcState.clock = vc.merge(srcState.clock, srcData.clock);
     }
   };
 };
