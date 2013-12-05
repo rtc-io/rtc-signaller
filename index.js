@@ -4,7 +4,6 @@
 var EventEmitter = require('events').EventEmitter;
 var uuid = require('uuid');
 var extend = require('cog/extend');
-var Channel = require('./channel');
 
 /**
   # rtc-signaller
@@ -104,9 +103,6 @@ var sig = module.exports = function(messenger, opts) {
     id: id
   };
 
-  // initialise the open channel registry
-  var activeChannels = {};
-
   // initialise the data event name
   var dataEvent = (opts || {}).dataEvent || 'data';
   var openEvent = (opts || {}).openEvent || 'open';
@@ -191,19 +187,6 @@ var sig = module.exports = function(messenger, opts) {
     return (sender || send)('/announce', attributes);
   };
 
-  signaller.closeChannel = function(channel) {
-    if (channel instanceof Channel) {
-      channel._close();
-
-      if (channel === activeChannels[channel.targetId]) {
-        activeChannels[channel.targetId] = undefined;
-      }
-    }
-    else if (typeof channel == 'string' || (channel instanceof String)) {
-      signaller.closeChannel(activeChannels[channel]);
-    }
-  };
-
   /**
     ### signaller#leave()
 
@@ -216,69 +199,6 @@ var sig = module.exports = function(messenger, opts) {
     // call the close method
     if (typeof close == 'function') {
       close.call(messenger);
-    }
-  };
-
-  /**
-    ### signaller#request(data)
-
-    The `signaller.request` call is where one peer goes looking for a target
-    peer that satisfies specific search parameters.  This may be a search
-    for a peer with a particular id, or something more general such as
-    a request for a peer with a particular name or role.
-
-    Once a suitable match has been found from within the messenging network
-    the callback will fire and provide a discrete messaging channel to that
-    particular peer.
-
-    __NOTE:__ The discreteness of the message needs to be programmed at the
-    mesh level if required. Signallers will not attempt to parse a message
-    destined for another signaller, but they are visible by default.  This
-    can easily be handled however, by filtering `/to` messages.
-  **/
-  signaller.request = function(data, opts, callback) {
-    // initialise a request id
-    var reqid = uuid.v4();
-    var timeoutTimer;
-
-    // handle 2 arg form
-    if (typeof opts == 'function') {
-      callback = opts;
-      opts = {};
-    }
-
-    // handle request acknowledge
-    once('/ackreq|' + reqid, function(data) {
-      var targetId = data.split('|')[2];
-
-      clearTimeout(timeoutTimer);
-
-      // if we have an existing channel active, then return an error
-      if (activeChannels[targetId]) {
-        return callback(new Error('channel active for peer: ' + targetId));
-      }
-
-      // trigger the callback with the send function wired
-      callback(
-        null,
-        activeChannels[targetId] = new Channel(signaller, targetId, opts)
-      );
-    });
-
-    // send out a request across the network
-    send('/request', extend({}, data, {
-      __srcid: id,
-      __reqid: reqid
-    }));
-
-    // TODO: inspect known peers for a match
-    if (typeof callback == 'function') {
-      timeoutTimer = setTimeout(function() {
-        var err = new Error('request timed out');
-        err.timeout = true;
-
-        callback(err);
-      }, (opts || {}).timeout || 3000);
     }
   };
 
