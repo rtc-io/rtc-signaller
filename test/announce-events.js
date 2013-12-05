@@ -69,3 +69,14 @@ test('info for peer:0 updated in signaller:1', function(t) {
   t.equal(peer.data.name, 'Fred', 'name is Fred');
   t.equal(peer.data.age, 30, 'age = 30');
 });
+
+test('signaller:1 receives a peer:leave event when signaller:0 leaves', function(t) {
+  t.plan(2);
+
+  signallers[1].once('peer:leave', function(data) {
+    t.equal(data.id, signallers[0].id, 'captured signaller:0 leave');
+    t.notOk(signallers[1].peers.get(data.id), 'peer record removed for signaller:0');
+  });
+
+  signallers[0].leave();
+});
