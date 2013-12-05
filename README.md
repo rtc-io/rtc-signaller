@@ -118,22 +118,6 @@ information that limits the messaging scope.
 
 Leave the messenger mesh
 
-### signaller#request(data)
-
-The `signaller.request` call is where one peer goes looking for a target
-peer that satisfies specific search parameters.  This may be a search
-for a peer with a particular id, or something more general such as
-a request for a peer with a particular name or role.
-
-Once a suitable match has been found from within the messenging network
-the callback will fire and provide a discrete messaging channel to that
-particular peer.
-
-__NOTE:__ The discreteness of the message needs to be programmed at the
-mesh level if required. Signallers will not attempt to parse a message
-destined for another signaller, but they are visible by default.  This
-can easily be handled however, by filtering `/to` messages.
-
 ### signaller#to(targetId)
 
 The to method returns an encapsulated
@@ -147,7 +131,7 @@ delegated to a simple message parser, which applies the following simple
 logic:
 
 - Is the message a `/to` message. If so, see if the message is for this
-  signaller scope (checking the target id - 2nd arg).  If so pass the
+  signaller (checking the target id - 2nd arg).  If so pass the
   remainder of the message onto the standard processing chain.  If not,
   discard the message.
 
@@ -166,19 +150,8 @@ logic:
 /announce|{}
 ```
 
-When an announce message is received by the socket scope, the attached
-object data is decoded and the scope emits an `announce` message.
-
-### request
-
-```
-/request|{"key":"value","__srcid": "", "__reqid": ""}
-```
-
-A request is basically a "search for a friend" message.  This is where one
-peer in the mesh is searching for another peer based on particular criteria.
-In general, a request message is delivered to all peers within the mesh
-and then those peers that are not in a blocked state will respond.
+When an announce message is received by the signaller, the attached
+object data is decoded and the signaller emits an `announce` message.
 
 ## License(s)
 
