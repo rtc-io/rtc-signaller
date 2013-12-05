@@ -153,6 +153,32 @@ logic:
 When an announce message is received by the signaller, the attached
 object data is decoded and the signaller emits an `announce` message.
 
+#### Events Triggered for `/announce` messages
+
+There are two different types of `peer:` events that can be triggered
+in on peer B to calling the `announce` method on peer A.
+
+- `peer:announce`
+
+  The `peer:announce` event is triggered when a new peer has been
+  discovered.  The data for the new peer (as an JS object) is provided
+  as the first argument of the event handler.
+
+- `peer:update`
+
+  If a peer "reannounces" then a `peer:update` event will be triggered
+  rather than a `peer:announce` event.
+
+### leave
+
+```
+/leave|{"id":"..."}
+```
+
+When a leave message is received from a peer, we check to see if that is
+a peer that we are managing state information for and if we are then the
+peer state is removed.
+
 ## License(s)
 
 ### Apache 2.0
