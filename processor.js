@@ -1,6 +1,7 @@
 /* jshint node: true */
 'use strict';
 
+var debug = require('cog/logger')('rtc-signaller-processor');
 var jsonparse = require('cog/jsonparse');
 
 /**
@@ -51,6 +52,8 @@ module.exports = function(signaller) {
     var isMatch = true;
     var parts;
     var handler;
+
+    debug('signaller ' + signaller.id + ' received data: ' + originalData);
 
     // process /to messages
     if (data.slice(0, 3) === '/to') {

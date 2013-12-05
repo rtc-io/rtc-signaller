@@ -17,23 +17,30 @@ test('create signallers', function(t) {
   t.end();
 });
 
-test('peer:0 announce', function(t) {
-  t.plan(4);
+test('concurrent announce', function(t) {
+  t.plan(5);
 
-  signallers[1].once('peer:announce', function(data) {
+  signallers[1].on('peer:announce', function(data) {
     t.equal(data.name, 'Fred', 'signaller 0 announce captured by signaller 1');
     t.ok(signallers[1].peers.get(data.id), 'signaller 1 has noted relationship with signaller 0');
   });
 
-  signallers[0].once('peer:announce', function(data) {
+  signallers[0].on('peer:announce', function(data) {
     // once peer:1 has processed peer:0 announce it will respond
     // if it is a new peer
     t.equal(data.id, signallers[1].id, 'signaller 1 has announced itself in response');
     t.ok(signallers[0].peers.get(data.id), 'signaller 0 has noted relationship with signaller 1');
   });
 
+  setTimeout(function() {
+    signallers[0].removeAllListeners();
+    signallers[1].removeAllListeners();
+    t.pass('received only the 1 announce message for each peer');
+  }, 1000);
+
   // peer 0 initiates the announce process
   signallers[0].announce({ name: 'Fred' });
+  signallers[1].announce({ name: 'Bob' });
 });
 
 test('ab roles have been correctly assigned', function(t) {
@@ -47,41 +54,4 @@ test('ab roles have been correctly assigned', function(t) {
   // ensure that data0 and data1 have inverse relationships for local and remote
   t.equal(data0.remote, data1.local, 'data 0 remote === data 1 local');
   t.equal(data1.local, data0.remote, 'data 1 local === data 0 remote');
-});
-
-test('second peer:0 announce triggers peer:update event only', function(t) {
-  var failTest = t.fail.bind(t, 'captured announce');
-
-  t.plan(2);
-
-  signallers[1].once('peer:announce', failTest);
-  signallers[1].once('peer:update', function(data) {
-    signallers[1].removeListener('peer:announce', failTest);
-
-    t.equal(data.name, 'Fred', 'name retransmitted');
-    t.equal(data.age, 30, 'age transmitted also');
-  });
-
-  signallers[0].announce({ age: 30 });
-});
-
-test('info for peer:0 updated in signaller:1', function(t) {
-  var peer;
-
-  t.plan(3);
-  t.ok(peer = signallers[1].peers.get(signallers[0].id), 'got peer data');
-  t.equal(peer.data.name, 'Fred', 'name is Fred');
-  t.equal(peer.data.age, 30, 'age = 30');
-});
-
-test('signaller:1 receives a peer:leave event when signaller:0 leaves', function(t) {
-  t.plan(3);
-
-  signallers[1].once('peer:leave', function(data) {
-    t.equal(data.id, signallers[0].id, 'captured signaller:0 leave');
-    t.equal(data.name, 'Fred', 'we know its Fred');
-    t.notOk(signallers[1].peers.get(data.id), 'peer record removed for signaller:0');
-  });
-
-  signallers[0].leave();
 });

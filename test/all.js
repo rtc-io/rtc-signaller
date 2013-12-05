@@ -7,6 +7,7 @@ var messenger = peers.shift();
 // require('./to')(messenger, peers);
 
 require('./announce-events');
+require('./announce-concurrent');
 
 // test announce
 
