@@ -9,7 +9,7 @@
   logic:
 
   - Is the message a `/to` message. If so, see if the message is for this
-    signaller scope (checking the target id - 2nd arg).  If so pass the
+    signaller (checking the target id - 2nd arg).  If so pass the
     remainder of the message onto the standard processing chain.  If not,
     discard the message.
 
@@ -20,9 +20,9 @@
   - Finally, does the message match any patterns that we are listening for?
     If so, then pass the entire message contents onto the registered handler.
 **/
-module.exports = function(scope) {
-  var id = scope.id;
-  var handlers = require('./handlers')(scope);
+module.exports = function(signaller) {
+  var id = signaller.id;
+  var handlers = require('./handlers')(signaller);
 
   function sendEvent(parts, data) {
     // initialise the event name
@@ -41,7 +41,7 @@ module.exports = function(scope) {
       return part;
     }).concat(data);
 
-    scope.emit.apply(scope, [evtName].concat(args));
+    signaller.emit.apply(signaller, [evtName].concat(args));
   }
 
   return function(originalData) {
@@ -79,7 +79,7 @@ module.exports = function(scope) {
     }
 
     // process matchers
-    scope.matchers = scope.matchers.filter(function(rule) {
+    signaller.matchers = signaller.matchers.filter(function(rule) {
       var exec = data.slice(0, rule.prefix.length) === rule.prefix;
 
       if (exec && typeof rule.handler == 'function') {
