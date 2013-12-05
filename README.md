@@ -147,13 +147,13 @@ logic:
 ### announce
 
 ```
-/announce|{}
+/announce|{"id": "...", ... }
 ```
 
 When an announce message is received by the signaller, the attached
 object data is decoded and the signaller emits an `announce` message.
 
-#### Events Triggered for `/announce` messages
+#### Events Triggered in response to `/announce`
 
 There are two different types of `peer:` events that can be triggered
 in on peer B to calling the `announce` method on peer A.
@@ -178,6 +178,18 @@ in on peer B to calling the `announce` method on peer A.
 When a leave message is received from a peer, we check to see if that is
 a peer that we are managing state information for and if we are then the
 peer state is removed.
+
+#### Events triggered in response to `/leave` messages
+
+The following event(s) are triggered when a `/leave` action is received
+from a peer signaller:
+
+- `peer:leave`
+
+  The `peer:leave` event is emitted once a `/leave` message is captured
+  from a peer.  Prior to the event being dispatched, the internal peers
+  data in the signaller is removed but can be accessed in 2nd argument
+  of the event handler.
 
 ## License(s)
 
