@@ -8,7 +8,6 @@
 
 module.exports = function(scope) {
   return {
-    announce: require('./announce')(scope),
-    request: require('./request')(scope)
+    announce: require('./announce')(scope)
   };
 };
