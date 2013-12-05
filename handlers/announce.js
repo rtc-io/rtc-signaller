@@ -1,6 +1,9 @@
 /* jshint node: true */
 'use strict';
 
+var extend = require('cog/extend');
+var roles = ['a', 'b'];
+
 /**
   ### announce
 
@@ -14,18 +17,50 @@
 **/
 module.exports = function(signaller) {
   return function(args) {
-    var payload;
+    var data = args[0];
+    var peer;
+    var ids;
 
-    try {
-      payload = JSON.parse(args[0]);
-    }
-    catch (e) {
-    }
+    // if we have valid data then process
+    if (data && data.id) {
+      // check to see if this is a known peer
+      peer = signaller.peers.get(data.id);
 
-    if (! payload) {
-      return signaller.emit('error', 'Unable to announce, invalid JSON: ' + args[0]);
-    }
+      // if the peer is existing, then update the data
+      if (peer) {
+        // update the data
+        peer.data = data;
 
-    return signaller.emit('announce', payload);
+        // trigger the peer update event
+        return signaller.emit('peer:update', data);
+      }
+
+      // initialise the ids array and sort
+      ids = [data.id, signaller.id].sort();
+
+      // create a new peer
+      peer = {
+        // determine the roles of the local vs remote
+        // participant a: is the lower of the two ids
+        // participant b: is the higher of the two ids
+        local: roles[ids.indexOf(signaller.id)],
+        remote: roles[ids.indexOf(data.id)],
+
+        // initialise the vector clock
+        clock: { a: 0, b: 0 },
+
+        // initialise the peer data
+        data: data
+      };
+
+      // set the peer data
+      signaller.peers.set(data.id, peer);
+
+      // send an announce reply
+      signaller.to(data.id).send('/announce', signaller.attributes);
+
+      // emit a new peer announce event
+      return signaller.emit('peer:announce', data);
+    }
   };
 };
