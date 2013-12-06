@@ -1,6 +1,6 @@
 {
   "name": "rtc-signaller",
-  "version": "0.10.1",
+  "version": "0.10.2",
   "description": "rtc.io transportless signalling for WebRTC",
   "main": "index.js",
   "directories": {
