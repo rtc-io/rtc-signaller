@@ -30,15 +30,12 @@ module.exports = function(signaller) {
     var data = args[0];
     var peer = signaller.peers.get(data && data.id);
 
-    // if we don't have a valid peer, then don't trigger the event
-    if (! peer) {
-      return;
+    // remove the peer from the peers data
+    if (peer) {
+      signaller.peers.delete(data.id);
     }
 
-    // remove the peer from the peers data
-    signaller.peers.delete(data.id);
-
     // emit the event
-    signaller.emit('peer:leave', peer.data, peer);
+    signaller.emit('peer:leave', data.id, peer);
   };
 };

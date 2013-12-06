@@ -75,12 +75,13 @@ test('info for peer:0 updated in signaller:1', function(t) {
 });
 
 test('signaller:1 receives a peer:leave event when signaller:0 leaves', function(t) {
-  t.plan(3);
+  t.plan(4);
 
-  signallers[1].once('peer:leave', function(data) {
-    t.equal(data.id, signallers[0].id, 'captured signaller:0 leave');
-    t.equal(data.name, 'Fred', 'we know its Fred');
-    t.notOk(signallers[1].peers.get(data.id), 'peer record removed for signaller:0');
+  signallers[1].once('peer:leave', function(id, peer) {
+    t.equal(id, signallers[0].id, 'captured signaller:0 leave');
+    t.ok(peer && peer.data, 'received peer data as this was a known peer');
+    t.equal(peer.data.name, 'Fred', 'we know its Fred');
+    t.notOk(signallers[1].peers.get(id), 'peer record removed for signaller:0');
   });
 
   signallers[0].leave();
