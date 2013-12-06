@@ -95,7 +95,7 @@ module.exports = function(signaller) {
       }
 
       // emit a new peer announce event
-      return signaller.emit('peer:announce', data);
+      return signaller.emit('peer:announce', data, peer);
     }
   };
 };
