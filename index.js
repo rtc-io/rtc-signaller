@@ -282,15 +282,17 @@ var sig = module.exports = function(messenger, opts) {
     var sender = function() {
       // get the peer (yes when send is called to make sure it hasn't left)
       var peer = signaller.peers.get(targetId);
-      var args = [
+      var args;
+
+      if (! peer) {
+        throw new Error('Unknown peer: ' + targetId);
+      }
+
+      args = [
         '/to',
         targetId,
         { id: signaller.id, clock: peer.clock }
       ].concat([].slice.call(arguments));
-
-      if (! peer) {
-        return;
-      }
 
       // increment the peer clock, using the role of the local
       // signaller.  If the peer role is 0, then the signallers role is 1
