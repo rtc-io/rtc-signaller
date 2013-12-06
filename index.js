@@ -230,7 +230,11 @@ var sig = module.exports = function(messenger, opts) {
 
       // if we don't have an error condition, create an active local lock
       if (ok) {
-        locks.set(label, { id: lockid });
+        locks.set(label, activeLock = { id: lockid });
+      }
+      // otherwise, delete the local provisional lock
+      else if (activeLock) {
+        locks.delete(label);
       }
 
       callback(ok ? null : new Error('could not acquire lock'));
@@ -268,7 +272,7 @@ var sig = module.exports = function(messenger, opts) {
     }
 
     // create a provisional lock
-    locks.set(label, { id: lockid, provisional: true });
+    locks.set(label, activeLock = { id: lockid, provisional: true });
 
     // wait for the lock result
     signaller.on('lockresult', handleLockResult);
