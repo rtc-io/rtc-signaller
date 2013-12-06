@@ -8,7 +8,7 @@ var peers = [
 ];
 var signallers = [];
 
-require('cog/logger').enable('*');
+// require('cog/logger').enable('*');
 
 test('create signallers', function(t) {
   t.plan(2);
@@ -58,7 +58,14 @@ test('attempt uncontested lock from peer:0', function(t) {
   });
 });
 
-test('release the lock', function(t) {
+test('unable to acquire default lock from peer:1', function(t) {
+  t.plan(1);
+  signallers[1].lock(signallers[0].id, function(err) {
+    t.ok(err, 'received error as expected');
+  });
+});
+
+test('peer:0 release the default lock', function(t) {
   t.plan(2);
   signallers[0].unlock(signallers[1].id, function(err) {
     t.ifError(err, 'lock released');
@@ -74,7 +81,31 @@ test('attempt uncontested lock from peer:1', function(t) {
   });
 });
 
-test('release the lock', function(t) {
+test('unable to acquire default lock from peer:0', function(t) {
+  t.plan(1);
+  signallers[0].lock(signallers[1].id, function(err) {
+    t.ok(err, 'received error as expected');
+  });
+});
+
+test('peer:0 can acquire an alternatively named lock', function(t) {
+  t.plan(3);
+  signallers[0].lock(signallers[1].id, { name: 'foo' }, function(err) {
+    var localLockId;
+    var remoteLockId;
+
+    t.ifError(err, 'got lock successfully');
+
+    // get the local lock id and remote lock id
+    localLockId = signallers[0].locks.get('foo');
+    remoteLockId = signallers[1].peers.get(signallers[0].id).locks.get('foo');
+
+    t.ok(localLockId, 'local foo lock detected');
+    t.equal(remoteLockId, localLockId, 'remote lock id === local lock id');
+  });
+});
+
+test('peer:1 release the default lock', function(t) {
   t.plan(2);
   signallers[1].unlock(signallers[0].id, function(err) {
     t.ifError(err, 'lock released');
