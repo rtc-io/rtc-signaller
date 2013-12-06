@@ -28,14 +28,14 @@ module.exports = function(signaller) {
   var id = signaller.id;
   var handlers = require('./handlers')(signaller);
 
-  function sendEvent(parts, data) {
+  function sendEvent(parts, srcState, data) {
     // initialise the event name
     var evtName = parts[0].slice(1);
 
     // convert any valid json objects to json
     var args = parts.slice(1).map(jsonparse).concat(data);
 
-    signaller.emit.apply(signaller, [evtName].concat(args));
+    signaller.emit.apply(signaller, [evtName, srcState].concat(args));
   }
 
   return function(originalData) {
@@ -85,7 +85,7 @@ module.exports = function(signaller) {
         );
       }
       else {
-        sendEvent(parts, originalData);
+        sendEvent(parts, srcState, originalData);
       }
     }
 

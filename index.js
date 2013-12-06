@@ -210,8 +210,13 @@ var sig = module.exports = function(messenger, opts) {
     var lockid = uuid.v4();
     var label;
 
-    function handleLockResult(result) {
+    function handleLockResult(src, result) {
       var ok = result && result.ok;
+
+      // if the source does not match the target then abort
+      if ((! src) || (src.id !== targetId)) {
+        return;
+      }
 
       // if the result label is not a match, then abort
       if ((! result) || (result.label !== label)) {
@@ -320,8 +325,13 @@ var sig = module.exports = function(messenger, opts) {
     var peer = peers.get(targetId);
     var label;
 
-    function handleUnlockResult(result) {
+    function handleUnlockResult(src, result) {
       var ok = result && result.ok;
+
+      // if not the correct source then abort
+      if ((! src) || (src.id !== targetId)) {
+        return;
+      }
 
       // if this is not an unlock result for this label, then abort
       if ((! result) || (result.label !== label)) {
