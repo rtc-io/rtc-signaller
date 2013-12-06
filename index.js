@@ -244,7 +244,7 @@ var sig = module.exports = function(messenger, opts) {
     }
 
     // create a default label if none provided
-    label = (opts || {}).label || 'default';
+    label = (opts || {}).label || (opts || {}).name || 'default';
 
     // if we have a local lock already in place, then return ok
     if (locks.get(label)) {
@@ -350,7 +350,7 @@ var sig = module.exports = function(messenger, opts) {
     callback = callback || function() {};
 
     // set a default label value
-    label = (opts || {}).label || 'default';
+    label = (opts || {}).label || (opts || {}).name || 'default';
 
     // if we have the peer and local lock then action the unlock
     if (peer && locks.get(label)) {
