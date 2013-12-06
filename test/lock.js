@@ -113,26 +113,26 @@ test('peer:1 release the default lock', function(t) {
   });
 });
 
-// test('contested lock results in alpha party getting lock', function(t) {
-//   var ids = [ signallers[0].id, signallers[1].id ];
-//   var alphaIndex = ids.indexOf([].concat(ids).sort()[0]);
+test('contested lock results in alpha party getting lock', function(t) {
+  var ids = [ signallers[0].id, signallers[1].id ];
+  var alphaIndex = ids.indexOf([].concat(ids).sort()[0]);
 
-//   t.plan(2);
-//   signallers[0].lock(signallers[1].id, function(err) {
-//     if (alphaIndex === 0) {
-//       t.ifError(err, 'signaller 0 was alpha and got lock');
-//     }
-//     else {
-//       t.ok(err, 'signaller 0 was beta and did not get lock');
-//     }
-//   });
+  t.plan(2);
+  signallers[0].lock(signallers[1].id, function(err) {
+    if (alphaIndex === 0) {
+      t.ifError(err, 'signaller 0 was alpha and got lock');
+    }
+    else {
+      t.ok(err, 'signaller 0 was beta and did not get lock');
+    }
+  });
 
-//   signallers[1].lock(signallers[0].id, function(err) {
-//     if (alphaIndex === 1) {
-//       t.ifError(err, 'signaller 1 was alpha and got lock');
-//     }
-//     else {
-//       t.ok(err, 'signaller 1 was beta and did not get lock');
-//     }
-//   });
-// });
+  signallers[1].lock(signallers[0].id, function(err) {
+    if (alphaIndex === 1) {
+      t.ifError(err, 'signaller 1 was alpha and got lock');
+    }
+    else {
+      t.ok(err, 'signaller 1 was beta and did not get lock');
+    }
+  });
+});
