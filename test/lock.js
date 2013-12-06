@@ -66,9 +66,7 @@ test('attempt uncontested lock from peer:1', function(t) {
 
 test('contested lock results in alpha party getting lock', function(t) {
   var ids = [ signallers[0].id, signallers[1].id ];
-  var alphaIndex = ids.indexOf([].concat(ids).sort()[1]);
-
-  console.log(ids, alphaIndex);
+  var alphaIndex = ids.indexOf([].concat(ids).sort()[0]);
 
   t.plan(2);
   signallers[0].lock(signallers[1].id, function(err) {

@@ -231,8 +231,10 @@ var sig = module.exports = function(messenger, opts) {
         return;
       }
 
-      // increment the peer clock
-      vc.increment(peer, peer.local);
+      // increment the peer clock, using the role of the local
+      // signaller.  If the peer role is 0, then the signallers role is 1
+      // and using xor (^) will generate the correct index
+      vc.increment(peer, ['a', 'b'][peer.roleIdx ^ 1]);
 
       // write on next tick to ensure clock updates are handled correctly
       setTimeout(function() {

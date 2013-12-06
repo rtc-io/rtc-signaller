@@ -39,9 +39,10 @@ module.exports = function(signaller) {
     // if the remote clock is greater than the lock clock state
     // then the lock is automatically successful
     failed = clockComparison < 0 ||
-      (clockComparison === 0 && srcState.local === 'b');
+      (clockComparison === 0 && srcState.roleIdx > 0);
 
-    console.log('clock comparison = ' + clockComparison + ' failed: ' + failed, srcState);
+    // console.log('signaller ' + signaller.id + ' checking lock state');
+    // console.log('clock comparison = ' + clockComparison + ' failed: ' + failed, srcState);
 
     // send the lock result
     signaller.to(srcState.id).send('/lockresult', { fail: failed });

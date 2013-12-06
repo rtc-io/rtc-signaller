@@ -49,7 +49,6 @@ module.exports = function(signaller) {
   return function(args, messageType, clock) {
     var data = args[0];
     var peer;
-    var ids;
 
     // if we have valid data then process
     if (data && data.id) {
@@ -67,18 +66,12 @@ module.exports = function(signaller) {
         return signaller.emit('peer:update', data);
       }
 
-      // initialise the ids array and sort
-      ids = [data.id, signaller.id].sort();
-
       // create a new peer
       peer = {
         id: data.id,
 
-        // determine the roles of the local vs remote
-        // participant a: is the lower of the two ids
-        // participant b: is the higher of the two ids
-        local: roles[ids.indexOf(signaller.id)],
-        remote: roles[ids.indexOf(data.id)],
+        // initialise the local role index
+        roleIdx: [data.id, signaller.id].sort().indexOf(data.id),
 
         // initialise the vector clock
         clock: clock || { a: 0, b: 0 },
