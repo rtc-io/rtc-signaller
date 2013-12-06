@@ -118,7 +118,7 @@ information that limits the messaging scope.
 
 Leave the messenger mesh
 
-### signaller#lock(targetId, callback)
+### signaller#lock(targetId, opts?, callback?)
 
 Attempt to get a temporary exclusive lock on the communication
 channel between the local signaller and the specified target peer id.
@@ -126,6 +126,8 @@ channel between the local signaller and the specified target peer id.
 ### signaller#to(targetId)
 
 The to method returns an encapsulated
+
+### signaller#unlock(targetId, opts?)
 
 ### signaller.loadPrimus(signalhost, callback)
 
@@ -211,6 +213,14 @@ In the case that two peers attempt to renegotiate with each other at the
 same time, then the peer that has been identified as party `a` in the peer
 relationship will take on the role of the initiator in the negotiation and
 party `b` will respond to the offer sdp.
+
+### unlock
+
+```
+/unlock|label
+```
+
+Clear a remote lock
 
 ## License(s)
 
