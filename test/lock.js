@@ -8,7 +8,7 @@ var peers = [
 ];
 var signallers = [];
 
-// require('cog/logger').enable('*');
+require('cog/logger').enable('*');
 
 test('create signallers', function(t) {
   t.plan(2);
@@ -51,39 +51,57 @@ test('concurrent announce', function(t) {
 });
 
 test('attempt uncontested lock from peer:0', function(t) {
-  t.plan(1);
+  t.plan(2);
   signallers[0].lock(signallers[1].id, function(err) {
     t.ifError(err, 'got lock successfully');
+    t.ok(signallers[0].locks.get('default'), 'default lock detected');
+  });
+});
+
+test('release the lock', function(t) {
+  t.plan(2);
+  signallers[0].unlock(signallers[1].id, function(err) {
+    t.ifError(err, 'lock released');
+    t.notOk(signallers[0].locks.get('default'), 'no default lock present');
   });
 });
 
 test('attempt uncontested lock from peer:1', function(t) {
-  t.plan(1);
+  t.plan(2);
   signallers[1].lock(signallers[0].id, function(err) {
     t.ifError(err, 'got lock successfully');
+    t.ok(signallers[1].locks.get('default'), 'default lock detected');
   });
 });
 
-test('contested lock results in alpha party getting lock', function(t) {
-  var ids = [ signallers[0].id, signallers[1].id ];
-  var alphaIndex = ids.indexOf([].concat(ids).sort()[0]);
-
+test('release the lock', function(t) {
   t.plan(2);
-  signallers[0].lock(signallers[1].id, function(err) {
-    if (alphaIndex === 0) {
-      t.ifError(err, 'signaller 0 was alpha and got lock');
-    }
-    else {
-      t.ok(err, 'signaller 0 was beta and did not get lock');
-    }
-  });
-
-  signallers[1].lock(signallers[0].id, function(err) {
-    if (alphaIndex === 1) {
-      t.ifError(err, 'signaller 1 was alpha and got lock');
-    }
-    else {
-      t.ok(err, 'signaller 1 was beta and did not get lock');
-    }
+  signallers[1].unlock(signallers[0].id, function(err) {
+    t.ifError(err, 'lock released');
+    t.notOk(signallers[1].locks.get('default'), 'no default lock present');
   });
 });
+
+// test('contested lock results in alpha party getting lock', function(t) {
+//   var ids = [ signallers[0].id, signallers[1].id ];
+//   var alphaIndex = ids.indexOf([].concat(ids).sort()[0]);
+
+//   t.plan(2);
+//   signallers[0].lock(signallers[1].id, function(err) {
+//     if (alphaIndex === 0) {
+//       t.ifError(err, 'signaller 0 was alpha and got lock');
+//     }
+//     else {
+//       t.ok(err, 'signaller 0 was beta and did not get lock');
+//     }
+//   });
+
+//   signallers[1].lock(signallers[0].id, function(err) {
+//     if (alphaIndex === 1) {
+//       t.ifError(err, 'signaller 1 was alpha and got lock');
+//     }
+//     else {
+//       t.ok(err, 'signaller 1 was beta and did not get lock');
+//     }
+//   });
+// });

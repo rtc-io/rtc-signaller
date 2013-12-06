@@ -3,6 +3,7 @@
 
 var debug = require('cog/logger')('rtc-signaller-lock');
 var vc = require('vectorclock');
+var FastMap = require('collections/fast-map');
 
 /**
   ### lock
@@ -25,7 +26,8 @@ var vc = require('vectorclock');
 module.exports = function(signaller) {
   return function(args, messageType, clock, srcState) {
     var clockComparison;
-    var failed = true;
+    var success = false;
+    var label = args[0];
 
     // if we don't have a clock value or don't know about the source
     // then just drop the message
@@ -33,18 +35,30 @@ module.exports = function(signaller) {
       return;
     }
 
-    debug('received lock request from src: ' + srcState.id);
+    debug('received "' + label + '" lock request from src: ' + srcState.id);
     clockComparison = vc.compare(clock, srcState.clock);
 
     // if the remote clock is greater than the lock clock state
     // then the lock is automatically successful
-    failed = clockComparison < 0 ||
-      (clockComparison === 0 && srcState.roleIdx > 0);
+    success = clockComparison > 0 ||
+      (clockComparison === 0 && srcState.roleIdx === 0);
 
     // console.log('signaller ' + signaller.id + ' checking lock state');
     // console.log('clock comparison = ' + clockComparison + ' failed: ' + failed, srcState);
 
+    // if the lock is successful, then add the lock info to the srcState
+    if (success) {
+      // ensure we have a locks member
+      srcState.locks = srcState.locks || new FastMap();
+
+      // create the lock
+      srcState.locks.set(label, args[1] || true);
+    }
+
     // send the lock result
-    signaller.to(srcState.id).send('/lockresult', { fail: failed });
+    signaller.to(srcState.id).send('/lockresult', {
+      label: label,
+      ok: success
+    });
   };
 };

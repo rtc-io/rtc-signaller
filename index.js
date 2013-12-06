@@ -108,6 +108,9 @@ var sig = module.exports = function(messenger, opts) {
   // create the peers map
   var peers = signaller.peers = new FastMap();
 
+  // create our locks map
+  var locks = signaller.locks = new FastMap();
+
   // initialise the data event name
   var dataEvent = (opts || {}).dataEvent || 'data';
   var writeMethod = (opts || {}).writeMethod || 'write';
@@ -197,17 +200,70 @@ var sig = module.exports = function(messenger, opts) {
   };
 
   /**
-    ### signaller#lock(targetId, callback)
+    ### signaller#lock(targetId, opts?, callback?)
 
     Attempt to get a temporary exclusive lock on the communication
     channel between the local signaller and the specified target peer id.
   **/
-  signaller.lock = function(targetId, callback) {
-    signaller.once('lockresult', function(result) {
-      callback(result.fail && new Error('Could not acquire lock'));
-    });
+  signaller.lock = function(targetId, opts, callback) {
+    var peer = peers.get(targetId);
+    var lockid = uuid.v4();
+    var label;
 
-    signaller.to(targetId).send('/lock');
+    function handleLockResult(result) {
+      var ok = result && result.ok;
+
+      // if the result label is not a match, then abort
+      if ((! result) || (result.label !== label)) {
+        return;
+      }
+
+      // don't listen for any further lock result messages
+      signaller.removeListener('lockresult', handleLockResult);
+
+      // if we don't have an error condition, create a local lock
+      if (ok) {
+        locks.set(label, lockid);
+      }
+
+      callback(ok ? null : new Error('could not acquire lock'));
+    }
+
+    // check for no label being supplied
+    if (typeof opts == 'function') {
+      callback = opts;
+      opts = {};
+    }
+
+    // ensure we have a callback
+    callback = callback || function() {};
+
+    // if the peer is not known, then we cannot initiate a lock
+    if (! peer) {
+      return callback(new Error('unknown target id - cannot initiate lock'));
+    }
+
+    // create a default label if none provided
+    label = (opts || {}).label || 'default';
+
+    // if we have a local lock already in place, then return ok
+    if (locks.get(label)) {
+      return callback();
+    }
+
+    // ensure we have locks for the peer
+    peer.locks = peer.locks || new FastMap();
+
+    // if a remote lock is in place, error out
+    if (peer.locks.get(label)) {
+      return callback(new Error('remote lock in place, cannot request lock'));
+    }
+
+    // wait for the lock result
+    signaller.on('lockresult', handleLockResult);
+
+    // send the lock message
+    signaller.to(targetId).send('/lock', label, lockid);
   };
 
   /**
@@ -252,6 +308,57 @@ var sig = module.exports = function(messenger, opts) {
       },
 
       send: sender,
+    }
+  };
+
+  /**
+
+    ### signaller#unlock(targetId, opts?)
+
+  **/
+  signaller.unlock = function(targetId, opts, callback) {
+    var peer = peers.get(targetId);
+    var label;
+
+    function handleUnlockResult(result) {
+      var ok = result && result.ok;
+
+      // if this is not an unlock result for this label, then abort
+      if ((! result) || (result.label !== label)) {
+        return;
+      }
+
+      // remove the listener
+      signaller.removeListener('unlockresult', handleUnlockResult);
+
+      // if ok, remove our local lock
+      if (ok) {
+        locks.delete(label);
+      }
+
+      // trigger the callback
+      callback(ok ? null : new Error('could not release lock: ' + label));
+    }
+
+    // handle the no opts case
+    if (typeof opts == 'function') {
+      callback = opts;
+      opts = {};
+    }
+
+    // ensure we have a callback
+    callback = callback || function() {};
+
+    // set a default label value
+    label = (opts || {}).label || 'default';
+
+    // if we have the peer and local lock then action the unlock
+    if (peer && locks.get(label)) {
+      signaller.on('unlockresult', handleUnlockResult);
+      signaller.to(targetId).send('/unlock', label, locks.get(label));
+    }
+    else {
+      return callback(new Error('no local lock with label ' + label));
     }
   };
 
