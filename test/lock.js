@@ -101,7 +101,7 @@ test('peer:0 can acquire an alternatively named lock', function(t) {
     remoteLockId = signallers[1].peers.get(signallers[0].id).locks.get('foo');
 
     t.ok(localLockId, 'local foo lock detected');
-    t.equal(remoteLockId, localLockId, 'remote lock id === local lock id');
+    t.deepEqual(remoteLockId, localLockId, 'remote lock id === local lock id');
   });
 });
 

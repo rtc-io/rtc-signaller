@@ -1,6 +1,7 @@
 /* jshint node: true */
 'use strict';
 
+var debug = require('cog/logger')('rtc-signaller');
 var EventEmitter = require('events').EventEmitter;
 var uuid = require('uuid');
 var extend = require('cog/extend');
@@ -207,6 +208,7 @@ var sig = module.exports = function(messenger, opts) {
   **/
   signaller.lock = function(targetId, opts, callback) {
     var peer = peers.get(targetId);
+    var activeLock;
     var lockid = uuid.v4();
     var label;
 
@@ -226,9 +228,9 @@ var sig = module.exports = function(messenger, opts) {
       // don't listen for any further lock result messages
       signaller.removeListener('lockresult', handleLockResult);
 
-      // if we don't have an error condition, create a local lock
+      // if we don't have an error condition, create an active local lock
       if (ok) {
-        locks.set(label, lockid);
+        locks.set(label, { id: lockid });
       }
 
       callback(ok ? null : new Error('could not acquire lock'));
@@ -252,7 +254,8 @@ var sig = module.exports = function(messenger, opts) {
     label = (opts || {}).label || (opts || {}).name || 'default';
 
     // if we have a local lock already in place, then return ok
-    if (locks.get(label)) {
+    activeLock = locks.get(label);
+    if (activeLock && (! activeLock.provisional)) {
       return callback();
     }
 
@@ -263,6 +266,9 @@ var sig = module.exports = function(messenger, opts) {
     if (peer.locks.get(label)) {
       return callback(new Error('remote lock in place, cannot request lock'));
     }
+
+    // create a provisional lock
+    locks.set(label, { id: lockid, provisional: true });
 
     // wait for the lock result
     signaller.on('lockresult', handleLockResult);
@@ -301,11 +307,11 @@ var sig = module.exports = function(messenger, opts) {
 
       // write on next tick to ensure clock updates are handled correctly
       setTimeout(function() {
+        var msg = args.map(prepareArg).filter(Boolean).join('|');
+        debug('TX (' + targetId + '): ', msg);
+
         // include the current clock value in with the payload
-        write.call(
-          messenger,
-          args.map(prepareArg).filter(Boolean).join('|')
-        );
+        write.call(messenger, msg);
       }, 0);
     };
 

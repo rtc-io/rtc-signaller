@@ -43,8 +43,10 @@ module.exports = function(signaller) {
     success = clockComparison > 0 ||
       (clockComparison === 0 && srcState.roleIdx === 0);
 
-    // console.log('signaller ' + signaller.id + ' checking lock state');
-    // console.log('clock comparison = ' + clockComparison + ' failed: ' + failed, srcState);
+    debug('signaller ' + signaller.id + ' checking lock state');
+    debug('clock value in message: ', clock);
+    debug('cached peer clock state: ', srcState.clock);
+    debug('clock comparison = ' + clockComparison + ' ok: ' + success, srcState);
 
     // if the lock is successful, then add the lock info to the srcState
     if (success) {
@@ -52,7 +54,7 @@ module.exports = function(signaller) {
       srcState.locks = srcState.locks || new FastMap();
 
       // create the lock
-      srcState.locks.set(label, args[1] || true);
+      srcState.locks.set(label, { id: args[1] || '' });
     }
 
     // send the lock result
