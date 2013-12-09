@@ -38,12 +38,20 @@
   "testling": {
     "files": "test/all.js",
     "server": "test/server.js",
-    "browsers": [
-      "firefox/23..latest",
-      "chrome/30..latest",
-      "chrome/canary",
-      "opera/14..latest",
-      "opera/next"
-    ]
+    "browsers": {
+      "ff": [
+        25,
+        "nightly"
+      ],
+      "chrome": [
+        30,
+        31,
+        "canary"
+      ],
+      "opera": [
+        17,
+        "next"
+      ]
+    }
   }
 }
