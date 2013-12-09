@@ -95,6 +95,9 @@ var vc = require('vectorclock');
 **/
 var sig = module.exports = function(messenger, opts) {
 
+  // get the autoreply setting
+  var autoreply = (opts || {}).autoreply;
+
   // create the signaller
   var signaller = new EventEmitter();
 
@@ -120,6 +123,9 @@ var sig = module.exports = function(messenger, opts) {
   // extract the write and close function references
   var write = messenger[writeMethod];
   var close = messenger[closeMethod];
+
+  // set the autoreply flag
+  signaller.autoreply = autoreply === undefined || autoreply;
 
   // create the processor
   var processor = require('./processor')(signaller);

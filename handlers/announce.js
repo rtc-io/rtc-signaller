@@ -88,7 +88,7 @@ module.exports = function(signaller) {
 
       // if this is an initial announce message (no vector clock attached)
       // then send a announce reply
-      if (! clock) {
+      if (signaller.autoreply && (! clock)) {
         signaller
           .to(data.id)
           .send('/announce', signaller.attributes);
