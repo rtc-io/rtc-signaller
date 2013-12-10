@@ -36,24 +36,5 @@
   "license": "Apache 2.0",
   "bugs": {
     "url": "https://github.com/rtc-io/rtc-signaller/issues"
-  },
-  "testling": {
-    "files": "test/all.js",
-    "server": "test/server.js",
-    "browsers": {
-      "ff": [
-        25,
-        "nightly"
-      ],
-      "chrome": [
-        30,
-        31,
-        "canary"
-      ],
-      "opera": [
-        17,
-        "next"
-      ]
-    }
   }
 }
