@@ -15,10 +15,12 @@
   "devDependencies": {
     "tape": "~2.3.0",
     "rtc-switchboard": "~0.4.0",
-    "messenger-memory": "~0.3.0"
+    "messenger-memory": "~0.3.0",
+    "mocha": "~1.15.1",
+    "zuul": "~1.0.6"
   },
   "scripts": {
-    "test": "node test/all.js",
+    "test": "node test/all.js && zuul -- test/all.js",
     "gendocs": "gendocs > README.md"
   },
   "repository": {

@@ -3,8 +3,8 @@ browsers:
   - name: chrome
     version: 30..latest
 
-  - name: safari
-    version: latest
+  # - name: safari
+  #   version: latest
 
   # - name: ie
   #   version: 9..latest
