@@ -18,11 +18,14 @@ test('create signallers', function(t) {
 });
 
 test('peer:0 announce', function(t) {
-  t.plan(4);
+  t.plan(6);
 
   signallers[1].once('peer:announce', function(data) {
     t.equal(data.name, 'Fred', 'signaller 0 announce captured by signaller 1');
     t.ok(signallers[1].peers.get(data.id), 'signaller 1 has noted relationship with signaller 0');
+
+    t.ok(data.browser, 'browser name has been supplied in announce');
+    t.ok(data.browserVersion, 'browser version has been supplied in announce');
   });
 
   signallers[0].once('peer:announce', function(data) {

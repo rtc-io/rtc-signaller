@@ -2,6 +2,7 @@
 'use strict';
 
 var debug = require('cog/logger')('rtc-signaller');
+var detect = require('rtc-core/detect');
 var EventEmitter = require('events').EventEmitter;
 var uuid = require('uuid');
 var extend = require('cog/extend');
@@ -106,6 +107,8 @@ var sig = module.exports = function(messenger, opts) {
 
   // initialise the attributes
   var attributes = signaller.attributes = {
+    browser: detect.browser,
+    browserVersion: detect.browserVersion,
     id: id
   };
 

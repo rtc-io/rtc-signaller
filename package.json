@@ -10,7 +10,8 @@
     "uuid": "~1.4.1",
     "cog": "~0.4.1",
     "vectorclock": "0.0.0",
-    "collections": "~0.2.2"
+    "collections": "~0.2.2",
+    "rtc-core": "~0.7.1"
   },
   "devDependencies": {
     "tape": "~2.3.0",
