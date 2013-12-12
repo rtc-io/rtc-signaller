@@ -25,7 +25,6 @@ var vc = require('vectorclock');
     If so, then pass the entire message contents onto the registered handler.
 **/
 module.exports = function(signaller) {
-  var id = signaller.id;
   var handlers = require('./handlers')(signaller);
 
   function sendEvent(parts, srcState, data) {
@@ -39,6 +38,7 @@ module.exports = function(signaller) {
   }
 
   return function(originalData) {
+    var id = signaller.id;
     var data = originalData;
     var isMatch = true;
     var parts;

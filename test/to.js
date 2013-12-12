@@ -1,5 +1,6 @@
 var test = require('tape');
 var createSignaller = require('..');
+var uuid = require('uuid');
 
 var runTest = module.exports = function(messenger, peers) {
   var s;
@@ -9,6 +10,12 @@ var runTest = module.exports = function(messenger, peers) {
     t.plan(2);
     t.ok(s = createSignaller(messenger), 'created');
     t.ok(s.id, 'have id');
+  });
+
+  test('change the signaller id', function(t) {
+    t.plan(1);
+    s.id = uuid.v4();
+    t.pass('signaller id updated');
   });
 
   test('convert other peers to signaller scopes', function(t) {
