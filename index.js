@@ -188,7 +188,7 @@ var sig = module.exports = function(messenger, opts) {
   **/
   signaller.announce = function(data, sender) {
     // update internal attributes
-    extend(attributes, data, { id: id });
+    extend(attributes, data, { id: signaller.id });
 
     // send the attributes over the network
     return (sender || send)('/announce', attributes);
