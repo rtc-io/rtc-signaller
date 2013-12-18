@@ -222,7 +222,7 @@ var sig = module.exports = function(messenger, opts) {
     var lockid = uuid.v4();
     var label;
 
-    function handleLockResult(src, result) {
+    function handleLockResult(result, src) {
       var ok = result && result.ok;
 
       // if the source does not match the target then abort
@@ -347,7 +347,7 @@ var sig = module.exports = function(messenger, opts) {
     var peer = peers.get(targetId);
     var label;
 
-    function handleUnlockResult(src, result) {
+    function handleUnlockResult(result, src) {
       var ok = result && result.ok;
 
       // if not the correct source then abort

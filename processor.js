@@ -32,9 +32,12 @@ module.exports = function(signaller) {
     var evtName = parts[0].slice(1);
 
     // convert any valid json objects to json
-    var args = parts.slice(1).map(jsonparse).concat(data);
+    var args = parts.slice(1).map(jsonparse);
 
-    signaller.emit.apply(signaller, [evtName, srcState].concat(args));
+    signaller.emit.apply(
+      signaller,
+      [evtName].concat(args).concat([srcState, data])
+    );
   }
 
   return function(originalData) {
