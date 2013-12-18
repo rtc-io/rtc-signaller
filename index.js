@@ -120,6 +120,7 @@ var sig = module.exports = function(messenger, opts) {
 
   // initialise the data event name
   var dataEvent = (opts || {}).dataEvent || 'data';
+  var openEvent = (opts || {}).openEvent || 'open';
   var writeMethod = (opts || {}).writeMethod || 'write';
   var closeMethod = (opts || {}).closeMethod || 'close';
 
@@ -395,6 +396,9 @@ var sig = module.exports = function(messenger, opts) {
 
   // handle message data events
   messenger.on(dataEvent, processor);
+
+  // pass through open events
+  messenger.on(openEvent, signaller.emit.bind(signaller, 'open'));
 
   return signaller;
 };
