@@ -56,3 +56,18 @@ test('ab roles have been correctly assigned', function(t) {
   t.equal(data0.remote, data1.local, 'data 0 remote === data 1 local');
   t.equal(data1.local, data0.remote, 'data 1 local === data 0 remote');
 });
+
+test('isMaster checks are accurate', function(t) {
+  var alphaId = [signallers[0].id, signallers[1].id].sort()[0];
+
+  t.plan(2);
+
+  if (alphaId === signallers[0].id) {
+    t.ok(signallers[0].isMaster(signallers[1].id));
+    t.notOk(signallers[1].isMaster(signallers[0].id));
+  }
+  else {
+    t.notOk(signallers[0].isMaster(signallers[1].id));
+    t.ok(signallers[1].isMaster(signallers[0].id));
+  }
+});

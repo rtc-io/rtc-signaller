@@ -196,6 +196,33 @@ var sig = module.exports = function(messenger, opts) {
   };
 
   /**
+    ### signaller#isMaster(targetId)
+
+    A simple function that indicates whether the local signaller is the master
+    for it's relationship with peer signaller indicated by `targetId`.  Roles
+    are determined at the point at which signalling peers discover each other,
+    and are simply worked out by whichever peer has the lowest signaller id
+    when lexigraphically sorted.
+
+    For example, if we have two signaller peers that have discovered each
+    others with the following ids:
+
+    - b11f4fd0-feb5-447c-80c8-c51d8c3cced2
+    - 8a07f82e-49a5-4b9b-a02e-43d911382be6
+
+    They would be assigned roles:
+
+    - b11f4fd0-feb5-447c-80c8-c51d8c3cced2
+    - 8a07f82e-49a5-4b9b-a02e-43d911382be6 (master)
+
+  **/
+  signaller.isMaster = function(targetId) {
+    var peer = peers.get(targetId);
+
+    return peer && peer.roleIdx !== 0;
+  };
+
+  /**
     ### signaller#leave()
 
     Leave the messenger mesh
