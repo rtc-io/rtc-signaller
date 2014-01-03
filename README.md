@@ -95,7 +95,7 @@ Use the send function to send a message to other peers in the current
 signalling scope (if announced in a room this will be a room, otherwise
 broadcast to all peers connected to the signalling server).
 
-### signaller#announce(data?)
+### announce(data?)
 
 The `announce` function of the signaller will pass an `/announce` message
 through the messenger network.  When no additional data is supplied to
@@ -151,7 +151,7 @@ that I am going offline:
 signaller.announce({ status: 'offline' });
 ```
 
-### signaller#isMaster(targetId)
+### isMaster(targetId)
 
 A simple function that indicates whether the local signaller is the master
 for it's relationship with peer signaller indicated by `targetId`.  Roles
@@ -170,18 +170,18 @@ They would be assigned roles:
 - `b11f4fd0-feb5-447c-80c8-c51d8c3cced2`
 - `8a07f82e-49a5-4b9b-a02e-43d911382be6` (master)
 
-### signaller#leave()
+### leave()
 
 Tell the signalling server we are leaving.  Calling this function is
 usually not required though as the signalling server should issue correct
 `/leave` messages when it detects a disconnect event.
 
-### signaller#lock(targetId, opts?, callback?)
+### lock(targetId, opts?, callback?)
 
 Attempt to get a temporary exclusive lock on the communication
 channel between the local signaller and the specified target peer id.
 
-### signaller#to(targetId)
+### to(targetId)
 
 Use the `to` function to send a message to the specified target peer.
 A large parge of negotiating a WebRTC peer connection involves direct
@@ -209,9 +209,17 @@ pc.createOffer(
 );
 ```
 
-### signaller#unlock(targetId, opts?)
+### signaller#unlock(targetId, opts?, callback)
 
-### signaller.loadPrimus(signalhost, callback)
+Send an unlock message to the target peer to release a previously
+attained lock.  The callback will be triggered once we know whether the
+lock release was successful and acknowledged.
+
+### loadPrimus(signalhost, callback)
+
+This is a convenience function that is patched into the signaller to assist
+with loading the `primus.js` client library from an `rtc-switchboard`
+signaling server.
 
 ### signaller process handling
 

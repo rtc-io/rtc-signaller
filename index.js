@@ -169,7 +169,7 @@ var sig = module.exports = function(messenger, opts) {
   };
 
   /**
-    ### signaller#announce(data?)
+    ### announce(data?)
 
     The `announce` function of the signaller will pass an `/announce` message
     through the messenger network.  When no additional data is supplied to
@@ -235,7 +235,7 @@ var sig = module.exports = function(messenger, opts) {
   };
 
   /**
-    ### signaller#isMaster(targetId)
+    ### isMaster(targetId)
 
     A simple function that indicates whether the local signaller is the master
     for it's relationship with peer signaller indicated by `targetId`.  Roles
@@ -262,7 +262,7 @@ var sig = module.exports = function(messenger, opts) {
   };
 
   /**
-    ### signaller#leave()
+    ### leave()
 
     Tell the signalling server we are leaving.  Calling this function is
     usually not required though as the signalling server should issue correct
@@ -280,7 +280,7 @@ var sig = module.exports = function(messenger, opts) {
   };
 
   /**
-    ### signaller#lock(targetId, opts?, callback?)
+    ### lock(targetId, opts?, callback?)
 
     Attempt to get a temporary exclusive lock on the communication
     channel between the local signaller and the specified target peer id.
@@ -361,7 +361,7 @@ var sig = module.exports = function(messenger, opts) {
   };
 
   /**
-    ### signaller#to(targetId)
+    ### to(targetId)
 
     Use the `to` function to send a message to the specified target peer.
     A large parge of negotiating a WebRTC peer connection involves direct
@@ -433,8 +433,12 @@ var sig = module.exports = function(messenger, opts) {
 
   /**
 
-    ### signaller#unlock(targetId, opts?)
+    ### signaller#unlock(targetId, opts?, callback)
 
+    Send an unlock message to the target peer to release a previously
+    attained lock.  The callback will be triggered once we know whether the
+    lock release was successful and acknowledged.
+    
   **/
   signaller.unlock = function(targetId, opts, callback) {
     var peer = peers.get(targetId);

@@ -6,7 +6,11 @@ var url = require('url');
 var reTrailingSlash = /\/$/;
 
 /**
-  ### signaller.loadPrimus(signalhost, callback)
+  ### loadPrimus(signalhost, callback)
+
+  This is a convenience function that is patched into the signaller to assist
+  with loading the `primus.js` client library from an `rtc-switchboard`
+  signaling server.
 
 **/
 module.exports = function(signalhost, callback) {
