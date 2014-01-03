@@ -173,19 +173,55 @@ var sig = module.exports = function(messenger, opts) {
     this function then only the id of the signaller is sent to all active
     members of the messenging network.
 
-    As a unique it is generally insufficient information to determine whether
-    a peer is a good match for another (for instance,  you might be looking
-    for other parties by name or role) it is generally a good idea to provide
-    some additional information during this announce call:
+    #### Joining Rooms
+
+    To join a room using an announce call you simply provide the name of the
+    room you wish to join as part of the data block that you annouce, for
+    example:
 
     ```js
-    signaller.announce({ role: 'translator' });
+    signaller.announce({ room: 'testroom' });
     ```
 
-    __NOTE:__ In some particular messenger types may attach or infer
-    additional data during the announce phase.  For instance, socket.io
-    connections are generally organised into rooms which is inferred
-    information that limits the messaging scope.
+    Signalling servers (such as
+    [rtc-switchboard](https://github.com/rtc-io/rtc-switchboard)) will then
+    place your peer connection into a room with other peers that have also
+    announced in this room.
+
+    Once you have joined a room, the server will only deliver messages that
+    you `send` to other peers within that room.
+
+    #### Providing Additional Announce Data
+
+    There may be instances where you wish to send additional data as part of
+    your announce message in your application.  For instance, maybe you want
+    to send an alias or nick as part of your announce message rather than just
+    use the signaller's generated id.
+
+    If for instance you were writing a simple chat application you could join
+    the `webrtc` room and tell everyone your name with the following announce
+    call:
+
+    ```js
+    signaller.announce({
+      room: 'webrtc',
+      nick: 'Damon'
+    });
+    ```
+
+    #### Announcing Updates
+
+    The signaller is written to distinguish between initial peer announcements
+    and peer data updates (see the docs on the announce handler below). As
+    such it is ok to provide any data updates using the announce method also.
+
+    For instance, I could send a status update as an announce message to flag
+    that I am going offline:
+
+    ```js
+    signaller.announce({ status: 'offline' });
+    ```
+
   **/
   signaller.announce = function(data, sender) {
     // update internal attributes
