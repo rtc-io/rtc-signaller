@@ -185,7 +185,7 @@ The to method returns an encapsulated
 
 ### signaller.loadPrimus(signalhost, callback)
 
-## signaller process handling
+### signaller process handling
 
 When a signaller's underling messenger emits a `data` event this is
 delegated to a simple message parser, which applies the following simple
@@ -203,9 +203,9 @@ logic:
 - Finally, does the message match any patterns that we are listening for?
   If so, then pass the entire message contents onto the registered handler.
 
-## signaller message handlers
+### signaller message handlers
 
-### announce
+#### announce
 
 ```
 /announce|{"id": "...", ... }
@@ -214,7 +214,7 @@ logic:
 When an announce message is received by the signaller, the attached
 object data is decoded and the signaller emits an `announce` message.
 
-#### Events Triggered in response to `/announce`
+##### Events Triggered in response to `/announce`
 
 There are two different types of `peer:` events that can be triggered
 in on peer B to calling the `announce` method on peer A.
@@ -230,7 +230,7 @@ in on peer B to calling the `announce` method on peer A.
   If a peer "reannounces" then a `peer:update` event will be triggered
   rather than a `peer:announce` event.
 
-### leave
+#### leave
 
 ```
 /leave|{"id":"..."}
@@ -240,7 +240,7 @@ When a leave message is received from a peer, we check to see if that is
 a peer that we are managing state information for and if we are then the
 peer state is removed.
 
-#### Events triggered in response to `/leave` messages
+##### Events triggered in response to `/leave` messages
 
 The following event(s) are triggered when a `/leave` action is received
 from a peer signaller:
@@ -252,7 +252,7 @@ from a peer signaller:
   data in the signaller is removed but can be accessed in 2nd argument
   of the event handler.
 
-### lock
+#### lock
 
 ```
 /lock
@@ -268,7 +268,7 @@ same time, then the peer that has been identified as party `a` in the peer
 relationship will take on the role of the initiator in the negotiation and
 party `b` will respond to the offer sdp.
 
-### unlock
+#### unlock
 
 ```
 /unlock|label

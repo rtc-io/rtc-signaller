@@ -6,7 +6,7 @@ var jsonparse = require('cog/jsonparse');
 var vc = require('vectorclock');
 
 /**
-  ## signaller process handling
+  ### signaller process handling
 
   When a signaller's underling messenger emits a `data` event this is
   delegated to a simple message parser, which applies the following simple

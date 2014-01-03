@@ -6,7 +6,7 @@ var vc = require('vectorclock');
 var FastMap = require('collections/fast-map');
 
 /**
-  ### lock
+  #### lock
 
   ```
   /lock

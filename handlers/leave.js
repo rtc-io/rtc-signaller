@@ -2,7 +2,7 @@
 'use strict';
 
 /**
-  ### leave
+  #### leave
 
   ```
   /leave|{"id":"..."}
@@ -12,7 +12,7 @@
   a peer that we are managing state information for and if we are then the
   peer state is removed.
 
-  #### Events triggered in response to `/leave` messages
+  ##### Events triggered in response to `/leave` messages
 
   The following event(s) are triggered when a `/leave` action is received
   from a peer signaller:

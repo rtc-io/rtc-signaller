@@ -5,7 +5,7 @@ var debug = require('cog/logger')('rtc-signaller-lock');
 var vc = require('vectorclock');
 
 /**
-  ### unlock
+  #### unlock
 
   ```
   /unlock|label

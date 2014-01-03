@@ -6,7 +6,7 @@ var extend = require('cog/extend');
 var roles = ['a', 'b'];
 
 /**
-  ### announce
+  #### announce
 
   ```
   /announce|{"id": "...", ... }
@@ -15,7 +15,7 @@ var roles = ['a', 'b'];
   When an announce message is received by the signaller, the attached
   object data is decoded and the signaller emits an `announce` message.
 
-  #### Events Triggered in response to `/announce`
+  ##### Events Triggered in response to `/announce`
 
   There are two different types of `peer:` events that can be triggered
   in on peer B to calling the `announce` method on peer A.
