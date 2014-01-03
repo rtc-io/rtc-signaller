@@ -162,17 +162,19 @@ when lexigraphically sorted.
 For example, if we have two signaller peers that have discovered each
 others with the following ids:
 
-- b11f4fd0-feb5-447c-80c8-c51d8c3cced2
-- 8a07f82e-49a5-4b9b-a02e-43d911382be6
+- `b11f4fd0-feb5-447c-80c8-c51d8c3cced2`
+- `8a07f82e-49a5-4b9b-a02e-43d911382be6`
 
 They would be assigned roles:
 
-- b11f4fd0-feb5-447c-80c8-c51d8c3cced2
-- 8a07f82e-49a5-4b9b-a02e-43d911382be6 (master)
+- `b11f4fd0-feb5-447c-80c8-c51d8c3cced2`
+- `8a07f82e-49a5-4b9b-a02e-43d911382be6` (master)
 
 ### signaller#leave()
 
-Leave the messenger mesh
+Tell the signalling server we are leaving.  Calling this function is
+usually not required though as the signalling server should issue correct
+`/leave` messages when it detects a disconnect event.
 
 ### signaller#lock(targetId, opts?, callback?)
 
@@ -181,7 +183,31 @@ channel between the local signaller and the specified target peer id.
 
 ### signaller#to(targetId)
 
-The to method returns an encapsulated
+Use the `to` function to send a message to the specified target peer.
+A large parge of negotiating a WebRTC peer connection involves direct
+communication between two parties which must be done by the signalling
+server.  The `to` function provides a simple way to provide a logical
+communication channel between the two parties:
+
+```js
+var send = signaller.to('e95fa05b-9062-45c6-bfa2-5055bf6625f4').send;
+
+// create an offer on a local peer connection
+pc.createOffer(
+  function(desc) {
+    // set the local description using the offer sdp
+    // if this occurs successfully send this to our peer
+    pc.setLocalDescription(
+      desc,
+      function() {
+        send('/sdp', desc);
+      },
+      handleFail
+    );
+  },
+  handleFail
+);
+```
 
 ### signaller#unlock(targetId, opts?)
 
