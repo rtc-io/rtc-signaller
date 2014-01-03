@@ -89,9 +89,11 @@ you to communicate with other peers via your messaging network.
 var signaller = require('rtc-signaller')(messenger);
 ```
 
-### signaller#send(data)
+### signaller#send(message, data*)
 
-Send data over the messenging interface.
+Use the send function to send a message to other peers in the current
+signalling scope (if announced in a room this will be a room, otherwise
+broadcast to all peers connected to the signalling server).
 
 ### signaller#announce(data?)
 
