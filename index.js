@@ -401,6 +401,11 @@ var sig = module.exports = function(messenger, opts) {
         throw new Error('Unknown peer: ' + targetId);
       }
 
+      // if the peer is inactive, then abort
+      if (peer.inactive) {
+        return;
+      }
+
       args = [
         '/to',
         targetId,
