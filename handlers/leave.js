@@ -30,9 +30,9 @@ module.exports = function(signaller) {
     var data = args[0];
     var peer = signaller.peers.get(data && data.id);
 
-    // remove the peer from the peers data
+    // if we know about the peer, mark it as inactive
     if (peer) {
-      signaller.peers.delete(data.id);
+      peer.inactive = true;
     }
 
     // emit the event
