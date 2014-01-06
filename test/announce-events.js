@@ -84,7 +84,8 @@ test('signaller:1 receives a peer:leave event when signaller:0 leaves', function
     t.equal(id, signallers[0].id, 'captured signaller:0 leave');
     t.ok(peer && peer.data, 'received peer data as this was a known peer');
     t.equal(peer.data.name, 'Fred', 'we know its Fred');
-    t.notOk(signallers[1].peers.get(id), 'peer record removed for signaller:0');
+
+    t.ok(signallers[1].peers.get(id).inactive, 'peer record marked inactive');
   });
 
   signallers[0].leave();
