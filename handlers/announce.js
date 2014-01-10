@@ -51,7 +51,7 @@ module.exports = function(signaller) {
     var peer;
 
     // if we have valid data then process
-    if (data && data.id) {
+    if (data && data.id && data.id !== signaller.id) {
       // check to see if this is a known peer
       peer = signaller.peers.get(data.id);
 
