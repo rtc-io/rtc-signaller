@@ -37,19 +37,14 @@ var vc = require('vectorclock');
 
   ## Getting Started
 
-  To work with the signaller, you first need a messenger of some kind. If you
-  have run up a version of the
-  [rtc-switchboard](https://github.com/rtc-io/rtc-switchboard) somewhere then
-  the following example should work:
+  While the signaller is capable of communicating by a number of different
+  messengers (i.e. anything that can send and receive messages over a wire)
+  it comes with support for understanding how to connect to an
+  [rtc-switchboard](https://github.com/rtc-io/rtc-switchboard) out of the box.
 
-  <<< examples/signalling-via-switchboard.js
+  The following code sample demonstrates how:
 
-  While the example above demonstrates communication between two endpoints
-  via websockets, it does not go into detail on setting up a WebRTC peer
-  connection (as that is significantly more involved).  If you are looking for
-  an easy way to do this, I'd recommend checking out
-  [rtc-quickconnect](https://github.com/rtc-io/rtc-quickconnect) or
-  [rtc-glue](https://github.com/rtc-io/rtc-glue).
+  <<< examples/getting-started.js
 
   ## Signal Flow Diagrams
 
@@ -92,6 +87,10 @@ var vc = require('vectorclock');
   // create a signaller from something that knows how to send messages
   var signaller = require('rtc-signaller')(messenger);
   ```
+
+  As demonstrated in the getting started guide, you can also pass through
+  a string value instead of a messenger instance if you simply want to
+  connect to an existing `rtc-switchboard` instance.
 
 **/
 var sig = module.exports = function(messenger, opts) {
@@ -160,8 +159,12 @@ var sig = module.exports = function(messenger, opts) {
     // handle message data events
     messenger.on(dataEvent, processor);
 
-    // pass through open events
-    messenger.on(openEvent, signaller.emit.bind(signaller, 'open'));
+    // when the connection is open, then emit an open event and a connected event
+    messenger.on(openEvent, function() {
+      // TODO: deprecate the open event
+      signaller.emit('open');
+      signaller.emit('connected');
+    });
 
     // flag as initialised
     initialized = true;

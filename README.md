@@ -31,21 +31,36 @@ mechanisms:
 
 ## Getting Started
 
-To work with the signaller, you first need a messenger of some kind. If you
-have run up a version of the
-[rtc-switchboard](https://github.com/rtc-io/rtc-switchboard) somewhere then
-the following example should work:
+While the signaller is capable of communicating by a number of different
+messengers (i.e. anything that can send and receive messages over a wire)
+it comes with support for understanding how to connect to an
+[rtc-switchboard](https://github.com/rtc-io/rtc-switchboard) out of the box.
+
+The following code sample demonstrates how:
 
 ```js
-// to be completed
-```
+// create a new signaller, connecting to the target switchboard
+var signaller = require('rtc-signaller')('http://rtc.io/switchboard');
 
-While the example above demonstrates communication between two endpoints
-via websockets, it does not go into detail on setting up a WebRTC peer
-connection (as that is significantly more involved).  If you are looking for
-an easy way to do this, I'd recommend checking out
-[rtc-quickconnect](https://github.com/rtc-io/rtc-quickconnect) or
-[rtc-glue](https://github.com/rtc-io/rtc-glue).
+// when a new peer is announced, log it
+signaller.on('peer:announce', function(data) {
+ console.log('new peer found in room: ', data);
+});
+
+// when a peer leaves the switchboard, log it
+signaller.on('peer:leave', function(id) {
+  console.log('peer ' + id + ' has left the room');
+});
+
+// for our sanity, pop a message once we are connected
+signaller.once('connected', function() {
+  console.log('we have successfully connected');
+});
+
+// send through an announce message
+// this will occur once the primus socket has been opened and active
+signaller.announce({ room: 'signaller-getting-started' });
+```
 
 ## Signal Flow Diagrams
 
