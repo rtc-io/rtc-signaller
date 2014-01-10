@@ -104,6 +104,10 @@ you to communicate with other peers via your messaging network.
 var signaller = require('rtc-signaller')(messenger);
 ```
 
+As demonstrated in the getting started guide, you can also pass through
+a string value instead of a messenger instance if you simply want to
+connect to an existing `rtc-switchboard` instance.
+
 ### signaller#send(message, data*)
 
 Use the send function to send a message to other peers in the current
