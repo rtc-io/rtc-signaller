@@ -123,22 +123,53 @@ var sig = module.exports = function(messenger, opts) {
   var openEvent = (opts || {}).openEvent || 'open';
   var writeMethod = (opts || {}).writeMethod || 'write';
   var closeMethod = (opts || {}).closeMethod || 'close';
+  var initialized = false;
+  var write;
+  var close;
+  var processor;
 
-  // extract the write and close function references
-  var write = messenger[writeMethod];
-  var close = messenger[closeMethod];
+  function connectToPrimus(url) {
+    // load primus
+    sig.loadPrimus(url, function(err, Primus) {
+      if (err) {
+        return signaller.emit('error', err);
+      }
+
+      // create the actual messenger from a primus connection
+      messenger = Primus.connect(url);
+
+      // now init
+      init();
+    });
+  }
+
+  function init() {
+    // extract the write and close function references
+    write = messenger[writeMethod];
+    close = messenger[closeMethod];
+
+    // create the processor
+    processor = require('./processor')(signaller);
+
+    // if the messenger doesn't provide a valid write method, then complain
+    if (typeof write != 'function') {
+      throw new Error('provided messenger does not implement a "' +
+        writeMethod + '" write method');
+    }
+
+    // handle message data events
+    messenger.on(dataEvent, processor);
+
+    // pass through open events
+    messenger.on(openEvent, signaller.emit.bind(signaller, 'open'));
+
+    // flag as initialised
+    initialized = true;
+    signaller.emit('init');
+  }
 
   // set the autoreply flag
   signaller.autoreply = autoreply === undefined || autoreply;
-
-  // create the processor
-  var processor = require('./processor')(signaller);
-
-  // if the messenger doesn't provide a valid write method, then complain
-  if (typeof write != 'function') {
-    throw new Error('provided messenger does not implement a "' +
-      writeMethod + '" write method');
-  }
 
   function prepareArg(arg) {
     if (typeof arg == 'object' && (! (arg instanceof String))) {
@@ -163,6 +194,13 @@ var sig = module.exports = function(messenger, opts) {
     // iterate over the arguments and stringify as required
     var args = [].slice.call(arguments);
     var dataline = args.map(prepareArg).filter(Boolean).join('|');
+
+    // if we are not initialized, then wait until we are
+    if (! initialized) {
+      return signaller.once('init', function() {
+        write.call(messenger, dataline);
+      });
+    }
 
     // send the data over the messenger
     return write.call(messenger, dataline);
@@ -496,11 +534,15 @@ var sig = module.exports = function(messenger, opts) {
     }
   };
 
-  // handle message data events
-  messenger.on(dataEvent, processor);
-
-  // pass through open events
-  messenger.on(openEvent, signaller.emit.bind(signaller, 'open'));
+  // if the messenger is a string, then we are going to attach to a
+  // ws endpoint and automatically set up primus
+  if (typeof messenger == 'string' || (messenger instanceof String)) {
+    connectToPrimus(messenger);
+  }
+  // otherwise, initialise the connection
+  else {
+    init();
+  }
 
   return signaller;
 };
