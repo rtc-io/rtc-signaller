@@ -15,4 +15,7 @@ require('./lock');
 if (typeof window != 'undefined') {
   // test primus loading
   require('./load-primus');
+
+  // test automatic messenger implementation
+  require('./auto-primus');
 }
