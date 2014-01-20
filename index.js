@@ -191,8 +191,13 @@ var sig = module.exports = function(messenger, opts) {
   **/
   var send = signaller.send = function() {
     // iterate over the arguments and stringify as required
+    // var metadata = { id: signaller.id };
     var args = [].slice.call(arguments);
-    var dataline = args.map(prepareArg).filter(Boolean).join('|');
+    var dataline;
+
+    // inject the metadata
+    args.splice(1, 0, { id: signaller.id });
+    dataline = args.map(prepareArg).filter(Boolean).join('|');
 
     // if we are not initialized, then wait until we are
     if (! initialized) {
@@ -364,9 +369,11 @@ var sig = module.exports = function(messenger, opts) {
 
       args = [
         '/to',
-        targetId,
-        { id: signaller.id }
+        targetId
       ].concat([].slice.call(arguments));
+
+      // inject metadata
+      args.splice(3, 0, { id: signaller.id });
 
       setTimeout(function() {
         var msg = args.map(prepareArg).filter(Boolean).join('|');

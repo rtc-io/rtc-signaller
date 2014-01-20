@@ -20,21 +20,25 @@ test('create signallers', function(t) {
 });
 
 test('peer:0 announce', function(t) {
-  t.plan(6);
+  t.plan(10);
 
-  signallers[1].once('peer:announce', function(data) {
+  signallers[1].once('peer:announce', function(data, srcData) {
     t.equal(data.name, 'Fred', 'signaller 0 announce captured by signaller 1');
     t.ok(signallers[1].peers.get(data.id), 'signaller 1 has noted relationship with signaller 0');
 
     t.ok(data.browser, 'browser name has been supplied in announce');
     t.ok(data.browserVersion, 'browser version has been supplied in announce');
+    t.ok(srcData, 'have source data');
+    t.equal(srcData.id, signallers[0].id, 'source data matched expected');
   });
 
-  signallers[0].once('peer:announce', function(data) {
+  signallers[0].once('peer:announce', function(data, src) {
     // once peer:1 has processed peer:0 announce it will respond
     // if it is a new peer
     t.equal(data.id, signallers[1].id, 'signaller 1 has announced itself in response');
     t.ok(signallers[0].peers.get(data.id), 'signaller 0 has noted relationship with signaller 1');
+    t.ok(src, 'have source data');
+    t.equal(src.id, signallers[1].id, 'source data matched expected');
   });
 
   // peer 0 initiates the announce process
@@ -57,13 +61,15 @@ test('ab roles have been correctly assigned', function(t) {
 test('second peer:0 announce triggers peer:update event only', function(t) {
   var failTest = t.fail.bind(t, 'captured announce');
 
-  t.plan(2);
+  t.plan(4);
 
   signallers[1].once('peer:announce', failTest);
-  signallers[1].once('peer:update', function(data) {
+  signallers[1].once('peer:update', function(data, src) {
     signallers[1].removeListener('peer:announce', failTest);
     t.equal(data.name, 'Fred', 'name retransmitted');
     t.equal(data.age, 30, 'age transmitted also');
+    t.ok(src, 'have source data');
+    t.equal(src.id, signallers[0].id, 'src == signaller:0');
   });
 
   signallers[0].announce({ age: 30 });

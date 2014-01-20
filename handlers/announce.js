@@ -61,7 +61,7 @@ module.exports = function(signaller) {
         copyData(peer.data, data);
 
         // trigger the peer update event
-        return signaller.emit('peer:update', data);
+        return signaller.emit('peer:update', data, srcData);
       }
 
       // create a new peer

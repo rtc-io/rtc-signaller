@@ -31,7 +31,7 @@ module.exports = function(signaller) {
     var evtName = parts[0].slice(1);
 
     // convert any valid json objects to json
-    var args = parts.slice(1).map(jsonparse);
+    var args = parts.slice(2).map(jsonparse);
 
     signaller.emit.apply(
       signaller,
@@ -59,11 +59,9 @@ module.exports = function(signaller) {
 
         // get the source data
         isDirectMessage = true;
-        srcData = parts[0];
-        srcState = signaller.peers.get(srcData && srcData.id);
 
         // extract the vector clock and update the parts
-        parts = parts.slice(1).map(jsonparse);
+        parts = parts.map(jsonparse);
       }
     }
 
@@ -76,13 +74,17 @@ module.exports = function(signaller) {
     parts = parts || data.split('|').map(jsonparse);
 
     // if we have a specific handler for the action, then invoke
-    if (parts[0].charAt(0) === '/') {
+    if (typeof parts[0] == 'string' && parts[0].charAt(0) === '/') {
       // look for a handler for the message type
       handler = handlers[parts[0].slice(1)];
 
+      // extract the metadata from the input data
+      srcData = parts[1];
+      srcState = signaller.peers.get(srcData && srcData.id) || srcData;
+
       if (typeof handler == 'function') {
         handler(
-          parts.slice(1),
+          parts.slice(2),
           parts[0].slice(1),
           srcData,
           srcState,
