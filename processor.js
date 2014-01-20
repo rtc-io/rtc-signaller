@@ -3,7 +3,6 @@
 
 var debug = require('cog/logger')('rtc-signaller-processor');
 var jsonparse = require('cog/jsonparse');
-var vc = require('vectorclock');
 
 /**
   ### signaller process handling
@@ -48,6 +47,7 @@ module.exports = function(signaller) {
     var handler;
     var srcData;
     var srcState;
+    var isDirectMessage = false;
 
     debug('signaller ' + signaller.id + ' received data: ' + originalData);
 
@@ -58,6 +58,7 @@ module.exports = function(signaller) {
         parts = data.slice(5 + id.length).split('|').map(jsonparse);
 
         // get the source data
+        isDirectMessage = true;
         srcData = parts[0];
         srcState = signaller.peers.get(srcData && srcData.id);
 
@@ -83,18 +84,14 @@ module.exports = function(signaller) {
         handler(
           parts.slice(1),
           parts[0].slice(1),
-          srcData && srcData.clock,
-          srcState
+          srcData,
+          srcState,
+          isDirectMessage
         );
       }
       else {
         sendEvent(parts, srcState, originalData);
       }
-    }
-
-    // if we have a clock value (and a source peer), then merge the clock
-    if (srcData && srcData.clock && srcState) {
-      srcState.clock = vc.merge(srcState.clock, srcData.clock);
     }
   };
 };

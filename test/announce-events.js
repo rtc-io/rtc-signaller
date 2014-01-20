@@ -8,6 +8,8 @@ var peers = [
 ];
 var signallers;
 
+// require('cog/logger').enable('*');
+
 test('create signallers', function(t) {
   t.plan(3);
   signallers = peers.map(signaller);
@@ -60,7 +62,6 @@ test('second peer:0 announce triggers peer:update event only', function(t) {
   signallers[1].once('peer:announce', failTest);
   signallers[1].once('peer:update', function(data) {
     signallers[1].removeListener('peer:announce', failTest);
-
     t.equal(data.name, 'Fred', 'name retransmitted');
     t.equal(data.age, 30, 'age transmitted also');
   });

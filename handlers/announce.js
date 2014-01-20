@@ -37,16 +37,14 @@ module.exports = function(signaller) {
   function copyData(target, source) {
     if (target && source) {
       for (var key in source) {
-        if (key != 'clock') {
-          target[key] = source[key];
-        }
+        target[key] = source[key];
       }
     }
 
     return target;
   }
 
-  return function(args, messageType, clock) {
+  return function(args, messageType, srcData, srcState, isDM) {
     var data = args[0];
     var peer;
 
@@ -73,9 +71,6 @@ module.exports = function(signaller) {
         // initialise the local role index
         roleIdx: [data.id, signaller.id].sort().indexOf(data.id),
 
-        // initialise the vector clock
-        clock: clock || { a: 0, b: 0 },
-
         // initialise the peer data
         data: {}
       };
@@ -88,7 +83,7 @@ module.exports = function(signaller) {
 
       // if this is an initial announce message (no vector clock attached)
       // then send a announce reply
-      if (signaller.autoreply && (! clock)) {
+      if (signaller.autoreply && (! isDM)) {
         signaller
           .to(data.id)
           .send('/announce', signaller.attributes);

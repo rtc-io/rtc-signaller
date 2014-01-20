@@ -7,7 +7,6 @@ var EventEmitter = require('events').EventEmitter;
 var uuid = require('uuid');
 var extend = require('cog/extend');
 var FastMap = require('collections/fast-map');
-var vc = require('vectorclock');
 
 /**
   # rtc-signaller
@@ -113,9 +112,6 @@ var sig = module.exports = function(messenger, opts) {
 
   // create the peers map
   var peers = signaller.peers = new FastMap();
-
-  // create our locks map
-  var locks = signaller.locks = new FastMap();
 
   // initialise the data event name
   var dataEvent = (opts || {}).dataEvent || 'data';
@@ -321,87 +317,6 @@ var sig = module.exports = function(messenger, opts) {
   };
 
   /**
-    ### lock(targetId, opts?, callback?)
-
-    Attempt to get a temporary exclusive lock on the communication
-    channel between the local signaller and the specified target peer id.
-  **/
-  signaller.lock = function(targetId, opts, callback) {
-    var peer = peers.get(targetId);
-    var activeLock;
-    var lockid = uuid.v4();
-    var label;
-
-    function handleLockResult(result, src) {
-      var ok = result && result.ok;
-
-      // if the source does not match the target then abort
-      if ((! src) || (src.id !== targetId)) {
-        return;
-      }
-
-      // if the result label is not a match, then abort
-      if ((! result) || (result.label !== label)) {
-        return;
-      }
-
-      // don't listen for any further lock result messages
-      signaller.removeListener('lockresult', handleLockResult);
-
-      // if we don't have an error condition, create an active local lock
-      if (ok) {
-        locks.set(label, activeLock = { id: lockid });
-      }
-      // otherwise, delete the local provisional lock
-      else if (activeLock) {
-        locks.delete(label);
-      }
-
-      callback(ok ? null : new Error('could not acquire lock'));
-    }
-
-    // check for no label being supplied
-    if (typeof opts == 'function') {
-      callback = opts;
-      opts = {};
-    }
-
-    // ensure we have a callback
-    callback = callback || function() {};
-
-    // if the peer is not known, then we cannot initiate a lock
-    if (! peer) {
-      return callback(new Error('unknown target id - cannot initiate lock'));
-    }
-
-    // create a default label if none provided
-    label = (opts || {}).label || (opts || {}).name || 'default';
-
-    // if we have a local lock already in place, then return ok
-    activeLock = locks.get(label);
-    if (activeLock && (! activeLock.provisional)) {
-      return callback();
-    }
-
-    // ensure we have locks for the peer
-    peer.locks = peer.locks || new FastMap();
-
-    // if a remote lock is in place, error out
-    if (peer.locks.get(label)) {
-      return callback(new Error('remote lock in place, cannot request lock'));
-    }
-
-    // create a provisional lock
-    locks.set(label, activeLock = { id: lockid, provisional: true });
-
-    // wait for the lock result
-    signaller.on('lockresult', handleLockResult);
-
-    // send the lock message
-    signaller.to(targetId).send('/lock', label, lockid);
-  };
-
-  /**
     ### to(targetId)
 
     Use the `to` function to send a message to the specified target peer.
@@ -450,20 +365,13 @@ var sig = module.exports = function(messenger, opts) {
       args = [
         '/to',
         targetId,
-        { id: signaller.id, clock: peer.clock }
+        { id: signaller.id }
       ].concat([].slice.call(arguments));
 
-      // increment the peer clock, using the role of the local
-      // signaller.  If the peer role is 0, then the signallers role is 1
-      // and using xor (^) will generate the correct index
-      vc.increment(peer, ['a', 'b'][peer.roleIdx ^ 1]);
-
-      // write on next tick to ensure clock updates are handled correctly
       setTimeout(function() {
         var msg = args.map(prepareArg).filter(Boolean).join('|');
         debug('TX (' + targetId + '): ', msg);
 
-        // include the current clock value in with the payload
         write.call(messenger, msg);
       }, 0);
     };
@@ -474,66 +382,6 @@ var sig = module.exports = function(messenger, opts) {
       },
 
       send: sender,
-    }
-  };
-
-  /**
-
-    ### signaller#unlock(targetId, opts?, callback)
-
-    Send an unlock message to the target peer to release a previously
-    attained lock.  The callback will be triggered once we know whether the
-    lock release was successful and acknowledged.
-    
-  **/
-  signaller.unlock = function(targetId, opts, callback) {
-    var peer = peers.get(targetId);
-    var label;
-
-    function handleUnlockResult(result, src) {
-      var ok = result && result.ok;
-
-      // if not the correct source then abort
-      if ((! src) || (src.id !== targetId)) {
-        return;
-      }
-
-      // if this is not an unlock result for this label, then abort
-      if ((! result) || (result.label !== label)) {
-        return;
-      }
-
-      // remove the listener
-      signaller.removeListener('unlockresult', handleUnlockResult);
-
-      // if ok, remove our local lock
-      if (ok) {
-        locks.delete(label);
-      }
-
-      // trigger the callback
-      callback(ok ? null : new Error('could not release lock: ' + label));
-    }
-
-    // handle the no opts case
-    if (typeof opts == 'function') {
-      callback = opts;
-      opts = {};
-    }
-
-    // ensure we have a callback
-    callback = callback || function() {};
-
-    // set a default label value
-    label = (opts || {}).label || (opts || {}).name || 'default';
-
-    // if we have the peer and local lock then action the unlock
-    if (peer && locks.get(label)) {
-      signaller.on('unlockresult', handleUnlockResult);
-      signaller.to(targetId).send('/unlock', label, locks.get(label));
-    }
-    else {
-      return callback(new Error('no local lock with label ' + label));
     }
   };
 
