@@ -107,7 +107,12 @@ var sig = module.exports = function(messenger, opts) {
   var attributes = signaller.attributes = {
     browser: detect.browser,
     browserVersion: detect.browserVersion,
-    id: id
+    id: id,
+
+    // TODO: this includes the complete package.json contents
+    // and we only need the version string so look for a browserify
+    // transform that does some static analysis?
+    agent: 'signaller@' + require('./package.json').version
   };
 
   // create the peers map
@@ -377,7 +382,7 @@ var sig = module.exports = function(messenger, opts) {
 
       setTimeout(function() {
         var msg = args.map(prepareArg).filter(Boolean).join('|');
-        debug('TX (' + targetId + '): ', msg);
+        debug('TX (' + targetId + '): ' + msg);
 
         write.call(messenger, msg);
       }, 0);
