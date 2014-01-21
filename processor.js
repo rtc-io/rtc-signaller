@@ -80,6 +80,14 @@ module.exports = function(signaller) {
 
       // extract the metadata from the input data
       srcData = parts[1];
+
+      // if we got data from ourself, then this is pretty dumb
+      // but if we have then throw it away
+      if (srcData && srcData.id === signaller.id) {
+        return console.warn('got data from ourself, discarding');
+      }
+
+      // get the source state
       srcState = signaller.peers.get(srcData && srcData.id) || srcData;
 
       if (typeof handler == 'function') {
