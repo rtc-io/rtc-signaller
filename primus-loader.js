@@ -37,13 +37,22 @@ module.exports = function(signalhost, callback) {
   if (script && typeof Primus != 'undefined') {
     return callback(null, Primus);
   }
+  // otherwise, if the script exists but Primus is not loaded,
+  // then wait for the load
+  else if (script) {
+    script.addEventListener('load', function() {
+      callback(null, Primus);
+    });
+
+    return;
+  }
 
   // otherwise create the script and load primus
   script = document.createElement('script');
   script.src = scriptSrc;
 
   script.onerror = callback;
-  script.onload = function() {
+  script.addEventListener('load', function() {
     // if we have a signalhost that is not basepathed at /
     // then tweak the primus prototype
     if (basePath !== '/') {
@@ -52,7 +61,7 @@ module.exports = function(signalhost, callback) {
     }
 
     callback(null, Primus);
-  };
+  });
 
   document.body.appendChild(script);
 };
