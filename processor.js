@@ -1,7 +1,7 @@
 /* jshint node: true */
 'use strict';
 
-var debug = require('cog/logger')('rtc-signaller-processor');
+var debug = require('cog/logger')('rtc-signaller');
 var jsonparse = require('cog/jsonparse');
 
 /**

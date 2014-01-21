@@ -1,7 +1,7 @@
 /* jshint node: true */
 'use strict';
 
-var debug = require('cog/logger')('rtc-signaller-announce');
+var debug = require('cog/logger')('rtc-signaller');
 var extend = require('cog/extend');
 var roles = ['a', 'b'];
 
@@ -47,6 +47,8 @@ module.exports = function(signaller) {
   return function(args, messageType, srcData, srcState, isDM) {
     var data = args[0];
     var peer;
+
+    debug('announce handler invoked, received data: ', data);
 
     // if we have valid data then process
     if (data && data.id && data.id !== signaller.id) {
