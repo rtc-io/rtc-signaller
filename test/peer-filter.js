@@ -22,7 +22,7 @@ test('create signallers', function(t) {
 test('filter out announce', function(t) {
   t.plan(4);
 
-  signallers[1].once('peer:screen', function(evt) {
+  signallers[1].once('peer:filter', function(evt) {
     t.ok(evt.data, 'Got event data');
     t.equal(evt.data.name, 'Fred', 'name is as expected');
     t.equal(evt.allow, true, 'Allow flag set to true');

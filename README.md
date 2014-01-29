@@ -263,9 +263,9 @@ object data is decoded and the signaller emits an `announce` message.
 There are three different types of `peer:` events that can be triggered
 in on peer B to calling the `announce` method on peer A.
 
-- `peer:screen`
+- `peer:filter`
 
-  The `peer:screen` event is triggered prior to the `peer:announce` or
+  The `peer:filter` event is triggered prior to the `peer:announce` or
   `peer:update` events being fired and provides an application the
   opportunity to reject a peer.  The handler for this event is passed
   a JS object that contains a `data` attribute for the announce data, and an
@@ -277,7 +277,7 @@ in on peer B to calling the `announce` method on peer A.
 
   ```js
   // only accept connections from Bob
-  signaller.on('peer:screen', function(evt) {
+  signaller.on('peer:filter', function(evt) {
     evt.allow = evt.allow && (evt.data.name === 'Bob');
   });
   ```
