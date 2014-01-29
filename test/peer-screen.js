@@ -1,0 +1,44 @@
+var test = require('tape');
+var messenger = require('messenger-memory');
+var signaller = require('..');
+var scope = [];
+var peers = [
+  messenger({ delay: Math.random() * 200, scope: scope }),
+  messenger({ delay: Math.random() * 200, scope: scope })
+];
+var signallers;
+
+// require('cog/logger').enable('*');
+
+test('create signallers', function(t) {
+  t.plan(3);
+  signallers = peers.map(signaller);
+  t.equal(signallers.length, 2);
+  t.equal(typeof signallers[0].announce, 'function', 'first signaller');
+  t.equal(typeof signallers[1].announce, 'function', 'second signaller');
+  t.end();
+});
+
+test('filter out announce', function(t) {
+  t.plan(4);
+
+  signallers[1].once('peer:screen', function(evt) {
+    t.ok(evt.data, 'Got event data');
+    t.equal(evt.data.name, 'Fred', 'name is as expected');
+    t.equal(evt.allow, true, 'Allow flag set to true');
+
+    // set allow to false
+    evt.allow = false;
+  });
+
+  signallers[1].once('peer:announce', function(data, srcData) {
+    t.fail('should not have received announce message');
+  });
+
+  setTimeout(function() {
+    t.pass('did not receive announce');
+  }, 500);
+
+  // peer 0 initiates the announce process
+  signallers[0].announce({ name: 'Fred' });
+});
