@@ -260,8 +260,27 @@ object data is decoded and the signaller emits an `announce` message.
 
 ##### Events Triggered in response to `/announce`
 
-There are two different types of `peer:` events that can be triggered
+There are three different types of `peer:` events that can be triggered
 in on peer B to calling the `announce` method on peer A.
+
+- `peer:screen`
+
+  The `peer:screen` event is triggered prior to the `peer:announce` or
+  `peer:update` events being fired and provides an application the
+  opportunity to reject a peer.  The handler for this event is passed
+  a JS object that contains a `data` attribute for the announce data, and an
+  `allow` flag that controls whether the peer is to be accepted.
+
+  Due to the way event emitters behave in node, the last handler invoked
+  is the authority on whether the peer is accepted or not (so make sure to
+  check the previous state of the allow flag):
+
+  ```js
+  // only accept connections from Bob
+  signaller.on('peer:screen', function(evt) {
+    evt.allow = evt.allow && (evt.data.name === 'Bob');
+  });
+  ```
 
 - `peer:announce`
 
