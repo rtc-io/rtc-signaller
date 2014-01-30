@@ -8,6 +8,12 @@ var uuid = require('uuid');
 var extend = require('cog/extend');
 var FastMap = require('collections/fast-map');
 
+// initialise signaller metadata so we don't have to include the package.json
+// TODO: make this checkable with some kind of prepublish script
+var metadata = {
+  version: '0.17'
+};
+
 /**
   # rtc-signaller
 
@@ -108,11 +114,7 @@ var sig = module.exports = function(messenger, opts) {
     browser: detect.browser,
     browserVersion: detect.browserVersion,
     id: id,
-
-    // TODO: this includes the complete package.json contents
-    // and we only need the version string so look for a browserify
-    // transform that does some static analysis?
-    agent: 'signaller@' + require('./package.json').version
+    agent: 'signaller@' + metadata.version
   };
 
   // create the peers map
