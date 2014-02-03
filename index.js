@@ -101,7 +101,7 @@ var sig = module.exports = function(messenger, opts) {
   var signaller = new EventEmitter();
 
   // initialise the id
-  var id = signaller.id = uuid.v4();
+  var id = signaller.id = (opts || {}).id || uuid.v4();
 
   // initialise the attributes
   var attributes = signaller.attributes = {
