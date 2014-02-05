@@ -89,7 +89,7 @@ module.exports = function(signaller) {
       peer = signaller.peers.get(data.id);
 
       // if the peer is existing, then update the data
-      if (peer) {
+      if (peer && (! peer.inactive)) {
         debug('signaller: ' + signaller.id + ' received update, data: ', data);
 
         // update the data
