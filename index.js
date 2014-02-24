@@ -11,7 +11,7 @@ var FastMap = require('collections/fast-map');
 // initialise signaller metadata so we don't have to include the package.json
 // TODO: make this checkable with some kind of prepublish script
 var metadata = {
-  version: '0.18.2'
+  version: '0.18.3'
 };
 
 /**
