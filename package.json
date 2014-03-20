@@ -13,12 +13,11 @@
     "rtc-core": "~0.7.1"
   },
   "devDependencies": {
-    "tape": "~2.5.0",
-    "rtc-switchboard": "~0.8.0",
+    "tape": "^2.10.2",
+    "rtc-switchboard": "^0.8.0",
     "messenger-memory": "~0.3.0",
-    "mocha": "~1.17.0",
     "zuul": "~1.5.4",
-    "fdom": "~0.6.3",
+    "fdom": "^0.8.0",
     "async": "~0.2.9"
   },
   "scripts": {
