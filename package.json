@@ -9,7 +9,7 @@
   "dependencies": {
     "uuid": "~1.4.1",
     "cog": "~0.5.1",
-    "collections": "~1.0.0",
+    "collections": "^2.0.0",
     "rtc-core": "~0.7.1"
   },
   "devDependencies": {
