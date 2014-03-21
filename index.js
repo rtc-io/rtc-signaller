@@ -6,6 +6,7 @@ var detect = require('rtc-core/detect');
 var EventEmitter = require('events').EventEmitter;
 var uuid = require('uuid');
 var extend = require('cog/extend');
+var throttle = require('cog/throttle');
 var FastMap = require('collections/fast-map');
 
 // initialise signaller metadata so we don't have to include the package.json
@@ -129,6 +130,7 @@ var sig = module.exports = function(messenger, opts) {
   var write;
   var close;
   var processor;
+  var announceTimer = 0;
 
   function connectToPrimus(url) {
     // load primus
@@ -276,11 +278,15 @@ var sig = module.exports = function(messenger, opts) {
 
   **/
   signaller.announce = function(data, sender) {
+    clearTimeout(announceTimer);
+
     // update internal attributes
     extend(attributes, data, { id: signaller.id });
 
     // send the attributes over the network
-    return (sender || send)('/announce', attributes);
+    return announceTimer = setTimeout(function() {
+      (sender || send)('/announce', attributes);
+    }, (opts || {}).announceDelay || 10);
   };
 
   /**
