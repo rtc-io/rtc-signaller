@@ -8,7 +8,7 @@ The signalling used by `rtc-signaller` follows some very simple rules:
   be recognized simply as their first character is the forward slash (`/`)
   character.
 
---
+---
 
 ## Transport Agnostic
 
@@ -19,14 +19,30 @@ via [websockets](http://www.websocket.org/), it is in fact a transport
 Basically, if you can send text over _x_ then you could use _x_ to send
 `rtc-signaller` messages.
 
---
+---
 
-## Standard Messages
+## Core Commands
 
---
+There are only a few core commands which make up the rtc-signaller signalling. These core commands should receive "special" treatment from a signalling server, whereas other commands are simply "passed through" to connected clients.
 
-## `/announce`
+---
+
+## /announce
+
+The announce command is used to tell a signalling server (and connected peers) that a new client is joining a virtual room.  The payload of the command is JSON and requires __at least__ an `id` and a `room` attribute to be specified.
+
+For example, this is what an announce message would typically look like:
 
 ```
-/announce
+TODO: include example
 ```
+
+---
+
+## /leave
+
+---
+
+## /to
+
+---
