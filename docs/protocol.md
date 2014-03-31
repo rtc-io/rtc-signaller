@@ -31,10 +31,12 @@ There are only a few core commands which make up the rtc-signaller signalling. T
 
 The announce command is used to tell a signalling server (and connected peers) that a new client is joining a virtual room.  The payload of the command is JSON and requires __at least__ an `id` and a `room` attribute to be specified.
 
-For example, this is what an announce message would typically look like:
+For example, this is what an announce message would typically look like (line breaks added for clarity):
 
 ```
-TODO: include example
+/announce
+|{"id":"c59b0e8f-bd75-4e74-a5df-8088c0b4bfbb"}
+|{"browser":"node","browserVersion":"?","id":"c59b0e8f-bd75-4e74-a5df-8088c0b4bfbb","agent":"signaller@0.19.0","name":"Fred"}
 ```
 
 ---
@@ -51,10 +53,13 @@ __NOTE:__ As most client leave actions are "hard closes", i.e. a browser window 
 
 The `/to` command allows you to direct a message to a particular peer rather than broadcasting it to all peers connected to the same room as you.
 
-An example `/to` command might look something like:
+An example `/to` command might look something like (again line breaks for clarity):
 
 ```
-/to|51469ae5-5d9f-4294-84dd-83ce3b37b7dd|/hello
+/to
+|51469ae5-5d9f-4294-84dd-83ce3b37b7dd
+|/hello
+|{"id":"98e17678-a89e-4f91-aee0-5b0d93ad546d"}
 ```
 
 ---
