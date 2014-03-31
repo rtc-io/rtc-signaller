@@ -41,8 +41,20 @@ TODO: include example
 
 ## /leave
 
+Unsurprisingly, a `/leave` message is the counterpart to an `/announce` message and is sent when a peer is disconnecting from the room.
+
+__NOTE:__ As most client leave actions are "hard closes", i.e. a browser window / tab has been closed, a signalling server should monitor disconnections and issue an appropriate `/leave` message if the client has not issued one already.
+
 ---
 
 ## /to
+
+The `/to` command allows you to direct a message to a particular peer rather than broadcasting it to all peers connected to the same room as you.
+
+An example `/to` command might look something like:
+
+```
+/to|51469ae5-5d9f-4294-84dd-83ce3b37b7dd|/hello
+```
 
 ---
