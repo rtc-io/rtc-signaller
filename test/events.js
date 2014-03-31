@@ -84,6 +84,33 @@ test('info for peer:0 updated in signaller:1', function(t) {
   t.equal(peer.data.age, 30, 'age = 30');
 });
 
+test('peer:0 sends non-command', function(t) {
+  t.plan(1);
+  signallers[1].once('data', function(args) {
+    t.deepEqual(args, ['hello'], 'got expected message');
+  });
+
+  signallers[0].send('hello');
+});
+
+test('peer:0 sends non-command with args', function(t) {
+  t.plan(1);
+  signallers[1].once('data', function(args) {
+    t.deepEqual(args, ['hello', 1, 2, 3], 'got expected message');
+  });
+
+  signallers[0].send('hello', 1, 2, 3);
+});
+
+test('peer:0 sends non-command to peer:1 (with args)', function(t) {
+  t.plan(1);
+  signallers[1].once('data', function(args) {
+    t.deepEqual(args, ['hello', 4, 5, 6], 'got expected message');
+  });
+
+  signallers[0].to(signallers[1].id).send('hello', 4, 5, 6);
+});
+
 test('signaller:1 receives a peer:leave event when signaller:0 leaves', function(t) {
   t.plan(4);
 
