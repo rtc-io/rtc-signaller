@@ -74,10 +74,7 @@ module.exports = function(signaller) {
     parts = parts || data.split('|').map(jsonparse);
 
     // if we have a specific handler for the action, then invoke
-    if (typeof parts[0] == 'string' && parts[0].charAt(0) === '/') {
-      // look for a handler for the message type
-      handler = handlers[parts[0].slice(1)];
-
+    if (typeof parts[0] == 'string') {
       // extract the metadata from the input data
       srcData = parts[1];
 
@@ -90,17 +87,33 @@ module.exports = function(signaller) {
       // get the source state
       srcState = signaller.peers.get(srcData && srcData.id) || srcData;
 
-      if (typeof handler == 'function') {
-        handler(
-          parts.slice(2),
-          parts[0].slice(1),
+      // handle commands
+      if (parts[0].charAt(0) === '/') {
+        // look for a handler for the message type
+        handler = handlers[parts[0].slice(1)];
+
+        if (typeof handler == 'function') {
+          handler(
+            parts.slice(2),
+            parts[0].slice(1),
+            srcData,
+            srcState,
+            isDirectMessage
+          );
+        }
+        else {
+          sendEvent(parts, srcState, originalData);
+        }
+      }
+      // otherwise, emit data
+      else {
+        signaller.emit(
+          'data',
+          parts.slice(0, 1).concat(parts.slice(2)),
           srcData,
           srcState,
           isDirectMessage
         );
-      }
-      else {
-        sendEvent(parts, srcState, originalData);
       }
     }
   };
