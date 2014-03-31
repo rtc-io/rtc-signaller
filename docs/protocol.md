@@ -3,10 +3,14 @@
 The signalling used by `rtc-signaller` follows some very simple rules:
 
 - All messages are text (utf-8 encoded at present)
+
 - Message parts are delimited by a pipe (`|`) character
-- Message commands must be contained in the initial message part and can
-  be recognized simply as their first character is the forward slash (`/`)
-  character.
+
+- Message commands must be contained in the initial message part and can be recognized simply as their first character is the forward slash (`/`) character.
+
+- All messages (apart from `/to` messages) are distributed to all active peers currently "announced" in a room.
+
+- All signaling clients identify themselves with a unique, [non-reusable](https://github.com/rtc-io/rtc-signaller/issues/10) id.
 
 ---
 
@@ -18,6 +22,14 @@ via [websockets](http://www.websocket.org/), it is in fact a transport
 
 Basically, if you can send text over _x_ then you could use _x_ to send
 `rtc-signaller` messages.
+
+---
+
+## Sender Metadata
+
+Sender metadata is injected into a message directly after the command (or initial message part) for all messages.  The only exception is a `/to` message which has no sender metadata attached as this should be contained within the wrapped message.
+
+At this stage only the sender id is included in the sender metadata (JSON), but this may be extended in the future to include additional information.
 
 ---
 
@@ -35,8 +47,8 @@ For example, this is what an announce message would typically look like (line br
 
 ```
 /announce
-|{"id":"c59b0e8f-bd75-4e74-a5df-8088c0b4bfbb"}
-|{"browser":"node","browserVersion":"?","id":"c59b0e8f-bd75-4e74-a5df-8088c0b4bfbb","agent":"signaller@0.19.0","name":"Fred"}
+|{"id":"dc6ac0ae-6e15-409b-b211-228a8f4a43b9"}
+|{"browser":"node","browserVersion":"?","id":"dc6ac0ae-6e15-409b-b211-228a8f4a43b9","agent":"signaller@0.18.3","room":"test-room"}
 ```
 
 ---
@@ -62,4 +74,15 @@ An example `/to` command might look something like (again line breaks for clarit
 |{"id":"98e17678-a89e-4f91-aee0-5b0d93ad546d"}
 ```
 
+For security reasons a signaling server is encouraged to direct `/to` messages only the connected peer; however, a client implementing this protocol should drop all '/to' messages that do not match it's own id.
+
 ---
+
+## That's Pretty Much It
+
+From a "protocol" perspective that's really all there is to it.
+
+
+
+
+
