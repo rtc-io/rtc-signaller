@@ -136,6 +136,29 @@ var sig = module.exports = function(messenger, opts) {
   var processor;
   var announceTimer = 0;
 
+  function bindBrowserEvents() {
+    messenger.addEventListener('message', function(evt) {
+      processor(evt.data);
+    });
+
+    messenger.addEventListener('open', function(evt) {
+      signaller.emit('open');
+      signaller.emit('connected');
+    });
+  }
+
+  function bindEvents() {
+    // handle message data events
+    messenger.on(dataEvent, processor);
+
+    // when the connection is open, then emit an open event and a connected event
+    messenger.on(openEvent, function() {
+      // TODO: deprecate the open event
+      signaller.emit('open');
+      signaller.emit('connected');
+    });
+  }
+
   function connectToPrimus(url) {
     // load primus
     sig.loadPrimus(url, function(err, Primus) {
@@ -173,15 +196,13 @@ var sig = module.exports = function(messenger, opts) {
         writeMethod + '" write method');
     }
 
-    // handle message data events
-    messenger.on(dataEvent, processor);
-
-    // when the connection is open, then emit an open event and a connected event
-    messenger.on(openEvent, function() {
-      // TODO: deprecate the open event
-      signaller.emit('open');
-      signaller.emit('connected');
-    });
+    // handle core browser messenging apis
+    if (typeof messenger.addEventListener == 'function') {
+      bindBrowserEvents();
+    }
+    else {
+      bindEvents();
+    }
 
     // flag as initialised
     initialized = true;
