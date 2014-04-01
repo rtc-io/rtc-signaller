@@ -82,7 +82,40 @@ For security reasons a signaling server is encouraged to direct `/to` messages o
 
 From a "protocol" perspective that's really all there is to it.
 
+---
 
+## Writing a Client
 
+The responsibilities of a client are fairly simple:
 
+- For `/to` messages ensure the target matches, otherwise throw the message away.
+- For all other messages:
+  - divide messages on the `|` character
+  - JSON parse any JSON parts into objects
+  - extract the 2nd part as sender metadata
+  
+---
+
+## Writing a Server
+
+The responsibilities of a server are also simple:
+
+- Only send `/to` messages to the appropriate peer.
+- When an `/announce` message is received place the peer in a logical room with other peers announcing in the same room.
+- Handle client disconnection and `/leave` messages appropriately, i.e. remove a peer from the logical room.
+- Distribute "non `/to`" messages to all peers in the same room as the peer that the message originated from.
+
+---
+
+## What About Authentication?
+
+While this hasn't been implemented in any applications to date, encrypted credentials or a session token could be supplied as part of the announce metadata.
+
+Additionally for per message authentication a session token could be included as part of the sender metadata that is included in each message.  This could be validated by the signaling server and stripped from the message before passing onto connected peers.
+
+---
+
+## What About Scaling?
+
+My intention was to minimally but adequately map out the interation required between peers, ensuring that both broadcast and direct messages were catered for.  The likelihood is that implementing server -> server message passing and routing will require some additional work but this isn't something the end clients should have to care about.
 
