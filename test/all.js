@@ -20,4 +20,7 @@ if (typeof window != 'undefined') {
 
   // test automatic messenger implementation
   require('./auto-primus');
+
+  // test native browser websocket support
+  require('./browser-websockets');
 }

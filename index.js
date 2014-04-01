@@ -9,6 +9,10 @@ var extend = require('cog/extend');
 var throttle = require('cog/throttle');
 var FastMap = require('collections/fast-map');
 
+// initialise the list of valid "write" methods
+var WRITE_METHODS = ['write', 'send'];
+var CLOSE_METHODS = ['close'];
+
 // initialise signaller metadata so we don't have to include the package.json
 // TODO: make this checkable with some kind of prepublish script
 var metadata = {
@@ -147,10 +151,18 @@ var sig = module.exports = function(messenger, opts) {
     });
   }
 
+  function extractProp(name) {
+    return messenger[name];
+  }
+
+  function isF(target) {
+    return typeof target == 'function';
+  }
+
   function init() {
     // extract the write and close function references
-    write = messenger[writeMethod];
-    close = messenger[closeMethod];
+    write = [writeMethod].concat(WRITE_METHODS).map(extractProp).filter(isF)[0];
+    close = [closeMethod].concat(CLOSE_METHODS).map(extractProp).filter(isF)[0];
 
     // create the processor
     processor = require('./processor')(signaller);
