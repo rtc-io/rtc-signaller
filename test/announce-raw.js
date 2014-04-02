@@ -1,8 +1,20 @@
+var extend = require('cog/extend');
 var test = require('tape');
 var createSignaller = require('..');
+var version = require('../package.json').version;
 
 var runTest = module.exports = function(messenger, peers) {
   var s;
+
+  function genAnnounce(data) {
+    return extend({}, data, {
+      // FIX THIS
+      agent: 'signaller@' + version,
+      browser: 'node',
+      browserVersion: '?',
+      id: s.id
+    });
+  }
 
   test('create', function(t) {
     t.plan(2);
@@ -21,20 +33,12 @@ var runTest = module.exports = function(messenger, peers) {
   });
 
   test('announce with attributes', function(t) {
-    peers.expect(t, ['/announce', {
-      id: s.id,
-      name: 'Bob'
-    }]);
-
+    peers.expect(t, ['/announce', { id: s.id }, genAnnounce({ name: 'Bob' }) ]);
     s.announce({ name: 'Bob' });
   });
 
   test('announce with different attributes', function(t) {
-    peers.expect(t, ['/announce', {
-      id: s.id,
-      name: 'Fred'
-    }]);
-
+    peers.expect(t, ['/announce', { id: s.id }, genAnnounce({ name: 'Fred' }) ]);
     s.announce({ name: 'Fred' });
   });
 
