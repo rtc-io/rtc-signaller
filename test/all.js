@@ -17,10 +17,13 @@ require('./custom-metadata')(messenger, peers);
 
 if (typeof window != 'undefined') {
   // test primus loading
-  require('./load-primus');
+  require('./primus-load');
 
   // test automatic messenger implementation
-  require('./auto-primus');
+  require('./primus-auto');
+
+  // test primus reconnection logic
+  // require('./primus-reconnect');
 
   // test native browser websocket support
   require('./browser-websockets');
