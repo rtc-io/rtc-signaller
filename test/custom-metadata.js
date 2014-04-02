@@ -45,7 +45,7 @@ var runTest = module.exports = function(messenger, peers) {
   });
 };
 
-if (typeof document == 'undefined' && (! module.parent)) {
+if  (! module.parent) {
   var peers = require('./helpers/createPeers')(3);
   runTest(peers.shift(), peers);
 }
