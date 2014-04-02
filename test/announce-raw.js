@@ -11,42 +11,35 @@ var runTest = module.exports = function(messenger, peers) {
   });
 
   test('announce', function(t) {
-    t.plan(2);
-    peers.expect(t, '/announce|{"id":"' + s.id + '"}');
+    peers.expect(t, ['/announce', {id: s.id } ]);
     s.announce();
   });
 
   test('disconnect', function(t) {
-    t.plan(2);
-    peers.expect(t, '/leave|{"id":"' + s.id + '"}');
+    peers.expect(t, ['/leave', { id: s.id } ]);
     s.leave();
   });
 
   test('announce with attributes', function(t) {
-    t.plan(2);
-    peers.expect(t, {
-      type: 'announce',
+    peers.expect(t, ['/announce', {
       id: s.id,
       name: 'Bob'
-    });
+    }]);
 
     s.announce({ name: 'Bob' });
   });
 
   test('announce with different attributes', function(t) {
-    t.plan(2);
-    peers.expect(t, {
-      type: 'announce',
+    peers.expect(t, ['/announce', {
       id: s.id,
       name: 'Fred'
-    });
+    }]);
 
     s.announce({ name: 'Fred' });
   });
 
   test('disconnect', function(t) {
-    t.plan(2);
-    peers.expect(t, '/leave|{"id":"' + s.id + '"}');
+    peers.expect(t, ['/leave', { id: s.id } ]);
     s.leave();
   });
 };
