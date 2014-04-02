@@ -109,7 +109,7 @@ var sig = module.exports = function(messenger, opts) {
   var autoreply = (opts || {}).autoreply;
 
   // initialise the metadata
-  var metadata = {};
+  var localMeta = {};
 
   // create the signaller
   var signaller = new EventEmitter();
@@ -386,10 +386,10 @@ var sig = module.exports = function(messenger, opts) {
   **/
   signaller.metadata = function(data) {
     if (arguments.length === 0) {
-      return extend({}, metadata);
+      return extend({}, localMeta);
     }
 
-    metadata = extend({}, data);
+    localMeta = extend({}, data);
   };
 
   /**
