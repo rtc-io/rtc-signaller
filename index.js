@@ -178,7 +178,7 @@ var sig = module.exports = function(messenger, opts) {
   }
 
   function createMetadata() {
-    return { id: signaller.id };
+    return extend({}, localMeta, { id: signaller.id });
   }
 
   function extractProp(name) {
