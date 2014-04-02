@@ -3,7 +3,6 @@ var peers = createPeers(3);
 var messenger = peers.shift();
 
 // test signalling logic
-// require('./announce-raw')(messenger, peers);
 // require('./to')(messenger, peers);
 
 require('./announce-concurrent');
@@ -12,7 +11,9 @@ require('./peer-filter');
 require('./set-id');
 require('./events');
 
-// test announce
+// inspect generated messages
+require('./announce-raw')(messenger, peers);
+// require('./custom-metadata');
 
 if (typeof window != 'undefined') {
   // test primus loading
