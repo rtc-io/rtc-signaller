@@ -31,7 +31,7 @@ module.exports = function(count) {
 
         // check the comparison against the actual parts
         comparisonParts.forEach(function(ref, idx) {
-          t.deepEqual(ref, comparisonParts[idx], 'part matched');
+          t.deepEqual(parts[idx], ref, 'part matched');
         });
       });
     };
