@@ -13,7 +13,7 @@ require('./events');
 
 // inspect generated messages
 require('./announce-raw')(messenger, peers);
-// require('./custom-metadata');
+require('./custom-metadata')(messenger, peers);
 
 if (typeof window != 'undefined') {
   // test primus loading
