@@ -1,4 +1,5 @@
 var EventEmitter = require('events').EventEmitter;
+var jsonparse = require('cog/jsonparse');
 
 module.exports = function(count) {
   // create the required number of event emitters
@@ -20,29 +21,18 @@ module.exports = function(count) {
       });
     };
 
-    peer.expect = function(t, result, cb) {
+    peer.expect = function(t, comparisonParts, cb) {
+      t.plan((t._plan || 0) + comparisonParts.length + 1);
+      
       peer.once('data', function(data) {
-        if (typeof result == 'string' || (result instanceof String)) {
-          t.equal(data, result);
-        }
-        else {
-          var parts = data.split('|');
-          var data = JSON.parse(parts[1]);
-          var matches = true;
+        var parts = data.split('|').map(jsonparse);
 
-          data.type = parts[0].slice(1);
+        t.pass('got data response');
 
-          // iterate through the expected result and match
-          Object.keys(result).forEach(function(key) {
-            matches = matches && data[key] === result[key];
-          });
-
-          t.ok(matches, 'all keys matched');
-        }
-
-        if (typeof cb == 'function') {
-          cb(data);
-        }
+        // check the comparison against the actual parts
+        comparisonParts.forEach(function(ref, idx) {
+          t.deepEqual(ref, comparisonParts[idx], 'part matched');
+        });
       });
     };
 
