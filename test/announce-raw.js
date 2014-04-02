@@ -2,6 +2,7 @@ var extend = require('cog/extend');
 var test = require('tape');
 var createSignaller = require('..');
 var version = require('../package.json').version;
+var detect = require('rtc-core/detect');
 
 var runTest = module.exports = function(messenger, peers) {
   var s;
@@ -10,8 +11,8 @@ var runTest = module.exports = function(messenger, peers) {
     return extend({}, data, {
       // FIX THIS
       agent: 'signaller@' + version,
-      browser: 'node',
-      browserVersion: '?',
+      browser: detect.browser,
+      browserVersion: detect.browserVersion,
       id: s.id
     });
   }
