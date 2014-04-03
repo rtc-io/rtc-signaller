@@ -53,11 +53,10 @@ test('disrupt the underlying socket', function(t) {
     t.fail('captured peer:disconnected which should not have happened on a reconnect');
   }
 
-  t.plan(5);
+  t.plan(4);
   sigB.once('peer:disconnected', t.pass.bind(t, 'captured disconnected'));
-  sigB.once('peer:update', function(data) {
-    t.ok(data, 'got valid data');
-    t.equal(data.name, 'Fred', 'Fred reannounced');
+  sigB.once('peer:connected', function(id, data) {
+    t.equal(id, sigA.id, 'Fred reconnected');
   });
 
   sigA.once('peer:disconnected', handleFail);
