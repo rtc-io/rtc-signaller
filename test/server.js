@@ -7,4 +7,8 @@ switchboard.on('fake:disconnect', function(msg, spark) {
   spark.end(null, { reconnect: true });
 });
 
+switchboard.on('fake:leave', function(msg, spark) {
+  spark.end();
+});
+
 server.listen(parseInt(port, 10) || 3000);

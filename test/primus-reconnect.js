@@ -79,3 +79,11 @@ test('message delivery successful after disconnect', function(t) {
 
   sigB.to(sigA.id).send('/hello');
 });
+
+test('disrupt the underlying socket (no reconnection attempt)', function(t) {
+  t.plan(3);
+  sigB.once('peer:disconnected', t.pass.bind(t, 'captured disconnected'));
+  sigB.once('peer:leave', t.pass.bind(t, 'captured leave'));
+  sigA.once('disconnected', t.pass.bind(t, 'captured disconnect on signaller A'));
+  sigA.send('/fake:leave');  
+});
