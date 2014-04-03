@@ -133,11 +133,16 @@ var sig = module.exports = function(messenger, opts) {
   var openEvent = (opts || {}).openEvent || 'open';
   var writeMethod = (opts || {}).writeMethod || 'write';
   var closeMethod = (opts || {}).closeMethod || 'close';
-  var initialized = false;
+  var connected = false;
   var write;
   var close;
   var processor;
   var announceTimer = 0;
+
+  function announceOnReconnect() {
+    signaller.announce();
+    // setTimeout(signaller.announce, );
+  }
 
   function bindBrowserEvents() {
     messenger.addEventListener('message', function(evt) {
@@ -151,12 +156,16 @@ var sig = module.exports = function(messenger, opts) {
   }
 
   function bindEvents() {
+    // if we don't have an on function for the messenger, then do nothing
+    if (typeof messenger.on != 'function') {
+      return;
+    }
+
     // handle message data events
     messenger.on(dataEvent, processor);
 
     // when the connection is open, then emit an open event and a connected event
     messenger.on(openEvent, function() {
-      // TODO: deprecate the open event
       signaller.emit('open');
       signaller.emit('connected');
     });
@@ -170,7 +179,7 @@ var sig = module.exports = function(messenger, opts) {
       }
 
       // create the actual messenger from a primus connection
-      messenger = Primus.connect(url);
+      signaller._messenger = messenger = Primus.connect(url);
 
       // now init
       init();
@@ -211,9 +220,13 @@ var sig = module.exports = function(messenger, opts) {
       bindEvents();
     }
 
-    // flag as initialised
-    initialized = true;
-    signaller.emit('init');
+    // determine if we are connected or not
+    connected = messenger.connected || false;
+    if (! connected) {
+      signaller.once('connected', function() {
+        connected = true;
+      });
+    }
   }
 
   // set the autoreply flag
@@ -249,8 +262,8 @@ var sig = module.exports = function(messenger, opts) {
     dataline = args.map(prepareArg).filter(Boolean).join('|');
 
     // if we are not initialized, then wait until we are
-    if (! initialized) {
-      return signaller.once('init', function() {
+    if (! connected) {
+      return signaller.once('connected', function() {
         write.call(messenger, dataline);
       });
     }
@@ -323,6 +336,10 @@ var sig = module.exports = function(messenger, opts) {
     // update internal attributes
     extend(attributes, data, { id: signaller.id });
 
+    // always announce on reconnect
+    signaller.removeListener('connected', announceOnReconnect);
+    signaller.on('connected', announceOnReconnect);
+
     // send the attributes over the network
     return announceTimer = setTimeout(function() {
       (sender || send)('/announce', attributes);
@@ -367,6 +384,9 @@ var sig = module.exports = function(messenger, opts) {
   signaller.leave = function() {
     // send the leave signal
     send('/leave', { id: id });
+
+    // stop announcing on reconnect
+    signaller.removeListener('connected', announceOnReconnect);
 
     // call the close method
     if (typeof close == 'function') {
@@ -472,6 +492,9 @@ var sig = module.exports = function(messenger, opts) {
   else {
     init();
   }
+
+  // connect an instance of the messenger to the signaller
+  signaller._messenger = messenger;
 
   return signaller;
 };
