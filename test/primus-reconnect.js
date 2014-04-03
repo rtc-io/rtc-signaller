@@ -53,7 +53,7 @@ test('disrupt the underlying socket', function(t) {
     t.fail('captured peer:leave which should not have happened on a reconnect');
   }
 
-  t.plan(4);
+  t.plan(5);
   sigB.once('peer:leave', t.pass.bind(t, 'captured leave'));
   sigB.once('peer:announce', function(data) {
     t.ok(data, 'got valid data');
@@ -67,6 +67,7 @@ test('disrupt the underlying socket', function(t) {
     t.pass('captured reconnection');
   });
 
+  sigA.once('disconnected', t.pass.bind(t, 'captured disconnect on signaller A'));
   sigA.send('/fake:disconnect');
 });
 
