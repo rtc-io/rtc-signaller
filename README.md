@@ -175,7 +175,7 @@ signaller about other peers:
   not been made by that peer within a certain time interval.
 
   The default `leaveTimeout` is configured in the
-  [defaults](https://github.com/rtc-io/rtc-signaller/blob/master/defaults.json)
+  [defaults](https://github.com/rtc-io/rtc-signaller/blob/master/defaults.js)
   but can be overriden by passing configuration options when creating the
   signaller.
 
