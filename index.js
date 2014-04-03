@@ -131,6 +131,7 @@ var sig = module.exports = function(messenger, opts) {
   // initialise the data event name
   var dataEvent = (opts || {}).dataEvent || 'data';
   var openEvent = (opts || {}).openEvent || 'open';
+  var closeEvent = (opts || {}).closeEvent || 'close';
   var writeMethod = (opts || {}).writeMethod || 'write';
   var closeMethod = (opts || {}).closeMethod || 'close';
   var connected = false;
@@ -168,6 +169,10 @@ var sig = module.exports = function(messenger, opts) {
     messenger.on(openEvent, function() {
       signaller.emit('open');
       signaller.emit('connected');
+    });
+
+    messenger.on(closeEvent, function() {
+      signaller.emit('disconnected');
     });
   }
 
