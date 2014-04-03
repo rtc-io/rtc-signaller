@@ -6,9 +6,9 @@
 
 **/
 
-module.exports = function(signaller) {
+module.exports = function(signaller, opts) {
   return {
-    announce: require('./announce')(signaller),
-    leave: require('./leave')(signaller)
+    announce: require('./announce')(signaller, opts),
+    leave: require('./leave')(signaller, opts)
   };
 };

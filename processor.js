@@ -23,8 +23,8 @@ var jsonparse = require('cog/jsonparse');
   - Finally, does the message match any patterns that we are listening for?
     If so, then pass the entire message contents onto the registered handler.
 **/
-module.exports = function(signaller) {
-  var handlers = require('./handlers')(signaller);
+module.exports = function(signaller, opts) {
+  var handlers = require('./handlers')(signaller, opts);
 
   function sendEvent(parts, srcState, data) {
     // initialise the event name

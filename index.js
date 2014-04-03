@@ -265,7 +265,7 @@ var sig = module.exports = function(messenger, opts) {
     close = [closeMethod].concat(CLOSE_METHODS).map(extractProp).filter(isF)[0];
 
     // create the processor
-    signaller.process = processor = require('./processor')(signaller);
+    signaller.process = processor = require('./processor')(signaller, opts);
 
     // if the messenger doesn't provide a valid write method, then complain
     if (typeof write != 'function') {
