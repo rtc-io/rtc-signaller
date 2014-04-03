@@ -5,6 +5,7 @@ var debug = require('cog/logger')('rtc-signaller');
 var detect = require('rtc-core/detect');
 var EventEmitter = require('events').EventEmitter;
 var uuid = require('uuid');
+var defaults = require('cog/defaults');
 var extend = require('cog/extend');
 var throttle = require('cog/throttle');
 var FastMap = require('collections/fast-map');
@@ -185,11 +186,7 @@ var sig = module.exports = function(messenger, opts) {
   var peers = signaller.peers = new FastMap();
 
   // initialise the data event name
-  var dataEvent = (opts || {}).dataEvent || 'data';
-  var openEvent = (opts || {}).openEvent || 'open';
-  var closeEvent = (opts || {}).closeEvent || 'close';
-  var writeMethod = (opts || {}).writeMethod || 'write';
-  var closeMethod = (opts || {}).closeMethod || 'close';
+
   var connected = false;
   var write;
   var close;
@@ -219,15 +216,15 @@ var sig = module.exports = function(messenger, opts) {
     }
 
     // handle message data events
-    messenger.on(dataEvent, processor);
+    messenger.on(opts.dataEvent, processor);
 
     // when the connection is open, then emit an open event and a connected event
-    messenger.on(openEvent, function() {
+    messenger.on(opts.openEvent, function() {
       signaller.emit('open');
       signaller.emit('connected');
     });
 
-    messenger.on(closeEvent, function() {
+    messenger.on(opts.closeEvent, function() {
       signaller.emit('disconnected');
     });
   }
@@ -261,8 +258,8 @@ var sig = module.exports = function(messenger, opts) {
 
   function init() {
     // extract the write and close function references
-    write = [writeMethod].concat(WRITE_METHODS).map(extractProp).filter(isF)[0];
-    close = [closeMethod].concat(CLOSE_METHODS).map(extractProp).filter(isF)[0];
+    write = [opts.writeMethod].concat(WRITE_METHODS).map(extractProp).filter(isF)[0];
+    close = [opts.closeMethod].concat(CLOSE_METHODS).map(extractProp).filter(isF)[0];
 
     // create the processor
     signaller.process = processor = require('./processor')(signaller, opts);
@@ -289,9 +286,6 @@ var sig = module.exports = function(messenger, opts) {
       });
     }
   }
-
-  // set the autoreply flag
-  signaller.autoreply = autoreply === undefined || autoreply;
 
   function prepareArg(arg) {
     if (typeof arg == 'object' && (! (arg instanceof String))) {
@@ -543,6 +537,12 @@ var sig = module.exports = function(messenger, opts) {
       send: sender,
     }
   };
+
+  // initialise opts defaults
+  opts = defaults({}, opts, require('./defaults'));
+
+  // set the autoreply flag
+  signaller.autoreply = autoreply === undefined || autoreply;
 
   // if the messenger is a string, then we are going to attach to a
   // ws endpoint and automatically set up primus
