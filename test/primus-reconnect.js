@@ -50,20 +50,20 @@ test('B: can announce prior to the connection being established', function(t) {
 test('disrupt the underlying socket', function(t) {
 
   function handleFail() {
-    t.fail('captured peer:leave which should not have happened on a reconnect');
+    t.fail('captured peer:disconnected which should not have happened on a reconnect');
   }
 
   t.plan(5);
-  sigB.once('peer:leave', t.pass.bind(t, 'captured leave'));
+  sigB.once('peer:disconnected', t.pass.bind(t, 'captured disconnected'));
   sigB.once('peer:announce', function(data) {
     t.ok(data, 'got valid data');
     t.equal(data.name, 'Fred', 'Fred reannounced');
   });
 
-  sigA.once('peer:leave', handleFail);
+  sigA.once('peer:disconnected', handleFail);
   sigA.once('connected', function() {
-    sigA.removeListener('peer:leave', handleFail);
-    sigB.removeListener('peer:leave', handleFail);
+    sigA.removeListener('peer:disconnected', handleFail);
+    sigB.removeListener('peer:disconnected', handleFail);
     t.pass('captured reconnection');
   });
 

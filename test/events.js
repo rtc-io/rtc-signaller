@@ -111,10 +111,10 @@ test('peer:0 sends non-command to peer:1 (with args)', function(t) {
   signallers[0].to(signallers[1].id).send('hello', 4, 5, 6);
 });
 
-test('signaller:1 receives a peer:leave event when signaller:0 leaves', function(t) {
+test('signaller:1 receives a peer:disconnected event when signaller:0 leaves', function(t) {
   t.plan(4);
 
-  signallers[1].once('peer:leave', function(id, peer) {
+  signallers[1].once('peer:disconnected', function(id, peer) {
     t.equal(id, signallers[0].id, 'captured signaller:0 leave');
     t.ok(peer && peer.data, 'received peer data as this was a known peer');
     t.equal(peer.data.name, 'Fred', 'we know its Fred');
