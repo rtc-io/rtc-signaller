@@ -105,13 +105,73 @@ var metadata = {
     which provides application developers the opportunity to modify data from
     the event (in this case the `allow` attribute).
 
-  - `peer:announce` - A new peer has been discovered in the system.
+  - `peer:connected` - If a peer has passed the `peer:filter` test (either
+     no filtering has been applied, or the allow flag is set to true in the
+     filter events) then a `peer:connected` event will be emitted:
+
+    ```js
+    signaller.on('peer:connected', function(id) {
+      console.log('peer ' + id + ' has connected');
+    });
+    ```
+
+    The primary use case for this event is if you are updating part of your
+    application UI to flag in response to a `peer:disconnected` event being
+    fired (which can be due to poor network connectivity), then you can use
+    the `peer:connected` event to restore UI elements to represent an active
+    connection on receiving this event.
+
+  - `peer:announce` - While the `peer:connected` event is triggered each time
+    a peer reconnects and announces to the signalling server, a `peer:announce`
+    event is only emitted by your local signaller if this is considered a
+    new connection from a peer.
+
+    If you are writing a WebRTC application, then this event is the best place
+    to start creating `RTCPeerConnection` objects between the local machine
+    and your remote, announced counterpart.  You will then be able to
+    [couple](https://github.com/rtc-io/rtc#rtccouple) those connections
+    together using the signaller.
+
+    ```js
+    signaller.on('peer:announce', function(data) {
+      console.log('discovered new peer: ' + data.id, data);
+
+      // TODO: create a peer connection with our new friend :)
+    });
+    ```
 
   - `peer:update` - An existing peer in the system has been "re-announced"
-    possibly with some data changes.
+    possibly with some data changes:
+
+    ```js
+    signaller.on('peer:update', function(data) {
+      console.log('data update from peer: ' + data.id, data);
+    });
+    ```
 
   - `peer:disconnected` - A peer has disconnected from the signalling server,
     but may reconnect if it manages to re-establish connectivity.
+
+    ```js
+    signaller.on('peer:disconnected', function(id) {
+      console.log('peer ' + id + ' has gone, but they might be back...');
+    });
+    ```
+
+  - `peer:leave` - This event is triggered when the signaller has previously
+    received a disconnection notification for a peer, and a reconnection has
+    not been made by that peer within a certain time interval.
+
+    The default `leaveTimeout` is configured in the
+    [defaults](https://github.com/rtc-io/rtc-signaller/blob/master/defaults.json)
+    but can be overriden by passing configuration options when creating the
+    signaller.
+
+    ```js
+    signaller.on('peer:leave', function(id) {
+      console.log('peer ' + id + ' has left :(');
+    });
+    ```
 
   ## Signal Flow Diagrams
 
