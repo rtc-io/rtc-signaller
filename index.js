@@ -113,6 +113,28 @@ var metadata = {
   The following events relate to information that has been relayed to this
   signaller about other peers:
 
+  - `peer:filter`
+
+    The `peer:filter` event is triggered prior to the `peer:announce` or
+    `peer:update` events being fired and provides an application the
+    opportunity to reject a peer.  The handler for this event is passed
+    a JS object that contains a `data` attribute for the announce data, and an
+    `allow` flag that controls whether the peer is to be accepted.
+
+    Due to the way event emitters behave in node, the last handler invoked
+    is the authority on whether the peer is accepted or not (so make sure to
+    check the previous state of the allow flag):
+
+    ```js
+    // only accept connections from Bob
+    signaller.on('peer:filter', function(evt) {
+      evt.allow = evt.allow && (evt.data.name === 'Bob');
+    });
+
+    __NOTE:__ This event handler does use a different syntax in the handler
+    which provides application developers the opportunity to modify data from
+    the event (in this case the `allow` attribute).
+
   - `peer:announce` - A new peer has been discovered in the system.
 
   - `peer:update` - An existing peer in the system has been "re-announced"
