@@ -78,7 +78,8 @@ module.exports = function(signaller) {
       // initialise the peer data
       copyData(peer.data, data);
 
-      // not inactive
+      // reset inactivity state
+      clearTimeout(peer.leaveTimer);
       peer.inactive = false;
 
       // set the peer data

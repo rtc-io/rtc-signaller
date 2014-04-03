@@ -13,14 +13,17 @@
   peer state is removed.
 
 **/
-module.exports = function(signaller) {
+module.exports = function(signaller, opts) {
   return function(args) {
     var data = args[0];
     var peer = signaller.peers.get(data && data.id);
 
-    // if we know about the peer, mark it as inactive
     if (peer) {
-      peer.inactive = true;
+      // start the inactivity timer
+      peer.leaveTimer = setTimeout(function() {
+        peer.inactive = true;
+        signaller.emit('peer:leave', data.id, peer);
+      }, opts.leaveTimeout);
     }
 
     // emit the event

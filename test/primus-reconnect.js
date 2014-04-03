@@ -55,7 +55,7 @@ test('disrupt the underlying socket', function(t) {
 
   t.plan(5);
   sigB.once('peer:disconnected', t.pass.bind(t, 'captured disconnected'));
-  sigB.once('peer:announce', function(data) {
+  sigB.once('peer:update', function(data) {
     t.ok(data, 'got valid data');
     t.equal(data.name, 'Fred', 'Fred reannounced');
   });
