@@ -36,6 +36,8 @@ module.exports = function(count) {
       });
     };
 
+    peer.connected = true;
+
     return peer;
   }
 

@@ -23,7 +23,7 @@ if (typeof window != 'undefined') {
   require('./primus-auto');
 
   // test primus reconnection logic
-  // require('./primus-reconnect');
+  require('./primus-reconnect');
 
   // test native browser websocket support
   require('./browser-websockets');
