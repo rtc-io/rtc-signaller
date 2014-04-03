@@ -9,6 +9,9 @@ mechanism for WebRTC.
 [![Build Status](https://img.shields.io/travis/rtc-io/rtc-signaller.svg?branch=master)](https://travis-ci.org/rtc-io/rtc-signaller)
 ![unstable](https://img.shields.io/badge/stability-unstable-yellowgreen.svg)
 
+[![Gitter chat](https://badges.gitter.im/rtc-io/discuss.png)](https://gitter.im/rtc-io/discuss)
+
+
 ## Purpose
 
 The signaller provides set of client-side tools that assist with the
