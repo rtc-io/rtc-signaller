@@ -121,7 +121,9 @@ var metadata = {
     the `peer:connected` event to restore UI elements to represent an active
     connection on receiving this event.
 
-  - `peer:announce` - While the `peer:connected` event is triggered each time
+  - `peer:announce`
+
+    While the `peer:connected` event is triggered each time
     a peer reconnects and announces to the signalling server, a `peer:announce`
     event is only emitted by your local signaller if this is considered a
     new connection from a peer.
@@ -140,7 +142,9 @@ var metadata = {
     });
     ```
 
-  - `peer:update` - An existing peer in the system has been "re-announced"
+  - `peer:update`
+
+    An existing peer in the system has been "re-announced"
     possibly with some data changes:
 
     ```js
@@ -149,7 +153,9 @@ var metadata = {
     });
     ```
 
-  - `peer:disconnected` - A peer has disconnected from the signalling server,
+  - `peer:disconnected`
+
+    A peer has disconnected from the signalling server,
     but may reconnect if it manages to re-establish connectivity.
 
     ```js
@@ -158,7 +164,9 @@ var metadata = {
     });
     ```
 
-  - `peer:leave` - This event is triggered when the signaller has previously
+  - `peer:leave`
+
+    This event is triggered when the signaller has previously
     received a disconnection notification for a peer, and a reconnection has
     not been made by that peer within a certain time interval.
 
