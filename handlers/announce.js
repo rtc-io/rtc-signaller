@@ -113,6 +113,9 @@ module.exports = function(signaller) {
       // initialise the peer data
       copyData(peer.data, data);
 
+      // not inactive
+      peer.inactive = false;
+
       // set the peer data
       signaller.peers.set(data.id, peer);
 
