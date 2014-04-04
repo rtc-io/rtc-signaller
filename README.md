@@ -7,7 +7,7 @@ mechanism for WebRTC.
 [![NPM](https://nodei.co/npm/rtc-signaller.png)](https://nodei.co/npm/rtc-signaller/)
 
 [![Build Status](https://img.shields.io/travis/rtc-io/rtc-signaller.svg?branch=master)](https://travis-ci.org/rtc-io/rtc-signaller)
-![unstable](https://img.shields.io/badge/stability-unstable-yellowgreen.svg)
+![stable](https://img.shields.io/badge/stability-stable-green.svg)
 
 [![Gitter chat](https://badges.gitter.im/rtc-io/discuss.png)](https://gitter.im/rtc-io/discuss)
 

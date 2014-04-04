@@ -2,7 +2,7 @@
   "badges": {
     "nodeico": true,
     "travis": true,
-    "stability": "unstable",
+    "stability": "stable",
     "gitter": "rtc-io/discuss"
   },
 
