@@ -119,7 +119,7 @@ test('signaller:1 receives a peer:disconnected event when signaller:0 leaves', f
     t.ok(peer && peer.data, 'received peer data as this was a known peer');
     t.equal(peer.data.name, 'Fred', 'we know its Fred');
 
-    t.ok(signallers[1].peers.get(id).inactive, 'peer record marked inactive');
+    t.ok(signallers[1].peers.get(id).leaveTimer, 'leaveTimer started for peer');
   });
 
   signallers[0].leave();
