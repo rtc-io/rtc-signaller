@@ -109,7 +109,9 @@ var metadata = {
     which provides application developers the opportunity to modify data from
     the event (in this case the `allow` attribute).
 
-  - `peer:connected` - If a peer has passed the `peer:filter` test (either
+  - `peer:connected`
+
+     If a peer has passed the `peer:filter` test (either
      no filtering has been applied, or the allow flag is set to true in the
      filter events) then a `peer:connected` event will be emitted:
 
