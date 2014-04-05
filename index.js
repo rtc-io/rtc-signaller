@@ -359,6 +359,9 @@ var sig = module.exports = function(messenger, opts) {
         connected = true;
       });
     }
+
+    // emit the initialized event
+    signaller.emit('init');
   }
 
   function prepareArg(arg) {
