@@ -1,9 +1,9 @@
 var test = require('tape');
 var roomId = require('uuid').v4();
-var signallingServer = 'http://rtc.io/switchboard/';
 var jsonparse = require('cog/jsonparse');
 var signaller;
-// var signallingServer = location.origin;
+var signallingServer = location.origin;
+// var signallingServer = 'http://rtc.io/switchboard/';
 
 test('create a signaller', function(t) {
   t.plan(2);
