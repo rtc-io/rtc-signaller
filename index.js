@@ -12,7 +12,7 @@ var FastMap = require('collections/fast-map');
 
 // initialise the list of valid "write" methods
 var WRITE_METHODS = ['write', 'send'];
-var CLOSE_METHODS = ['close'];
+var CLOSE_METHODS = ['close', 'end'];
 
 // initialise signaller metadata so we don't have to include the package.json
 // TODO: make this checkable with some kind of prepublish script
@@ -510,7 +510,7 @@ var sig = module.exports = function(messenger, opts) {
     `/leave` messages when it detects a disconnect event.
 
   **/
-  signaller.leave = function() {
+  signaller.leave = signaller.close = function() {
     // send the leave signal
     send('/leave', { id: id });
 
