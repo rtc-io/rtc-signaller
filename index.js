@@ -357,11 +357,14 @@ var sig = module.exports = function(messenger, opts) {
     if (! connected) {
       signaller.once('connected', function() {
         connected = true;
+
+        // always announce on reconnect
+        signaller.on('connected', announceOnReconnect);
       });
     }
 
     // emit the initialized event
-    signaller.emit('init');
+    setTimeout(signaller.emit.bind(signaller, 'init'), 0);
   }
 
   function prepareArg(arg) {
@@ -468,9 +471,13 @@ var sig = module.exports = function(messenger, opts) {
     // update internal attributes
     extend(attributes, data, { id: signaller.id });
 
-    // always announce on reconnect
-    signaller.removeListener('connected', announceOnReconnect);
-    signaller.on('connected', announceOnReconnect);
+    // if we are already connected, then ensure we announce on
+    // reconnect
+    if (connected) {
+      // always announce on reconnect
+      signaller.removeListener('connected', announceOnReconnect);
+      signaller.on('connected', announceOnReconnect);
+    }
 
     // send the attributes over the network
     return announceTimer = setTimeout(function() {
