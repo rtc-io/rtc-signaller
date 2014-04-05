@@ -26,8 +26,8 @@ test('announce results in a single send to the server', function(t) {
 
       announceRemaining -= 1;
       t.ok(
-        data[0].id === signaller.id &&
-        data[1].id === signaller.id,
+        parts[1].id === signaller.id &&
+        parts[2].id === signaller.id,
         'announce message valid'
       );
     }
