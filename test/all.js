@@ -24,6 +24,7 @@ if (typeof window != 'undefined') {
 
   // test primus reconnection logic
   require('./primus-reconnect');
+  require('./primus-manualclose');
 
   // test native browser websocket support
   require('./browser-websockets');
