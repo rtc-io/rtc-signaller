@@ -21,6 +21,7 @@ if (typeof window != 'undefined') {
 
   // test automatic messenger implementation
   require('./primus-auto');
+  require('./primus-announce');
 
   // test primus reconnection logic
   require('./primus-reconnect');
