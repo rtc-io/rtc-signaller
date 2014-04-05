@@ -1,3 +1,8 @@
+### 1.2.0 (05 Apr 2014)
+
+- Signaller now emits an "init" event after it's initialized
+- Fix double announce bug
+
 ### 1.1.0 (05 Apr 2014)
 
 - Added `signaller.close()` as an alias for `signaller.leave()`
