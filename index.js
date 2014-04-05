@@ -612,6 +612,9 @@ var sig = module.exports = function(messenger, opts) {
     }
   };
 
+  // remove max listeners from the emitter
+  signaller.setMaxListeners(0);
+
   // initialise opts defaults
   opts = defaults({}, opts, require('./defaults'));
 
