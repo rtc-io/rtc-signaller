@@ -9,16 +9,15 @@
   "dependencies": {
     "uuid": "~1.4.1",
     "cog": "~0.5.1",
-    "collections": "^2.0.0",
-    "rtc-core": "~0.7.1"
+    "collections": "^2"
   },
   "devDependencies": {
-    "tape": "^2.10.2",
+    "tape": "^2",
     "rtc-switchboard": "^0.10.1",
-    "messenger-memory": "^1.0.0",
-    "zuul": "~1.5.4",
+    "messenger-memory": "^1",
+    "zuul": "^1",
     "fdom": "^0.8.0",
-    "async": "~0.2.9"
+    "async": "~0.6"
   },
   "scripts": {
     "test": "node test/all.js && zuul -- test/all.js",
