@@ -9,7 +9,8 @@
   "dependencies": {
     "uuid": "~1.4.1",
     "cog": "~0.5.1",
-    "collections": "^1"
+    "collections": "^1",
+    "rtc-core": "^1"
   },
   "devDependencies": {
     "tape": "^2",
