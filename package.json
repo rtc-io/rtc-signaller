@@ -16,12 +16,12 @@
     "tape": "^2",
     "rtc-switchboard": "^0.10.1",
     "messenger-memory": "^1",
-    "zuul": "^1",
+    "testling": "^1",
     "fdom": "^0.8.0",
     "async": "~0.6"
   },
   "scripts": {
-    "test": "node test/all.js && zuul -- test/all.js",
+    "test": "node test/all.js && testling -x ./.travis/start-$BROWSER.sh",
     "gendocs": "gendocs > README.md"
   },
   "repository": {
@@ -37,5 +37,9 @@
   "license": "Apache 2.0",
   "bugs": {
     "url": "https://github.com/rtc-io/rtc-signaller/issues"
+  },
+  "testling": {
+    "files": "test/all.js",
+    "server": "test/server.js"
   }
 }
