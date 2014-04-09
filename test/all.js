@@ -10,6 +10,7 @@ require('./announce-debounce');
 require('./peer-filter');
 require('./set-id');
 require('./events');
+require('./send-falsey-parts');
 
 // inspect generated messages
 require('./announce-raw')(messenger, peers);
