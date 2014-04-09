@@ -318,6 +318,10 @@ var sig = module.exports = function(messenger, opts) {
     });
   }
 
+  function createDataLine(args) {
+    return args.map(prepareArg).join('|');
+  }
+
   function createMetadata() {
     return extend({}, localMeta, { id: signaller.id });
   }
@@ -394,7 +398,7 @@ var sig = module.exports = function(messenger, opts) {
 
     // inject the metadata
     args.splice(1, 0, createMetadata());
-    dataline = args.map(prepareArg).filter(Boolean).join('|');
+    dataline = createDataLine(args);
 
     // if we are not initialized, then wait until we are
     if (! connected) {
@@ -606,7 +610,7 @@ var sig = module.exports = function(messenger, opts) {
       args.splice(3, 0, createMetadata());
 
       setTimeout(function() {
-        var msg = args.map(prepareArg).filter(Boolean).join('|');
+        var msg = createDataLine(args);
         debug('TX (' + targetId + '): ' + msg);
 
         write.call(messenger, msg);
