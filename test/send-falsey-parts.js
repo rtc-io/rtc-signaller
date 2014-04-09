@@ -25,6 +25,16 @@ var runTest = module.exports = function(messenger, peers) {
     peers.expect(t, ['/value', { id: s.id }, 0]);
     s.send('/value', 0);
   });
+
+  test('can send message with empty string as arguments', function(t) {
+    peers.expect(t, ['/message', { id: s.id }, '']);
+    s.send('/message', '');
+  });
+
+  test('can send message with value false as argument', function(t) {
+    peers.expect(t, ['/connected', { id: s.id }, false ]);
+    s.send('/connected', false);
+  });
 };
 
 if (! module.parent) {
