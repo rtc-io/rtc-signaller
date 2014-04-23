@@ -4,6 +4,7 @@ var signaller = require('..');
 var uuid = require('uuid');
 var scope = [];
 var signallers = [];
+var roomId = uuid.v4();
 
 var signallingServer = location.origin;
 // var signallingServer = 'http://rtc.io/switchboard/';
@@ -20,7 +21,7 @@ test('create signaller:1', function(t) {
   signallers[1].once('init', t.pass.bind(t, 'initialized'));
 });
 
-test('concurrent announce', function(t) {
+test('concurrent announce via primus', function(t) {
   t.plan(5);
 
   signallers[1].on('peer:announce', function(data) {
@@ -42,8 +43,8 @@ test('concurrent announce', function(t) {
   }, 1000);
 
   // peer 0 initiates the announce process
-  signallers[0].announce({ name: 'Fred' });
-  signallers[1].announce({ name: 'Bob' });
+  signallers[0].announce({ room: roomId, name: 'Fred' });
+  signallers[1].announce({ room: roomId, name: 'Bob' });
 });
 
 test('ab roles have been correctly assigned', function(t) {
