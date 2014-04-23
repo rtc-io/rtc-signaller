@@ -40,7 +40,6 @@ module.exports = function(signaller, opts) {
   }
 
   return function(originalData) {
-    var id = signaller.id;
     var data = originalData;
     var isMatch = true;
     var parts;
@@ -49,7 +48,9 @@ module.exports = function(signaller, opts) {
     var srcState;
     var isDirectMessage = false;
 
-    debug('signaller ' + signaller.id + ' received data: ' + originalData);
+    // force the id into string format so we can run length and comparison tests on it
+    var id = signaller.id + '';
+    debug('signaller ' + id + ' received data: ' + originalData);
 
     // process /to messages
     if (data.slice(0, 3) === '/to') {
