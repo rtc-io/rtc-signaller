@@ -6,6 +6,7 @@ var messenger = peers.shift();
 // require('./to')(messenger, peers);
 
 require('./announce-concurrent');
+require('./announce-customid');
 require('./announce-debounce');
 require('./peer-filter');
 require('./set-id');
