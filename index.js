@@ -132,13 +132,13 @@ module.exports = function(messenger, opts) {
 
   function connectToHost(url) {
     // load primus
-    connect(url, function(err, Primus) {
+    connect(url, function(err, socket) {
       if (err) {
         return signaller.emit('error', err);
       }
 
       // create the actual messenger from a primus connection
-      signaller._messenger = messenger = Primus.connect(url);
+      signaller._messenger = messenger = socket.connect(url);
 
       // now init
       init();
