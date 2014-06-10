@@ -95,6 +95,7 @@ module.exports = function(messenger, opts) {
   var announceTimer = 0;
 
   function announceOnReconnect() {
+    connected = true;
     signaller.announce();
   }
 
@@ -317,9 +318,13 @@ module.exports = function(messenger, opts) {
 
     // send the attributes over the network
     return announceTimer = setTimeout(function() {
-      if (connected) {
-        (sender || send)('/announce', attributes);
+      if (! connected) {
+        return signaller.once('connected', function() {
+          (sender || send)('/announce', attributes);
+        });
       }
+
+      (sender || send)('/announce', attributes);
     }, (opts || {}).announceDelay || 10);
   };
 
