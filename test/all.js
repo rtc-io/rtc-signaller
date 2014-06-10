@@ -4,6 +4,7 @@ var messenger = peers.shift();
 
 // test signalling logic
 // require('./to')(messenger, peers);
+require('./message-announce');
 
 require('./announce-concurrent');
 require('./announce-customid');
