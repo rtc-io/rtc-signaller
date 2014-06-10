@@ -12,7 +12,7 @@ env:
 #    - BROWSER=firefox BVER=aurora
 
 before_script:
-  node test/server.js
+  - node test/server.js &
 
 before_install:
   - mkdir -p .travis
