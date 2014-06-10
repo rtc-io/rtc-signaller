@@ -2,15 +2,14 @@
   "name": "rtc-signaller",
   "version": "1.2.3",
   "description": "rtc.io transportless signalling for WebRTC",
-  "main": "index.js",
   "directories": {
     "test": "test"
   },
   "dependencies": {
-    "uuid": "^1",
     "cog": "~0.5",
     "collections": "^1",
-    "rtc-core": "^1"
+    "rtc-core": "^1",
+    "uuid": "^1"
   },
   "devDependencies": {
     "tape": "^2",
@@ -38,6 +37,8 @@
   "bugs": {
     "url": "https://github.com/rtc-io/rtc-signaller/issues"
   },
+  "main": "./main.js",
+  "browser": "./browser.js",
   "testling": {
     "files": "test/all.js",
     "server": "test/server.js"
