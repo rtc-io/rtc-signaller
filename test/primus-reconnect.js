@@ -1,12 +1,13 @@
 var test = require('tape');
 var signaller = require('..');
 var roomId = require('uuid').v4();
+var signallingServer = require('./helpers/signalling-server');
 var sigA;
 var sigB;
 
 test('A: can create a signalling instance that automatically connects via primus', function(t) {
   t.plan(1);
-  t.ok(sigA = signaller(location.origin), 'signaller created');
+  t.ok(sigA = signaller(signallingServer), 'signaller created');
 });
 
 test('A: can announce prior to the connection being established', function(t) {
@@ -22,7 +23,7 @@ test('A: will receive an open event when channel is open', function(t) {
 
 test('B: can create a signalling instance that automatically connects via primus', function(t) {
   t.plan(1);
-  t.ok(sigB = signaller(location.origin), 'signaller created');
+  t.ok(sigB = signaller(signallingServer), 'signaller created');
 });
 
 test('B: will receive an open event when channel is open', function(t) {
@@ -85,5 +86,5 @@ test('disrupt the underlying socket (no reconnection attempt)', function(t) {
   sigB.once('peer:disconnected', t.pass.bind(t, 'captured disconnected'));
   sigB.once('peer:leave', t.pass.bind(t, 'captured leave'));
   sigA.once('disconnected', t.pass.bind(t, 'captured disconnect on signaller A'));
-  sigA.send('/fake:leave');  
+  sigA.send('/fake:leave');
 });

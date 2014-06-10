@@ -2,10 +2,11 @@ var test = require('tape');
 var signaller = require('..');
 var sigA;
 var sigB;
+var signallingServer = require('./helpers/signalling-server');
 
 test('connect signaller', function(t) {
   t.plan(2);
-  t.ok(sigA = signaller(location.origin), 'signaller created');
+  t.ok(sigA = signaller(signallingServer), 'signaller created');
   sigA.announce({ name: 'Fred', room: require('uuid').v4() });
   sigA.once('connected', t.pass.bind(t, 'signaller open'));
 });
@@ -18,7 +19,7 @@ test('signaller.leave(), receive disconnect event', function(t) {
 
 test('reconnect signaller', function(t) {
   t.plan(2);
-  t.ok(sigA = signaller(location.origin), 'signaller created');
+  t.ok(sigA = signaller(signallingServer), 'signaller created');
   sigA.announce({ name: 'Fred', room: require('uuid').v4() });
   sigA.once('connected', t.pass.bind(t, 'signaller open'));
 });

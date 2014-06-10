@@ -5,23 +5,23 @@ var uuid = require('uuid');
 var scope = [];
 var signallers = [];
 var roomId = uuid.v4();
-
-var signallingServer = location.origin;
-// var signallingServer = 'http://rtc.io/switchboard/';
+var signallingServer = require('./helpers/signalling-server');
 
 test('create signaller:0', function(t) {
-  t.plan(2);
-  t.ok(signallers[0] = require('../')(signallingServer), 'created');
+  t.plan(3);
+  t.ok(signallers[0] = require('../')(signallingServer, { id: 1 }), 'created');
+  t.equal(signallers[0].id, 1, 'id === 1');
   signallers[0].once('init', t.pass.bind(t, 'initialized'));
 });
 
 test('create signaller:1', function(t) {
-  t.plan(2);
-  t.ok(signallers[1] = require('../')(signallingServer), 'created');
+  t.plan(3);
+  t.ok(signallers[1] = require('../')(signallingServer, { id: 2 }), 'created');
+  t.equal(signallers[1].id, 2, 'id === 2');
   signallers[1].once('init', t.pass.bind(t, 'initialized'));
 });
 
-test('concurrent announce via primus', function(t) {
+test('announce via primus, custom ids', function(t) {
   t.plan(5);
 
   signallers[1].on('peer:announce', function(data) {
@@ -73,4 +73,12 @@ test('isMaster checks are accurate', function(t) {
     t.notOk(signallers[0].isMaster(signallers[1].id));
     t.ok(signallers[1].isMaster(signallers[0].id));
   }
+});
+
+test('close the signallers', function(t) {
+  t.plan(signallers.length);
+  signallers.forEach(function(signaller, idx) {
+    signaller.on('disconnected', t.pass.bind(t, 'signaller ' + idx + ' disconnected'));
+    signaller.close();
+  });
 });

@@ -17,19 +17,17 @@ require('./send-falsey-parts');
 require('./announce-raw')(messenger, peers);
 require('./custom-metadata')(messenger, peers);
 
+// test automatic messenger implementation
+require('./switchboard-auto');
+require('./switchboard-announce');
+require('./switchboard-announce-customid');
+require('./switchboard-manualclose');
+
 if (typeof window != 'undefined') {
   // test primus loading
   require('./primus-load');
-
-  // test automatic messenger implementation
-  require('./primus-auto');
-  require('./primus-announce');
-  require('./primus-announce-customid');
   require('./primus-announce-payload');
-
-  // test primus reconnection logic
   require('./primus-reconnect');
-  require('./primus-manualclose');
 
   // test native browser websocket support
   require('./browser-websockets');
