@@ -108,6 +108,10 @@ module.exports = function(messenger, opts) {
       signaller.emit('open');
       signaller.emit('connected');
     });
+
+    messenger.addEventListener('close', function(evt) {
+      signaller.emit('disconnected');
+    });
   }
 
   function bindEvents() {
