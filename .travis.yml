@@ -11,12 +11,16 @@ env:
 #    - BROWSER=firefox BVER=beta
 #    - BROWSER=firefox BVER=aurora
 
+before_script:
+  node test/server.js
+
 before_install:
   - mkdir -p .travis
   - curl -s https://codeload.github.com/rtc-io/webrtc-testing-on-travis/tar.gz/master | tar -xz --strip-components=1 --directory .travis
   - ./.travis/setup.sh
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
+
 
 after_failure:
   - for file in *.log; do echo $file; echo "======================"; cat $file; done || true
