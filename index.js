@@ -96,7 +96,6 @@ module.exports = function(messenger, opts) {
 
   function announceOnReconnect() {
     signaller.announce();
-    // setTimeout(signaller.announce, );
   }
 
   function bindBrowserEvents() {
