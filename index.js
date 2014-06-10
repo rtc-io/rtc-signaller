@@ -163,10 +163,19 @@ module.exports = function(messenger, opts) {
     return messenger[name];
   }
 
+  // attempt to detect whether the underlying messenger is closing
+  // this can be tough as we deal with both native (or simulated native)
+  // sockets or an abstraction layer such as primus
   function isClosing() {
-    return messenger &&
+    var isAbstraction = messenger &&
+        // a primus socket has a socket attribute
+        typeof messenger.socket != 'undefined';
+
+    return isAbstraction ? false : (
+      messenger &&
       typeof messenger.readyState != 'undefined' &&
-      messenger.readyState >= 2;
+      messenger.readyState >= 2
+    );
   }
 
   function isF(target) {
