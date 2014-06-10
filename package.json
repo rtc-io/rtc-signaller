@@ -9,7 +9,8 @@
     "cog": "~0.5",
     "collections": "^1",
     "rtc-core": "^1",
-    "uuid": "^1"
+    "uuid": "^1",
+    "ws": "~0.4"
   },
   "devDependencies": {
     "tape": "^2",
