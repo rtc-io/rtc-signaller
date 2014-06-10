@@ -61,10 +61,10 @@ var metadata = {
   connect to an existing `rtc-switchboard` instance.
 
 **/
-var sig = module.exports = function(messenger, opts) {
-
+module.exports = function(messenger, opts) {
   // get the autoreply setting
   var autoreply = (opts || {}).autoreply;
+  var connect = (opts || {}).connect || require('./ws-connect');
 
   // initialise the metadata
   var localMeta = {};
@@ -130,9 +130,9 @@ var sig = module.exports = function(messenger, opts) {
     });
   }
 
-  function connectToPrimus(url) {
+  function connectToHost(url) {
     // load primus
-    sig.loadPrimus(url, function(err, Primus) {
+    connect(url, function(err, Primus) {
       if (err) {
         return signaller.emit('error', err);
       }
@@ -465,7 +465,7 @@ var sig = module.exports = function(messenger, opts) {
   // if the messenger is a string, then we are going to attach to a
   // ws endpoint and automatically set up primus
   if (typeof messenger == 'string' || (messenger instanceof String)) {
-    connectToPrimus(messenger);
+    connectToHost(messenger);
   }
   // otherwise, initialise the connection
   else {
@@ -480,5 +480,3 @@ var sig = module.exports = function(messenger, opts) {
 
   return signaller;
 };
-
-sig.loadPrimus = require('./primus-loader');
