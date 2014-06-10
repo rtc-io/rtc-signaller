@@ -163,6 +163,12 @@ module.exports = function(messenger, opts) {
     return messenger[name];
   }
 
+  function isClosing() {
+    return messenger &&
+      typeof messenger.readyState != 'undefined' &&
+      messenger.readyState >= 2;
+  }
+
   function isF(target) {
     return typeof target == 'function';
   }
@@ -232,6 +238,11 @@ module.exports = function(messenger, opts) {
     // inject the metadata
     args.splice(1, 0, createMetadata());
     dataline = createDataLine(args);
+
+    // perform an isclosing check
+    if (isClosing()) {
+      return;
+    }
 
     // if we are not initialized, then wait until we are
     if (! connected) {
