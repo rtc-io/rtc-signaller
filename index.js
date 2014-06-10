@@ -109,6 +109,7 @@ module.exports = function(messenger, opts) {
     });
 
     messenger.addEventListener('close', function(evt) {
+      connected = false;
       signaller.emit('disconnected');
     });
   }
@@ -129,6 +130,7 @@ module.exports = function(messenger, opts) {
     });
 
     messenger.on(opts.closeEvent, function() {
+      connected = false;
       signaller.emit('disconnected');
     });
   }
@@ -315,7 +317,9 @@ module.exports = function(messenger, opts) {
 
     // send the attributes over the network
     return announceTimer = setTimeout(function() {
-      (sender || send)('/announce', attributes);
+      if (connected) {
+        (sender || send)('/announce', attributes);
+      }
     }, (opts || {}).announceDelay || 10);
   };
 
