@@ -37,7 +37,7 @@ test('concurrent announce via primus', function(t) {
   setTimeout(function() {
     signallers[0].removeAllListeners();
     signallers[1].removeAllListeners();
-    t.pass('received only the 1 announce message for each peer');
+    t.equal(t.assertCount, 4, 'four previous tests passed ok');
   }, 1000);
 
   // peer 0 initiates the announce process
