@@ -2,7 +2,6 @@
 /* global document, location, Primus: false */
 'use strict';
 
-var url = require('url');
 var reTrailingSlash = /\/$/;
 
 /**
@@ -14,9 +13,9 @@ var reTrailingSlash = /\/$/;
 
 **/
 module.exports = function(signalhost, callback) {
+  var anchor = document.createElement('a');
   var script;
   var baseUrl;
-  var basePath;
   var scriptSrc;
 
   // if the signalhost is a function, we are in single arg calling mode
@@ -25,9 +24,11 @@ module.exports = function(signalhost, callback) {
     signalhost = location.origin;
   }
 
+  // initialise the anchor with the signalhost
+  anchor.href = signalhost;
+
   // read the base path
   baseUrl = signalhost.replace(reTrailingSlash, '');
-  basePath = url.parse(signalhost).pathname;
   scriptSrc = baseUrl + '/rtc.io/primus.js';
 
   // look for the script first
@@ -55,8 +56,8 @@ module.exports = function(signalhost, callback) {
   script.addEventListener('load', function() {
     // if we have a signalhost that is not basepathed at /
     // then tweak the primus prototype
-    if (basePath !== '/') {
-      Primus.prototype.pathname = basePath.replace(reTrailingSlash, '') +
+    if (anchor.pathname !== '/') {
+      Primus.prototype.pathname = anchor.pathname.replace(reTrailingSlash, '') +
         Primus.prototype.pathname;
     }
 
