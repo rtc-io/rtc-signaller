@@ -1,6 +1,6 @@
 var test = require('tape');
 var signaller = require('..');
-var roomId = require('uuid').v4();
+var roomId = require('../uuid')();
 var sigA;
 var sigB;
 
@@ -85,5 +85,5 @@ test('disrupt the underlying socket (no reconnection attempt)', function(t) {
   sigB.once('peer:disconnected', t.pass.bind(t, 'captured disconnected'));
   sigB.once('peer:leave', t.pass.bind(t, 'captured leave'));
   sigA.once('disconnected', t.pass.bind(t, 'captured disconnect on signaller A'));
-  sigA.send('/fake:leave');  
+  sigA.send('/fake:leave');
 });

@@ -1,12 +1,13 @@
 var test = require('tape');
 var signaller = require('..');
+var uuid = require('../uuid');
 var sigA;
 var sigB;
 
 test('connect signaller', function(t) {
   t.plan(2);
   t.ok(sigA = signaller(location.origin), 'signaller created');
-  sigA.announce({ name: 'Fred', room: require('uuid').v4() });
+  sigA.announce({ name: 'Fred', room: uuid() });
   sigA.once('connected', t.pass.bind(t, 'signaller open'));
 });
 
@@ -19,7 +20,7 @@ test('signaller.leave(), receive disconnect event', function(t) {
 test('reconnect signaller', function(t) {
   t.plan(2);
   t.ok(sigA = signaller(location.origin), 'signaller created');
-  sigA.announce({ name: 'Fred', room: require('uuid').v4() });
+  sigA.announce({ name: 'Fred', room: uuid() });
   sigA.once('connected', t.pass.bind(t, 'signaller open'));
 });
 
