@@ -7,7 +7,6 @@
   },
   "dependencies": {
     "cog": "^1",
-    "collections": "^1",
     "rtc-core": "^1",
     "ws": "~0.4"
   },
