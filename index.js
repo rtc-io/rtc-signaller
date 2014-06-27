@@ -7,8 +7,8 @@ var EventEmitter = require('events').EventEmitter;
 var defaults = require('cog/defaults');
 var extend = require('cog/extend');
 var throttle = require('cog/throttle');
+var getable = require('cog/getable');
 var uuid = require('./uuid');
-var FastMap = require('collections/fast-map');
 
 // initialise the list of valid "write" methods
 var WRITE_METHODS = ['write', 'send'];
@@ -84,7 +84,7 @@ module.exports = function(messenger, opts) {
   };
 
   // create the peers map
-  var peers = signaller.peers = new FastMap();
+  var peers = signaller.peers = getable({});
 
   // initialise the data event name
 
