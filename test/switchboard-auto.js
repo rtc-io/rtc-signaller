@@ -1,6 +1,6 @@
 var test = require('tape');
 var signaller = require('..');
-var uuid = require('uuid');
+var uuid = require('../uuid');
 var sig;
 var signallingServer = require('./helpers/signalling-server');
 
@@ -11,7 +11,7 @@ test('can create a signalling instance that automatically connects via primus', 
 
 test('can announce prior to the connection being established', function(t) {
   t.plan(1);
-  sig.announce({ name: 'Fred', room: uuid.v4() });
+  sig.announce({ name: 'Fred', room: uuid() });
   t.pass('Announce called without error');
 });
 

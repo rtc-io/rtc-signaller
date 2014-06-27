@@ -1,5 +1,5 @@
 var test = require('tape');
-var roomId = require('uuid').v4();
+var roomId = require('../uuid')();
 var jsonparse = require('cog/jsonparse');
 var signaller;
 var signallingServer = require('./helpers/signalling-server');

@@ -1,7 +1,6 @@
 var test = require('tape');
 var messenger = require('messenger-memory');
 var signaller = require('..');
-var uuid = require('uuid');
 var scope = [];
 var peers = [
   messenger({ delay: Math.random() * 200, scope: scope }),

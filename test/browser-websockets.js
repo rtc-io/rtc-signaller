@@ -1,7 +1,7 @@
 var test = require('tape');
 var signaller = require('..');
 var url = require('url');
-var uuid = require('uuid');
+var uuid = require('../uuid');
 var parts = url.parse(location.origin);
 var wsUrl = 'ws' + parts.protocol.slice(4) + '//' + parts.host + '/primus';
 var socket;
@@ -37,7 +37,7 @@ test('create a new signaller wrapping the socket, wait for open', function(t) {
 });
 
 test('can announce in a test room', function(t) {
-  var roomId = uuid.v4();
+  var roomId = uuid();
 
   t.plan(3);
   sig.once('roominfo', function(data) {

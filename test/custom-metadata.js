@@ -1,10 +1,10 @@
 var test = require('tape');
 var createSignaller = require('..');
-var uuid = require('uuid');
+var uuid = require('../uuid');
 
 var runTest = module.exports = function(messenger, peers) {
   var s;
-  var token = uuid.v4();
+  var token = uuid();
 
   test('create', function(t) {
     t.plan(2);
@@ -13,7 +13,7 @@ var runTest = module.exports = function(messenger, peers) {
   });
 
   test('announce', function(t) {
-    peers.expect(t, ['/announce', {id: s.id } ]);
+    peers.expect(t, ['/announce', { id: s.id } ]);
     s.announce();
   });
 

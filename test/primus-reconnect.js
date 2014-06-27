@@ -1,6 +1,6 @@
 var test = require('tape');
 var signaller = require('..');
-var roomId = require('uuid').v4();
+var roomId = require('../uuid')();
 var signallingServer = require('./helpers/signalling-server');
 var sigA;
 var sigB;

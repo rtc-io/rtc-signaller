@@ -1,10 +1,10 @@
 var test = require('tape');
 var messenger = require('messenger-memory');
 var signaller = require('..');
-var uuid = require('uuid');
+var uuid = require('../uuid');
 var scope = [];
 var signallers = [];
-var roomId = uuid.v4();
+var roomId = uuid();
 var signallingServer = require('./helpers/signalling-server');
 
 test('create signaller:0', function(t) {

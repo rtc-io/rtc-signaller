@@ -4,10 +4,10 @@
 var debug = require('cog/logger')('rtc-signaller');
 var detect = require('rtc-core/detect');
 var EventEmitter = require('events').EventEmitter;
-var uuid = require('uuid');
 var defaults = require('cog/defaults');
 var extend = require('cog/extend');
 var throttle = require('cog/throttle');
+var uuid = require('./uuid');
 var FastMap = require('collections/fast-map');
 
 // initialise the list of valid "write" methods
@@ -73,7 +73,7 @@ module.exports = function(messenger, opts) {
   var signaller = new EventEmitter();
 
   // initialise the id
-  var id = signaller.id = (opts || {}).id || uuid.v4();
+  var id = signaller.id = (opts || {}).id || uuid();
 
   // initialise the attributes
   var attributes = signaller.attributes = {
