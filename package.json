@@ -7,7 +7,6 @@
     "test": "test"
   },
   "dependencies": {
-    "uuid": "^1",
     "cog": "~0.5",
     "collections": "^1",
     "rtc-core": "^1"
