@@ -17,7 +17,7 @@ var CLOSE_METHODS = ['close', 'end'];
 // initialise signaller metadata so we don't have to include the package.json
 // TODO: make this checkable with some kind of prepublish script
 var metadata = {
-  version: '2.0.0'
+  version: '2.1.0'
 };
 
 /**
