@@ -3,7 +3,7 @@
 
 var debug = require('cog/logger')('rtc-signaller');
 var detect = require('rtc-core/detect');
-var EventEmitter = require('events').EventEmitter;
+var EventEmitter = require('eventemitter3');
 var defaults = require('cog/defaults');
 var extend = require('cog/extend');
 var throttle = require('cog/throttle');
