@@ -95,7 +95,6 @@ module.exports = function(messenger, opts) {
   var announceTimer = 0;
 
   function announceOnReconnect() {
-    connected = true;
     signaller.announce();
   }
 
@@ -105,6 +104,7 @@ module.exports = function(messenger, opts) {
     });
 
     messenger.addEventListener('open', function(evt) {
+      connected = true;
       signaller.emit('open');
       signaller.emit('connected');
     });
@@ -126,6 +126,7 @@ module.exports = function(messenger, opts) {
 
     // when the connection is open, then emit an open event and a connected event
     messenger.on(opts.openEvent, function() {
+      connected = true;
       signaller.emit('open');
       signaller.emit('connected');
     });
@@ -212,8 +213,6 @@ module.exports = function(messenger, opts) {
     connected = messenger.connected || false;
     if (! connected) {
       signaller.once('connected', function() {
-        connected = true;
-
         // always announce on reconnect
         signaller.on('connected', announceOnReconnect);
       });
