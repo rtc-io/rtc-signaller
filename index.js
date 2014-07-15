@@ -326,6 +326,12 @@ module.exports = function(messenger, opts) {
 
   **/
   signaller.announce = function(data, sender) {
+
+    function sendAnnounce() {
+      (sender || send)('/announce', attributes);
+      signaller.emit('local:announce', attributes);
+    }
+
     clearTimeout(announceTimer);
 
     // update internal attributes
@@ -342,12 +348,10 @@ module.exports = function(messenger, opts) {
     // send the attributes over the network
     return announceTimer = setTimeout(function() {
       if (! connected) {
-        return signaller.once('connected', function() {
-          (sender || send)('/announce', attributes);
-        });
+        return signaller.once('connected', sendAnnounce);
       }
 
-      (sender || send)('/announce', attributes);
+      sendAnnounce();
     }, (opts || {}).announceDelay || 10);
   };
 
