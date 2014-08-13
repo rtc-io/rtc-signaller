@@ -143,7 +143,7 @@ module.exports = function(messenger, opts) {
     }
 
     // load primus
-    connect(url, function(err, socket) {
+    connect(url, opts, function(err, socket) {
       if (err) {
         return signaller.emit('error', err);
       }
