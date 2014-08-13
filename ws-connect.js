@@ -14,7 +14,7 @@ function connect(signalhost) {
   return new WebSocket(signalhost);
 }
 
-module.exports = function(signalhost, callback) {
+module.exports = function(signalhost, opts, callback) {
   var ws = connect(signalhost);
 
   ws.once('open', function() {
