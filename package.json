@@ -13,15 +13,16 @@
     "ws": "~0.4"
   },
   "devDependencies": {
-    "tape": "^2",
-    "rtc-switchboard": "^0.10.1",
-    "messenger-memory": "^1.1",
-    "testling": "^1",
+    "async": "~0.9",
     "fdom": "^0.8.0",
-    "async": "~0.9"
+    "messenger-memory": "^1.1",
+    "rtc-switchboard": "^0.10.1",
+    "tape": "^2",
+    "testling": "^1",
+    "zuul": "^1.10.1"
   },
   "scripts": {
-    "test": "node test/all.js && testling -x ./.travis/start-$BROWSER.sh",
+    "test": "node test/all.js && zuul -- test/all.js",
     "gendocs": "gendocs > README.md"
   },
   "repository": {

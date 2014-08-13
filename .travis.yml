@@ -1,31 +1,13 @@
 language: node_js
 node_js:
-- 0.10
-
-env:
-  matrix:
-    - BROWSER=chrome  BVER=stable
-    - BROWSER=chrome  BVER=beta
-    - BROWSER=chrome  BVER=unstable
-#    - BROWSER=firefox BVER=stable
-#    - BROWSER=firefox BVER=beta
-#    - BROWSER=firefox BVER=aurora
-
+- 0.1
 before_script:
-  - node test/server.js &
-
-before_install:
-  - mkdir -p .travis
-  - curl -s https://codeload.github.com/rtc-io/webrtc-testing-on-travis/tar.gz/master | tar -xz --strip-components=1 --directory .travis
-  - ./.travis/setup.sh
-  - export DISPLAY=:99.0
-  - sh -e /etc/init.d/xvfb start
-
-
-after_failure:
-  - for file in *.log; do echo $file; echo "======================"; cat $file; done || true
-
+- node test/server.js &
 notifications:
   email:
   - damon.oehlman@nicta.com.au
   irc: irc.freenode.org#rtc.io
+env:
+  global:
+  - secure: JhS7qlPficasGRDHP8Cw2BFJMgjCfTl1WIO35wvnvNgDQ2KdaImYBSzFGtNYURY6fiRstxTAcbnYV9vif2k2LMZua1mN1jQ2NiUiBApAxmFUo9xev76Cil0c/ztVgr+kfWfIx5CDo2vUTP7Ynf6iy6Nbvr7bCkCB0QHEpKPnLyc=
+  - secure: ZgprPQLTN78NQA/AJkKpYQaWNZZm1J/tpjwivwunsd9g0Z63WRlvo/qp6IZZ9JB6VKuGUvX8U8Ygmmw5ogJ0bEsRhVsXGsVQ6andsqv8L0lr6RRMjKtxo/Tve5CnloJkCOgJGH80YGaOczBTKaJKs3PTCsC6tuRpYBT2BIOAihc=
