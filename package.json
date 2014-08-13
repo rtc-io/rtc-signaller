@@ -8,6 +8,7 @@
   "dependencies": {
     "cog": "^1",
     "eventemitter3": "^0.1.2",
+    "formatter": "^0.4.1",
     "rtc-core": "^3.0.0",
     "ws": "~0.4"
   },
