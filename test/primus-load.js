@@ -11,14 +11,6 @@ test('can load primus', function(t) {
   });
 });
 
-test('can load primus, defaulting to location.origin', function(t) {
-  t.plan(2);
-  loader(function(err, p) {
-    t.ifError(err);
-    t.ok(p === Primus, 'primus loaded, p is a valid Primus reference');
-  });
-});
-
 test('remove the primus script from the page', function(t) {
   t.plan(1);
 
@@ -37,7 +29,7 @@ test('remove the primus script from the page', function(t) {
 test('concurrent loads pass', function(t) {
   var dl = function(cb) {
     setTimeout(function() {
-      loader(cb);
+      loader(location.origin, cb);
     }, 0);
   };
 
