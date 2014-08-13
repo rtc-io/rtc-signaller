@@ -19,12 +19,6 @@ module.exports = function(signalhost, opts, callback) {
   var script;
   var scriptSrc;
 
-  // if the signalhost is a function, we are in single arg calling mode
-  if (typeof signalhost == 'function') {
-    callback = signalhost;
-    signalhost = location.origin;
-  }
-
   if (typeof opts == 'function') {
     callback = opts;
     opts = {};
