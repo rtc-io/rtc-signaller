@@ -38,7 +38,7 @@ test('concurrent announce via primus', function(t) {
     signallers[0].removeAllListeners();
     signallers[1].removeAllListeners();
     t.equal(t.assertCount, 4, 'four previous tests passed ok');
-  }, 1000);
+  }, 10000);
 
   // peer 0 initiates the announce process
   signallers[0].announce({ room: roomId, name: 'Fred' });

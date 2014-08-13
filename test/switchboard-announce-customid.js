@@ -40,7 +40,7 @@ test('announce via primus, custom ids', function(t) {
     signallers[0].removeAllListeners();
     signallers[1].removeAllListeners();
     t.pass('received only the 1 announce message for each peer');
-  }, 1000);
+  }, 10000);
 
   // peer 0 initiates the announce process
   signallers[0].announce({ room: roomId, name: 'Fred' });
