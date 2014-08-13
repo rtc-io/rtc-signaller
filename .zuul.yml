@@ -1,9 +1,9 @@
 ui: tape
 browsers:
   - name: chrome
-    version: [35,36,beta]
+    version: [latest,beta]
 
   - name: firefox
-    version: 30..latest
+    version: latest
 
 server: ./test/server.js
