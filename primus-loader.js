@@ -3,19 +3,20 @@
 'use strict';
 
 var reTrailingSlash = /\/$/;
+var formatter = require('formatter');
+var primusUrl = formatter('{{ signalhost }}{{ primusPath }}');
 
 /**
-  ### loadPrimus(signalhost, callback)
+  ### loadPrimus(signalhost, opts?, callback)
 
   This is a convenience function that is patched into the signaller to assist
   with loading the `primus.js` client library from an `rtc-switchboard`
   signaling server.
 
 **/
-module.exports = function(signalhost, callback) {
+module.exports = function(signalhost, opts, callback) {
   var anchor = document.createElement('a');
   var script;
-  var baseUrl;
   var scriptSrc;
 
   // if the signalhost is a function, we are in single arg calling mode
@@ -24,12 +25,19 @@ module.exports = function(signalhost, callback) {
     signalhost = location.origin;
   }
 
+  if (typeof opts == 'function') {
+    callback = opts;
+    opts = {};
+  }
+
   // initialise the anchor with the signalhost
   anchor.href = signalhost;
 
-  // read the base path
-  baseUrl = signalhost.replace(reTrailingSlash, '');
-  scriptSrc = baseUrl + '/rtc.io/primus.js';
+  // initialise the script location
+  scriptSrc = primusUrl({
+    signalhost: signalhost.replace(reTrailingSlash, ''),
+    primusPath: (opts || {}).primusPath || '/rtc.io/primus.js'
+  });
 
   // look for the script first
   script = document.querySelector('script[src="' + scriptSrc + '"]');
