@@ -13,6 +13,20 @@ var primusUrl = formatter('{{ signalhost }}{{ primusPath }}');
   with loading the `primus.js` client library from an `rtc-switchboard`
   signaling server.
 
+  In the case that you wish to load `primus.js` from a location other than
+  the default location of `{{ signalhost }}/rtc.io/primus.js` you can
+  provide an options object which allows for the following customizations:
+
+  - `primusPath` (default: `/rtc.io/primus.js`)
+
+    The path at which the `primus.js` file can be found on the signalhost.
+
+   __NOTE:__ The above options are passed through when creating a
+   signaller object, and thus packages such as
+   [rtc-quickconnect](https://github.com/rtc-io/rtc-quickconnect)
+   will allow you to make the customisation with it's top level
+   options also.
+
 **/
 module.exports = function(signalhost, opts, callback) {
   var anchor = document.createElement('a');
