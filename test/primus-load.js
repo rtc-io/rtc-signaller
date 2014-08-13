@@ -66,3 +66,18 @@ test('can specify an alternative script location for primus', function(t) {
     t.ok(p === Primus, 'primus loaded, p is a valid Primus reference');
   });
 });
+
+test('remove the primus script from the page', function(t) {
+  t.plan(1);
+
+  // iterate through the scripts and remove any primus scripts
+  qsa('script').forEach(function(script) {
+    if (/primus\.js$/.test(script.src)) {
+      script.parentNode.removeChild(script);
+    }
+  });
+
+  // unset Primus
+  Primus = undefined;
+  t.equal(typeof Primus, 'undefined', 'Primus now undefined');
+});
