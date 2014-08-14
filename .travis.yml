@@ -3,9 +3,6 @@ language: node_js
 node_js:
 - 0.10.29
 
-before_script:
-- node test/server.js &
-
 env:
   matrix:
     - BROWSER=chrome  BVER=stable
@@ -23,8 +20,11 @@ before_install:
   - mkdir -p .travis
   - curl -s https://codeload.github.com/rtc-io/webrtc-testing-on-travis/tar.gz/master | tar -xz --strip-components=1 --directory .travis
   - ./.travis/setup.sh
+
+before_script:
   - export DISPLAY=:99.0
-  - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x16"
+  - sh -e /etc/init.d/xvfb start
+  - node test/server.js &
 
 after_failure:
   - for file in *.log; do echo $file; echo "======================"; cat $file; done || true
