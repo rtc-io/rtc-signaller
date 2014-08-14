@@ -18,11 +18,10 @@
     "messenger-memory": "^1.1",
     "rtc-switchboard": "^0.10.1",
     "tape": "^2",
-    "testling": "^1",
-    "zuul": "^1.10.1"
+    "testling": "^1"
   },
   "scripts": {
-    "test": "node test/all.js && zuul -- test/all.js",
+    "test": "node test/all.js && testling -x ./.travis/start-$BROWSER.sh",
     "gendocs": "gendocs > README.md"
   },
   "repository": {
