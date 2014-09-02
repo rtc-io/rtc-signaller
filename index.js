@@ -198,7 +198,7 @@ module.exports = function(messenger, opts) {
     // if the messenger doesn't provide a valid write method, then complain
     if (typeof write != 'function') {
       throw new Error('provided messenger does not implement a "' +
-        writeMethod + '" write method');
+        opts.writeMethod + '" write method');
     }
 
     // handle core browser messenging apis
