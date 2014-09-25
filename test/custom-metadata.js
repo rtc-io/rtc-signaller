@@ -1,6 +1,6 @@
 var test = require('tape');
 var createSignaller = require('..');
-var uuid = require('../uuid');
+var uuid = require('cuid');
 
 var runTest = module.exports = function(messenger, peers) {
   var s;

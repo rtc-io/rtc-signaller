@@ -8,7 +8,7 @@ test('a new signaller without an id specified will initialize an id', function(t
 });
 
 test('a new signaller with an ide specified will use that id', function(t) {
-  var id = require('../uuid')();
+  var id = require('cuid')();
   var sig;
 
   t.plan(1);

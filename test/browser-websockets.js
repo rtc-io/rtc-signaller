@@ -1,7 +1,7 @@
 var test = require('tape');
 var signaller = require('..');
 var url = require('url');
-var uuid = require('../uuid');
+var uuid = require('cuid');
 var parts = url.parse(location.origin);
 var wsUrl = 'ws' + parts.protocol.slice(4) + '//' + parts.host + '/primus';
 var socket;

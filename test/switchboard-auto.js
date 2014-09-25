@@ -1,6 +1,6 @@
 var test = require('tape');
 var signaller = require('..');
-var uuid = require('../uuid');
+var uuid = require('cuid');
 var sig;
 var signallingServer = require('./helpers/signalling-server');
 
