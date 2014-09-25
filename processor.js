@@ -33,7 +33,7 @@ module.exports = function(signaller, opts) {
     // convert any valid json objects to json
     var args = parts.slice(2).map(jsonparse);
 
-    signaller.emit.apply(
+    signaller.apply(
       signaller,
       [evtName].concat(args).concat([srcState, data])
     );
@@ -108,7 +108,7 @@ module.exports = function(signaller, opts) {
       }
       // otherwise, emit data
       else {
-        signaller.emit(
+        signaller(
           'data',
           parts.slice(0, 1).concat(parts.slice(2)),
           srcData,

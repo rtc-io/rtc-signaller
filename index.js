@@ -3,9 +3,9 @@
 
 var debug = require('cog/logger')('rtc-signaller');
 var detect = require('rtc-core/detect');
-var EventEmitter = require('eventemitter3');
 var defaults = require('cog/defaults');
 var extend = require('cog/extend');
+var mbus = require('mbus');
 var throttle = require('cog/throttle');
 var getable = require('cog/getable');
 var uuid = require('cuid');
@@ -70,7 +70,7 @@ module.exports = function(messenger, opts) {
   var localMeta = {};
 
   // create the signaller
-  var signaller = new EventEmitter();
+  var signaller = mbus('', (opts || {}).logger);
 
   // initialise the id
   var id = signaller.id = (opts || {}).id || uuid();
@@ -105,13 +105,13 @@ module.exports = function(messenger, opts) {
 
     messenger.addEventListener('open', function(evt) {
       connected = true;
-      signaller.emit('open');
-      signaller.emit('connected');
+      signaller('open');
+      signaller('connected');
     });
 
     messenger.addEventListener('close', function(evt) {
       connected = false;
-      signaller.emit('disconnected');
+      signaller('disconnected');
     });
   }
 
@@ -127,25 +127,25 @@ module.exports = function(messenger, opts) {
     // when the connection is open, then emit an open event and a connected event
     messenger.on(opts.openEvent, function() {
       connected = true;
-      signaller.emit('open');
-      signaller.emit('connected');
+      signaller('open');
+      signaller('connected');
     });
 
     messenger.on(opts.closeEvent, function() {
       connected = false;
-      signaller.emit('disconnected');
+      signaller('disconnected');
     });
   }
 
   function connectToHost(url) {
     if (typeof connect != 'function') {
-      return signaller.emit('error', new Error('no connect function'));
+      return signaller('error', new Error('no connect function'));
     }
 
     // load primus
     connect(url, opts, function(err, socket) {
       if (err) {
-        return signaller.emit('error', err);
+        return signaller('error', err);
       }
 
       // create the actual messenger from a primus connection
@@ -219,7 +219,7 @@ module.exports = function(messenger, opts) {
     }
 
     // emit the initialized event
-    setTimeout(signaller.emit.bind(signaller, 'init'), 0);
+    setTimeout(signaller.bind(signaller, 'init'), 0);
   }
 
   function prepareArg(arg) {
@@ -329,7 +329,7 @@ module.exports = function(messenger, opts) {
 
     function sendAnnounce() {
       (sender || send)('/announce', attributes);
-      signaller.emit('local:announce', attributes);
+      signaller('local:announce', attributes);
     }
 
     clearTimeout(announceTimer);
@@ -491,9 +491,6 @@ module.exports = function(messenger, opts) {
       send: sender,
     }
   };
-
-  // remove max listeners from the emitter
-  signaller.setMaxListeners(0);
 
   // initialise opts defaults
   opts = defaults({}, opts, require('./defaults'));

@@ -22,11 +22,11 @@ module.exports = function(signaller, opts) {
       // start the inactivity timer
       peer.leaveTimer = setTimeout(function() {
         peer.inactive = true;
-        signaller.emit('peer:leave', data.id, peer);
+        signaller('peer:leave', data.id, peer);
       }, opts.leaveTimeout);
     }
 
     // emit the event
-    signaller.emit('peer:disconnected', data.id, peer);
+    signaller('peer:disconnected', data.id, peer);
   };
 };

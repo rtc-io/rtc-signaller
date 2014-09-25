@@ -34,7 +34,7 @@ module.exports = function(signaller) {
       allow: true
     };
 
-    signaller.emit('peer:filter', evt);
+    signaller('peer:filter', evt);
 
     return evt.allow;
   }
@@ -56,7 +56,7 @@ module.exports = function(signaller) {
       // trigger the peer connected event to flag that we know about a
       // peer connection. The peer has passed the "filter" check but may
       // be announced / updated depending on previous connection status
-      signaller.emit('peer:connected', data.id, data);
+      signaller('peer:connected', data.id, data);
 
       // if the peer is existing, then update the data
       if (peer && (! peer.inactive)) {
@@ -66,7 +66,7 @@ module.exports = function(signaller) {
         copyData(peer.data, data);
 
         // trigger the peer update event
-        return signaller.emit('peer:update', data, srcData);
+        return signaller('peer:update', data, srcData);
       }
 
       // create a new peer
@@ -99,7 +99,7 @@ module.exports = function(signaller) {
       }
 
       // emit a new peer announce event
-      return signaller.emit('peer:announce', data, peer);
+      return signaller('peer:announce', data, peer);
     }
   };
 };
