@@ -8,7 +8,7 @@ var defaults = require('cog/defaults');
 var extend = require('cog/extend');
 var throttle = require('cog/throttle');
 var getable = require('cog/getable');
-var uuid = require('./uuid');
+var uuid = require('cuid');
 
 // initialise the list of valid "write" methods
 var WRITE_METHODS = ['write', 'send'];

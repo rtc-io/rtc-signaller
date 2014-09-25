@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "cog": "^1",
+    "cuid": "^1.2.4",
     "eventemitter3": "^0.1.2",
     "formatter": "^0.4.1",
     "rtc-core": "^3.0.0",
