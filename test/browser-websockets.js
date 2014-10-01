@@ -1,5 +1,5 @@
 var test = require('tape');
-var signaller = require('..');
+var signaller = require('../signaller');
 var url = require('url');
 var uuid = require('cuid');
 var parts = url.parse(location.origin);

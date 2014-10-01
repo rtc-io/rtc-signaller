@@ -1,6 +1,6 @@
 var test = require('tape');
 var messenger = require('messenger-memory');
-var signaller = require('..');
+var signaller = require('../signaller');
 var scope = [];
 var peers = [
   messenger({ delay: 50, scope: scope }),

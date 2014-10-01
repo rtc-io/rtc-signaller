@@ -4,7 +4,7 @@ var signaller;
 
 test('create a signaller', function(t) {
   t.plan(1);
-  t.ok(signaller = require('..')(messenger));
+  t.ok(signaller = require('../signaller')(messenger));
 });
 
 test('announce with no additional data matches expected', function(t) {

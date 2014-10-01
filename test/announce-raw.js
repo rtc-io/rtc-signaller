@@ -1,6 +1,6 @@
 var extend = require('cog/extend');
 var test = require('tape');
-var createSignaller = require('..');
+var createSignaller = require('../signaller');
 var version = require('../package.json').version;
 var detect = require('rtc-core/detect');
 
