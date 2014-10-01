@@ -6,7 +6,7 @@ var signallingServer = require('./helpers/signalling-server');
 
 test('create a signaller', function(t) {
   t.plan(2);
-  t.ok(signaller = require('../signaller')(signallingServer), 'created');
+  t.ok(signaller = require('../')(signallingServer), 'created');
   signaller.once('init', t.pass.bind(t, 'initialized'));
 });
 
