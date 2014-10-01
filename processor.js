@@ -48,6 +48,11 @@ module.exports = function(signaller, opts) {
     var srcState;
     var isDirectMessage = false;
 
+    // discard primus messages
+    if (data && data.slice(0, 6) === 'primus') {
+      return;
+    }
+
     // force the id into string format so we can run length and comparison tests on it
     var id = signaller.id + '';
     debug('signaller ' + id + ' received data: ' + originalData);
