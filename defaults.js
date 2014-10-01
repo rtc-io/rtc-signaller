@@ -3,6 +3,7 @@ module.exports = {
   dataEvent: 'data',
   openEvent: 'open',
   closeEvent: 'close',
+  errorEvent: 'error',
 
   // messenger functions
   writeMethod: 'write',
