@@ -4,6 +4,7 @@ var reTrailingSlash = /\/$/;
 var pingers = [];
 var PINGHEADER = 'primus::ping::';
 var PONGHEADER = 'primus::pong::';
+var pingTimer;
 
 function connect(signalhost) {
   var socket;
@@ -24,15 +25,21 @@ function connect(signalhost) {
     }
   });
 
+  socket.on('close', function() {
+    var idx = pingers.indexOf(socket);
+    if (idx >= 0) {
+      pingers.splice(idx, 1);
+      if (pingers.length === 0) {
+        clearTimeout(pingTimer);
+      }
+    }
+  });
+
   queuePing(socket);
   return socket;
 }
 
-function queuePing(socket) {
-  pingers.push(socket);
-}
-
-setInterval(function() {
+function ping() {
   pingers.splice(0).forEach(function(socket) {
     if (socket.readyState === 1) {
       socket.send(PINGHEADER + Date.now(), function(err) {
@@ -42,7 +49,16 @@ setInterval(function() {
       });
     }
   });
-}, 10e3);
+}
+
+function queuePing(socket) {
+  if (pingers.length === 0) {
+    clearTimeout(pingTimer);
+    pingTimer = setTimeout(ping, 10e3);
+  }
+
+  pingers.push(socket);
+}
 
 module.exports = function(signalhost, opts, callback) {
   var ws = connect(signalhost);
