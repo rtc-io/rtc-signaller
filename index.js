@@ -116,11 +116,6 @@ module.exports = function(messenger, opts) {
   }
 
   function bindEvents() {
-    // if we don't have an on function for the messenger, then do nothing
-    if (typeof messenger.on != 'function') {
-      return;
-    }
-
     // handle message data events
     messenger.on(opts.dataEvent, processor);
 
@@ -202,11 +197,11 @@ module.exports = function(messenger, opts) {
     }
 
     // handle core browser messenging apis
-    if (typeof messenger.addEventListener == 'function') {
-      bindBrowserEvents();
-    }
-    else {
+    if (typeof messenger.on == 'function') {
       bindEvents();
+    }
+    else if (typeof messenger.addEventListener == 'function') {
+      bindBrowserEvents();
     }
 
     // determine if we are connected or not
