@@ -35,7 +35,7 @@ The following code sample demonstrates how:
 
 ```js
 // create a new signaller, connecting to the target switchboard
-var signaller = require('rtc-signaller')('http://rtc.io/switchboard');
+var signaller = require('rtc-signaller')('//switchboard.rtc.io/');
 
 // when a new peer is announced, log it
 signaller.on('peer:announce', function(data) {
@@ -59,6 +59,7 @@ signaller.once('connected', function() {
 // send through an announce message
 // this will occur once the primus socket has been opened and active
 signaller.announce({ room: 'signaller-getting-started' });
+
 ```
 
 ## Signaller Events
@@ -317,26 +318,6 @@ pc.createOffer(
   handleFail
 );
 ```
-
-### loadPrimus(signalhost, opts?, callback)
-
-This is a convenience function that is patched into the signaller to assist
-with loading the `primus.js` client library from an `rtc-switchboard`
-signaling server.
-
-In the case that you wish to load `primus.js` from a location other than
-the default location of `{{ signalhost }}/rtc.io/primus.js` you can
-provide an options object which allows for the following customizations:
-
-- `primusPath` (default: `/rtc.io/primus.js`)
-
-  The path at which the `primus.js` file can be found on the signalhost.
-
- __NOTE:__ The above options are passed through when creating a
- signaller object, and thus packages such as
- [rtc-quickconnect](https://github.com/rtc-io/rtc-quickconnect)
- will allow you to make the customisation with it's top level
- options also.
 
 ### signaller process handling
 
