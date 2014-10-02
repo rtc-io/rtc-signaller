@@ -1,5 +1,5 @@
 // create a new signaller, connecting to the target switchboard
-var signaller = require('..')('http://rtc.io/switchboard');
+var signaller = require('..')('//switchboard.rtc.io/');
 
 // when a new peer is announced, log it
 signaller.on('peer:announce', function(data) {
