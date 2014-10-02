@@ -64,7 +64,7 @@ var metadata = {
 module.exports = function(messenger, opts) {
   // get the autoreply setting
   var autoreply = (opts || {}).autoreply;
-  var connect = (opts || {}).connect;
+  var connect = (opts || {}).connect || require('./connect');
 
   // initialise the metadata
   var localMeta = {};
@@ -116,11 +116,6 @@ module.exports = function(messenger, opts) {
   }
 
   function connectToHost(url) {
-    if (typeof connect != 'function') {
-      return signaller('error', new Error('no connect function'));
-    }
-
-    // load primus
     connect(url, opts, function(err, socket) {
       if (err) {
         return signaller('error', err);
