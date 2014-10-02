@@ -124,6 +124,8 @@ module.exports = function(messenger, opts) {
       // create the actual messenger from a primus connection
       signaller._messenger = messenger = socket.connect(url);
 
+      // if the socket has a ready state, check for connected
+
       // now init
       init();
     });
@@ -176,6 +178,8 @@ module.exports = function(messenger, opts) {
   }
 
   function init() {
+    var initEvents = ['init'];
+
     // extract the write and close function references
     write = [opts.writeMethod].concat(WRITE_METHODS).map(extractProp).filter(isF)[0];
     close = [opts.closeMethod].concat(CLOSE_METHODS).map(extractProp).filter(isF)[0];
@@ -190,11 +194,11 @@ module.exports = function(messenger, opts) {
     }
 
     // handle core browser messenging apis
-    if (typeof messenger.on == 'function') {
-      bindEvents();
-    }
-    else if (typeof messenger.addEventListener == 'function') {
+    if (typeof messenger.addEventListener == 'function') {
       bindBrowserEvents();
+    }
+    else if (typeof messenger.on == 'function') {
+      bindEvents();
     }
 
     // determine if we are connected or not
@@ -205,9 +209,16 @@ module.exports = function(messenger, opts) {
         signaller.on('connected', announceOnReconnect);
       });
     }
+    else {
+      initEvents = initEvents.concat(['open', 'connected']);
+    }
 
     // emit the initialized event
-    setTimeout(signaller.bind(signaller, 'init'), 0);
+    setTimeout(function() {
+      initEvents.forEach(function(name) {
+        signaller(name);
+      });
+    }, 0);
   }
 
   function prepareArg(arg) {
