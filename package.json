@@ -39,8 +39,6 @@
   "bugs": {
     "url": "https://github.com/rtc-io/rtc-signaller/issues"
   },
-  "main": "./main.js",
-  "browser": "./browser.js",
   "testling": {
     "files": "test/all.js",
     "server": "test/server.js"
