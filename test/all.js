@@ -27,9 +27,9 @@ require('./switchboard-manualclose');
 
 if (typeof window != 'undefined') {
   // test primus loading
-  require('./primus-load');
-  require('./primus-announce-payload');
-  require('./primus-reconnect');
+//   require('./primus-load');
+//   require('./primus-announce-payload');
+//   require('./primus-reconnect');
 
   // test native browser websocket support
   require('./browser-websockets');
