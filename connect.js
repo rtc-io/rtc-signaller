@@ -1,6 +1,45 @@
 var WebSocket = require('ws');
 var reHttpSignalhost = /^http(.*)$/;
 var reTrailingSlash = /\/$/;
+var pingers = [];
+var pingTimer;
+
+function ping() {
+  var messages = [
+    'primus::ping::' + Date.now(),
+    '/ping|' + Date.now()
+  ];
+
+  pingers.splice(0).forEach(function(socket) {
+
+    function pingSent(err) {
+      if (err) {
+        return console.log('could not send ping: ', err);
+      }
+
+      queuePing(socket);
+    }
+
+    if (socket.readyState === 1) {
+      socket.send(messages[0], function(err) {
+        if (err) {
+          return pingSent(err);
+        }
+
+        socket.send(messages[1], pingSent);
+      });
+    }
+  });
+}
+
+function queuePing(socket) {
+  if (pingers.length === 0) {
+    clearTimeout(pingTimer);
+    pingTimer = setTimeout(ping, 10e3);
+  }
+
+  pingers.push(socket);
+}
 
 module.exports = function(signalhost, opts, callback) {
   var urls;
@@ -13,6 +52,7 @@ module.exports = function(signalhost, opts, callback) {
 
     if (socket) {
       socket.addEventListener('open', function() {
+        queuePing(socket);
         clearTimeout(timeoutTimer);
 
         callback(null, {
