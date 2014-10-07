@@ -77,7 +77,7 @@ module.exports = function(signalhost, opts, callback) {
       });
 
       timeoutTimer = setTimeout(function() {
-        socket.close();
+        socket.close(4000, 'no switchboard at requested address');
         checkNext();
       }, timeout);
     }
