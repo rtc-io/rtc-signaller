@@ -3,6 +3,7 @@ var reHttpSignalhost = /^http(.*)$/;
 var reTrailingSlash = /\/$/;
 var pingers = [];
 var pingTimer;
+var DEFAULT_PATHS = ['/primus', '/'];
 
 function ping() {
   var messages = [
@@ -85,6 +86,9 @@ module.exports = function(signalhost, opts, callback) {
   }
 
   // initialise the test urls
-  urls = [ signalhost + '/primus', signalhost ];
+  urls = ((opts || {}).paths || DEFAULT_PATHS).map(function(pathname) {
+    return signalhost + pathname;
+  });
+
   checkNext();
 };
