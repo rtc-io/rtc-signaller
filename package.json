@@ -11,7 +11,7 @@
     "formatter": "^0.4.1",
     "mbus": "^1.3.0",
     "rtc-core": "^3.0.0",
-    "ws": "~0.4"
+    "ws": "DamonOehlman/ws#close-terminate-initial-request"
   },
   "devDependencies": {
     "async": "~0.9",
