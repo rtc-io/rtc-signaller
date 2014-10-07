@@ -51,36 +51,38 @@ module.exports = function(signalhost, opts, callback) {
     var socket = url && new WebSocket(url);
     var timeoutTimer;
 
-    if (socket) {
-      socket.addEventListener('open', function() {
-        queuePing(socket);
-        clearTimeout(timeoutTimer);
+    if (! socket) {
+      return callback(new Error('Unable to contact signalling server'));
+    }
 
-        // watch for socket closes and terminate the ping if appropriate
-        socket.addEventListener('close', function() {
-          var idx = pingers.indexOf(socket);
-          if (idx >= 0) {
-            pingers.splice(idx, 1);
-            if (pingers.length === 0) {
-              clearTimeout(pingTimer);
-            }
+    socket.addEventListener('open', function() {
+      queuePing(socket);
+      clearTimeout(timeoutTimer);
+
+      // watch for socket closes and terminate the ping if appropriate
+      socket.addEventListener('close', function() {
+        var idx = pingers.indexOf(socket);
+        if (idx >= 0) {
+          pingers.splice(idx, 1);
+          if (pingers.length === 0) {
+            clearTimeout(pingTimer);
           }
-        });
-
-        callback(null, {
-          connect: function() {
-            socket.connected = true;
-
-            return socket;
-          }
-        });
+        }
       });
 
-      timeoutTimer = setTimeout(function() {
-        socket.close(4000, 'no switchboard at requested address');
-        checkNext();
-      }, timeout);
-    }
+      callback(null, {
+        connect: function() {
+          socket.connected = true;
+
+          return socket;
+        }
+      });
+    });
+
+    timeoutTimer = setTimeout(function() {
+      socket.close(4000, 'no switchboard at requested address');
+      checkNext();
+    }, timeout);
   }
 
   // if we have a protocol match url (//) then add the current location domain
