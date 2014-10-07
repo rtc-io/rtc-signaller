@@ -56,6 +56,17 @@ module.exports = function(signalhost, opts, callback) {
         queuePing(socket);
         clearTimeout(timeoutTimer);
 
+        // watch for socket closes and terminate the ping if appropriate
+        socket.addEventListener('close', function() {
+          var idx = pingers.indexOf(socket);
+          if (idx >= 0) {
+            pingers.splice(idx, 1);
+            if (pingers.length === 0) {
+              clearTimeout(pingTimer);
+            }
+          }
+        });
+
         callback(null, {
           connect: function() {
             socket.connected = true;
