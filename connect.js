@@ -3,7 +3,7 @@ var reHttpSignalhost = /^http(.*)$/;
 var reTrailingSlash = /\/$/;
 var pingers = [];
 var pingTimer;
-var DEFAULT_PATHS = ['/primus', '/'];
+var DEFAULT_PATHS = ['/', '/primus'];
 
 function ping() {
   var messages = [
