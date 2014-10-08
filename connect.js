@@ -55,6 +55,12 @@ module.exports = function(signalhost, opts, callback) {
       return callback(new Error('Unable to contact signalling server'));
     }
 
+    socket.addEventListener('error', function(err) {
+      console.info('error attempting to connect to ' + url);
+      clearTimeout(timeoutTimer);
+      checkNext();
+    });
+
     socket.addEventListener('open', function() {
       queuePing(socket);
       clearTimeout(timeoutTimer);
