@@ -17,7 +17,7 @@
     "async": "~0.9",
     "fdom": "^0.8.0",
     "messenger-memory": "^1.1",
-    "rtc-switchboard": "^0.10.1",
+    "rtc-switchboard": "^1.2.0",
     "tape": "^3.0.0",
     "testling": "^1"
   },
