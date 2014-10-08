@@ -1,7 +1,6 @@
 /* jshint node: true */
 'use strict';
 
-var debug = require('cog/logger')('rtc-signaller');
 var detect = require('rtc-core/detect');
 var defaults = require('cog/defaults');
 var extend = require('cog/extend');
@@ -475,10 +474,7 @@ module.exports = function(messenger, opts) {
       args.splice(3, 0, createMetadata());
 
       setTimeout(function() {
-        var msg = createDataLine(args);
-        debug('TX (' + targetId + '): ' + msg);
-
-        write.call(messenger, msg);
+        write.call(messenger, createDataLine(args));
       }, 0);
     };
 

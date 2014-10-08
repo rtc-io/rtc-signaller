@@ -1,7 +1,6 @@
 /* jshint node: true */
 'use strict';
 
-var debug = require('cog/logger')('rtc-signaller');
 var jsonparse = require('cog/jsonparse');
 
 /**
@@ -55,7 +54,6 @@ module.exports = function(signaller, opts) {
 
     // force the id into string format so we can run length and comparison tests on it
     var id = signaller.id + '';
-    debug('signaller ' + id + ' received data: ' + originalData);
 
     // process /to messages
     if (data.slice(0, 3) === '/to') {

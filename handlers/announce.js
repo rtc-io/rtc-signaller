@@ -1,8 +1,6 @@
 /* jshint node: true */
 'use strict';
 
-var debug = require('cog/logger')('rtc-signaller');
-var extend = require('cog/extend');
 var roles = ['a', 'b'];
 
 /**
@@ -43,8 +41,6 @@ module.exports = function(signaller) {
     var data = args[0];
     var peer;
 
-    debug('announce handler invoked, received data: ', data);
-
     // if we have valid data then process
     if (data && data.id && data.id !== signaller.id) {
       if (! dataAllowed(data)) {
@@ -60,8 +56,6 @@ module.exports = function(signaller) {
 
       // if the peer is existing, then update the data
       if (peer && (! peer.inactive)) {
-        debug('signaller: ' + signaller.id + ' received update, data: ', data);
-
         // update the data
         copyData(peer.data, data);
 

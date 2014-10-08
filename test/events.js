@@ -8,8 +8,6 @@ var peers = [
 ];
 var signallers;
 
-// require('cog/logger').enable('*');
-
 test('create signallers', function(t) {
   t.plan(3);
   signallers = peers.map(signaller);
