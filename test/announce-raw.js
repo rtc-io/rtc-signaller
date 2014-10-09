@@ -33,6 +33,12 @@ var runTest = module.exports = function(messenger, peers) {
     s.leave();
   });
 
+  test('recreate', function(t) {
+    t.plan(2);
+    t.ok(s = createSignaller(messenger), 'created');
+    t.ok(s.id, 'have id');
+  });
+
   test('announce with attributes', function(t) {
     peers.expect(t, ['/announce', { id: s.id }, genAnnounce({ name: 'Bob' }) ]);
     s.announce({ name: 'Bob' });
