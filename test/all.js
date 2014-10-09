@@ -24,6 +24,7 @@ require('./switchboard-auto');
 require('./switchboard-announce');
 require('./switchboard-announce-customid');
 require('./switchboard-manualclose');
+require('./switchboard-announce-concurrent');
 
 if (typeof window != 'undefined') {
   // test primus loading
