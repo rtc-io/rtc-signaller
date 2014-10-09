@@ -19,7 +19,8 @@
     "messenger-memory": "^1.1",
     "rtc-switchboard": "^1.2.0",
     "tape": "^3.0.0",
-    "testling": "^1"
+    "testling": "^1",
+    "whisk": "^1.0.0"
   },
   "scripts": {
     "test": "node test/all.js && testling -x ./.travis/start-$BROWSER.sh",
