@@ -399,6 +399,9 @@ module.exports = function(messenger, opts) {
     if (typeof close == 'function') {
       close.call(messenger);
     }
+
+    // set connected to false
+    connected = false;
   };
 
   /**
@@ -474,7 +477,9 @@ module.exports = function(messenger, opts) {
       args.splice(3, 0, createMetadata());
 
       setTimeout(function() {
-        write.call(messenger, createDataLine(args));
+        if (connected) {
+          write.call(messenger, createDataLine(args));
+        }
       }, 0);
     };
 
