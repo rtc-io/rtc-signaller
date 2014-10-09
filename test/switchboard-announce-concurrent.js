@@ -4,18 +4,28 @@ var uuid = require('cuid');
 var signallers = [];
 var roomId = uuid();
 var signallingServer = require('./helpers/signalling-server');
+var signallerCount = typeof window != 'undefined' ? 10 : 100;
 var times = require('whisk/times');
 var pluck = require('whisk/pluck');
 
 test('create signallers', function(t) {
-  signallers = times(50).map(function() {
-    return signaller(signallingServer);
-  });
+  var pending;
 
-  t.plan(signallers.length);
-  signallers.forEach(function(sig, idx) {
-    sig.once('connected', t.pass.bind(t, 'signaller ' + idx + ' connected'));
-  });
+  function connectNext() {
+    var idx;
+    var sig = signaller(signallingServer).once('connected', function() {
+      t.pass('signaller ' + idx + ' connected');
+
+      if (signallers.length < signallerCount) {
+        connectNext();
+      }
+    });
+
+    signallers[idx = signallers.length] = sig;
+  }
+
+  t.plan(signallerCount);
+  connectNext();
 });
 
 test('concurrent announce', function(t) {
