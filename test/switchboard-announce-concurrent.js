@@ -50,7 +50,7 @@ test('concurrent announce', function(t) {
     }
 
     sig.on('peer:announce', handleAnnounce);
-    sig.announce();
+    sig.announce({ room: roomId });
   });
 });
 
