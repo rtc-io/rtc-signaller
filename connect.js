@@ -27,7 +27,6 @@ function ping() {
 
 function queuePing(socket) {
   if (pingers.length === 0) {
-    console.log('queueing ping');
     clearTimeout(pingTimer);
     pingTimer = setTimeout(ping, 10e3);
   }
