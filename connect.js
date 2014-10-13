@@ -12,29 +12,22 @@ function ping() {
   ];
 
   pingers.splice(0).forEach(function(socket) {
-
-    function pingSent(err) {
-      if (err) {
-        return console.log('could not send ping: ', err);
-      }
-
-      queuePing(socket);
-    }
-
     if (socket.readyState === 1) {
-      socket.send(messages[0], function(err) {
-        if (err) {
-          return pingSent(err);
-        }
-
-        socket.send(messages[1], pingSent);
-      });
+      try {
+        socket.send(messages[0]);
+        socket.send(messages[1]);
+        queuePing(socket);
+      }
+      catch (e) {
+        console.error('could not send ping: ', e);
+      }
     }
   });
 }
 
 function queuePing(socket) {
   if (pingers.length === 0) {
+    console.log('queueing ping');
     clearTimeout(pingTimer);
     pingTimer = setTimeout(ping, 10e3);
   }
