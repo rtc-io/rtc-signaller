@@ -1,8 +1,6 @@
 /* jshint node: true */
 'use strict';
 
-var roles = ['a', 'b'];
-
 /**
   #### announce
 

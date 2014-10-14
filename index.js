@@ -5,7 +5,6 @@ var detect = require('rtc-core/detect');
 var defaults = require('cog/defaults');
 var extend = require('cog/extend');
 var mbus = require('mbus');
-var throttle = require('cog/throttle');
 var getable = require('cog/getable');
 var uuid = require('cuid');
 
@@ -489,7 +488,7 @@ module.exports = function(messenger, opts) {
       },
 
       send: sender,
-    }
+    };
   };
 
   // initialise opts defaults
