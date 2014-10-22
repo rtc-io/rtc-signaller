@@ -137,28 +137,6 @@ The following events relate to information that has been relayed to this signall
   });
   ```
 
-- `peer:disconnected`
-
-  A peer has disconnected from the signalling server, but may reconnect if it manages to re-establish connectivity.
-
-  ```js
-  signaller.on('peer:disconnected', function(id) {
-    console.log('peer ' + id + ' has gone, but they might be back...');
-  });
-  ```
-
-- `peer:leave`
-
-  This event is triggered when the signaller has previously received a disconnection notification for a peer, and a reconnection has not been made by that peer within a certain time interval.
-
-  The default `leaveTimeout` is configured in the [defaults](https://github.com/rtc-io/rtc-signaller/blob/master/defaults.js) but can be overriden by passing configuration options when creating the signaller.
-
-  ```js
-  signaller.on('peer:leave', function(id) {
-    console.log('peer ' + id + ' has left :(');
-  });
-  ```
-
 
 ## Signal Flow Diagrams
 
@@ -347,16 +325,6 @@ logic:
 
 When an announce message is received by the signaller, the attached
 object data is decoded and the signaller emits an `announce` message.
-
-#### leave
-
-```
-/leave|{"id":"..."}
-```
-
-When a leave message is received from a peer, we check to see if that is
-a peer that we are managing state information for and if we are then the
-peer state is removed.
 
 ## License(s)
 
