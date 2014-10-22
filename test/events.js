@@ -82,6 +82,15 @@ test('info for peer:0 updated in signaller:1', function(t) {
   t.equal(peer.data.age, 30, 'age = 30');
 });
 
+test('peer:0 sends command', function(t) {
+  t.plan(1);
+  signallers[1].once('hello', function(text) {
+    t.equal(text, 'there', 'got expected message');
+  });
+
+  signallers[0].send('/hello', 'there');
+});
+
 test('peer:0 sends non-command', function(t) {
   t.plan(1);
   signallers[1].once('data', function(args) {
