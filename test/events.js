@@ -84,7 +84,7 @@ test('info for peer:0 updated in signaller:1', function(t) {
 
 test('peer:0 sends command', function(t) {
   t.plan(1);
-  signallers[1].once('hello', function(text) {
+  signallers[1].once('command:hello', function(text) {
     t.equal(text, 'there', 'got expected message');
   });
 
