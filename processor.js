@@ -27,7 +27,7 @@ module.exports = function(signaller, opts) {
 
   function sendEvent(parts, srcState, data) {
     // initialise the event name
-    var evtName = 'command:' + parts[0].slice(1);
+    var evtName = 'message:' + parts[0].slice(1);
 
     // convert any valid json objects to json
     var args = parts.slice(2).map(jsonparse);
