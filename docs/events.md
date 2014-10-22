@@ -35,6 +35,18 @@ The following events relate to information that has been relayed to this signall
   });
   ```
 
+- `peer:connected`
+
+  If a peer has passed the `peer:filter` test (either no filtering has been applied, or the allow flag is set to true in the filter events) then a `peer:connected` event will be emitted:
+
+  ```js
+  signaller.on('peer:connected', function(id) {
+    console.log('peer ' + id + ' has connected');
+  });
+  ```
+
+  This event can be useful if you wish to know when a peer has connected to the signalling server, and don't care whether it is a new peer (generating a `peer:announce` event) or known peer (generating a `peer:update` event).
+
 - `peer:announce`
 
   While the `peer:connected` event is triggered each time a peer reconnects and announces to the signalling server, a `peer:announce` event is only emitted by your local signaller if this is considered a new connection from a peer.
