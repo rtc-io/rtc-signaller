@@ -79,18 +79,16 @@ The following events relate to information that has been relayed to this signall
 
 - `peer:filter`
 
-  The `peer:filter` event is triggered prior to the `peer:announce` or `peer:update` events being fired and provides an application the opportunity to reject a peer.  The handler for this event is passed a JS object that contains a `data` attribute for the announce data, and an `allow` flag that controls whether the peer is to be accepted.
+  The `peer:filter` event is triggered prior to the `peer:announce` or `peer:update` events being fired and provides an application the opportunity to reject a peer.  The handler for this event is passed the id of the peer that has connected to the room and a JS `data` object for the announce data. This data only differs from the `peer:announce` (or `peer:update`) data in that an `allow` attribute is included and controls whether we will acknowledge the presence of this new peer.
 
   Due to the way event emitters behave in node, the last handler invoked is the authority on whether the peer is accepted or not (so make sure to check the previous state of the allow flag):
 
   ```js
   // only accept connections from Bob
-  signaller.on('peer:filter', function(evt) {
-    evt.allow = evt.allow && (evt.data.name === 'Bob');
+  signaller.on('peer:filter', function(id, data) {
+    data.allow = data.allow && (data.name === 'Bob');
   });
   ```
-
-  __NOTE:__ This event handler does use a different syntax in the handler which provides application developers the opportunity to modify data from the event (in this case the `allow` attribute).
 
 - `peer:connected`
 
@@ -102,7 +100,7 @@ The following events relate to information that has been relayed to this signall
   });
   ```
 
-  The primary use case for this event is if you are updating part of your application UI to flag in response to a `peer:disconnected` event being fired (which can be due to poor network connectivity), then you can use the `peer:connected` event to restore UI elements to represent an active connection on receiving this event.
+  This event can be useful if you wish to know when a peer has connected to the signalling server, and don't care whether it is a new peer (generating a `peer:announce` event) or known peer (generating a `peer:update` event).
 
 - `peer:announce`
 
