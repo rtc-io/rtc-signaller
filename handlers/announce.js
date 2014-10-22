@@ -1,6 +1,8 @@
 /* jshint node: true */
 'use strict';
 
+var extend = require('cog/extend');
+
 /**
   #### announce
 
@@ -14,25 +16,11 @@
 **/
 module.exports = function(signaller) {
 
-  function copyData(target, source) {
-    if (target && source) {
-      for (var key in source) {
-        target[key] = source[key];
-      }
-    }
-
-    return target;
-  }
-
   function dataAllowed(data) {
-    var evt = {
-      data: data,
-      allow: true
-    };
+    var cloned = extend({ allow: true }, data);
+    signaller('peer:filter', data.id, cloned);
 
-    signaller('peer:filter', evt);
-
-    return evt.allow;
+    return cloned.allow;
   }
 
   return function(args, messageType, srcData, srcState, isDM) {
@@ -55,7 +43,7 @@ module.exports = function(signaller) {
       // if the peer is existing, then update the data
       if (peer && (! peer.inactive)) {
         // update the data
-        copyData(peer.data, data);
+        extend(peer.data, data);
 
         // trigger the peer update event
         return signaller('peer:update', data, srcData);
@@ -73,7 +61,7 @@ module.exports = function(signaller) {
       };
 
       // initialise the peer data
-      copyData(peer.data, data);
+      extend(peer.data, data);
 
       // reset inactivity state
       clearTimeout(peer.leaveTimer);
