@@ -15,7 +15,7 @@
   },
   "devDependencies": {
     "async": "~0.9",
-    "fdom": "^0.8.0",
+    "fdom": "^1.1.0",
     "messenger-memory": "^1.1",
     "rtc-switchboard": "^0.10.1",
     "tape": "^3.0.0",
