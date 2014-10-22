@@ -40,7 +40,7 @@ test('can announce in a test room', function(t) {
   var roomId = uuid();
 
   t.plan(3);
-  sig.once('roominfo', function(data) {
+  sig.once('message:roominfo', function(data) {
     t.ok(data, 'got data');
     t.equal(data.memberCount, 1, 'room has one member');
   });
