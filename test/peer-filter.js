@@ -18,15 +18,16 @@ test('create signallers', function(t) {
 });
 
 test('filter out announce', function(t) {
-  t.plan(4);
+  t.plan(5);
 
-  signallers[1].once('peer:filter', function(evt) {
-    t.ok(evt.data, 'Got event data');
-    t.equal(evt.data.name, 'Fred', 'name is as expected');
-    t.equal(evt.allow, true, 'Allow flag set to true');
+  signallers[1].once('peer:filter', function(id, data) {
+    t.ok(data, 'Got event data');
+    t.equal(id, signallers[0].id, 'got id for peer');
+    t.equal(data.name, 'Fred', 'name is as expected');
+    t.equal(data.allow, true, 'Allow flag set to true');
 
     // set allow to false
-    evt.allow = false;
+    data.allow = false;
   });
 
   signallers[1].once('peer:announce', function(data, srcData) {
