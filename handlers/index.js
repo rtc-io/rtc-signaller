@@ -8,7 +8,6 @@
 
 module.exports = function(signaller, opts) {
   return {
-    announce: require('./announce')(signaller, opts),
-    leave: require('./leave')(signaller, opts)
+    announce: require('./announce')(signaller, opts)
   };
 };
