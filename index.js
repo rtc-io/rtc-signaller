@@ -12,6 +12,11 @@ var uuid = require('cuid');
 var WRITE_METHODS = ['write', 'send'];
 var CLOSE_METHODS = ['close', 'end'];
 
+// ready state constants
+var RS_DISCONNECTED = 0;
+var RS_CONNECTING = 1;
+var RS_CONNECTED = 2;
+
 // initialise signaller metadata so we don't have to include the package.json
 // TODO: make this checkable with some kind of prepublish script
 var metadata = {
@@ -84,9 +89,9 @@ module.exports = function(messenger, opts) {
   // create the peers map
   var peers = signaller.peers = getable({});
 
-  // initialise the data event name
+  // initialise the ready state to disconnected
+  var readyState = 0;
 
-  var connected = false;
   var write;
   var close;
   var processor;
@@ -146,12 +151,12 @@ module.exports = function(messenger, opts) {
       console.log('socket closed with error: ', err);
     }
 
-    connected = false;
+    readyState = RS_DISCONNECTED;
     signaller('disconnected');
   }
 
   function handleMessengerOpen() {
-    connected = true;
+    readyState = RS_CONNECTED;
     signaller('open');
     signaller('connected');
   }
@@ -200,8 +205,8 @@ module.exports = function(messenger, opts) {
     }
 
     // determine if we are connected or not
-    connected = messenger.connected || false;
-    if (! connected) {
+    readyState = messenger.connected ? RS_CONNECTED : RS_DISCONNECTED;
+    if (readyState !== RS_CONNECTED) {
       signaller.once('connected', function() {
         // always announce on reconnect
         signaller.on('connected', announceOnReconnect);
@@ -254,7 +259,7 @@ module.exports = function(messenger, opts) {
     }
 
     // if we are not initialized, then wait until we are
-    if (! connected) {
+    if (readyState !== RS_CONNECTED) {
       return signaller.once('connected', function() {
         write.call(messenger, dataline);
       });
@@ -336,7 +341,7 @@ module.exports = function(messenger, opts) {
 
     // if we are already connected, then ensure we announce on
     // reconnect
-    if (connected) {
+    if (readyState === RS_CONNECTED) {
       // always announce on reconnect
       signaller.removeListener('connected', announceOnReconnect);
       signaller.on('connected', announceOnReconnect);
@@ -344,7 +349,7 @@ module.exports = function(messenger, opts) {
 
     // send the attributes over the network
     return announceTimer = setTimeout(function() {
-      if (! connected) {
+      if (readyState !== RS_CONNECTED) {
         return signaller.once('connected', sendAnnounce);
       }
 
@@ -400,7 +405,7 @@ module.exports = function(messenger, opts) {
     }
 
     // set connected to false
-    connected = false;
+    readyState = RS_DISCONNECTED;
   };
 
   /**
@@ -476,7 +481,7 @@ module.exports = function(messenger, opts) {
       args.splice(3, 0, createMetadata());
 
       setTimeout(function() {
-        if (connected) {
+        if (readyState === RS_CONNECTED) {
           write.call(messenger, createDataLine(args));
         }
       }, 0);
