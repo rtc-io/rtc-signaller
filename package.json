@@ -22,8 +22,7 @@
     "rtc-switchboard": "^2.0.0",
     "tape": "^3.0.0",
     "testling": "^1",
-    "whisk": "^1.0.0",
-    "ws": "git://github.com/DamonOehlman/ws#close-terminate-initial-request"
+    "whisk": "^1.0.0"
   },
   "scripts": {
     "test": "node test/all.js && testling -x ./.travis/start-$BROWSER.sh",
