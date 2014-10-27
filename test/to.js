@@ -1,68 +1,69 @@
 var test = require('tape');
-var createSignaller = require('..');
-var uuid = require('cuid');
+var messenger = require('messenger-memory')();
+var signaller = require('../signaller');
+var times = require('whisk/times');
+var pluck = require('whisk/pluck');
+var roomId = require('cuid')();
+var signallers;
 
-var runTest = module.exports = function(messenger, peers) {
-  var s;
-  var altScopes;
-
-  test('create', function(t) {
-    t.plan(2);
-    t.ok(s = createSignaller(messenger), 'created');
-    t.ok(s.id, 'have id');
+test('/to tests: create signallers', function(t) {
+  t.plan(1);
+  signallers = times(5).map(function() {
+    return signaller(messenger);
   });
 
-  test('change the signaller id', function(t) {
-    t.plan(1);
-    s.id = uuid.v4();
-    t.pass('signaller id updated');
-  });
+  t.equal(signallers.length, 5, 'created signallers');
+});
 
-  test('convert other peers to signaller scopes', function(t) {
-    t.plan(peers.length);
+test('/to tests: concurrent announce', function(t) {
+  t.plan(signallers.length);
 
-    altScopes = peers.map(createSignaller);
-    altScopes.forEach(function(peer) {
-      t.ok(typeof altScopes.request, 'function', 'have a request function');
-    })
-  });
+  signallers.forEach(function(sig) {
+    var expected = signallers.map(pluck('id')).filter(function(id) {
+      return id !== sig.id;
+    });
 
-  test('targeted announce', function(t) {
-    t.plan(1);
-    peers.first().expect(t, '/to|' + altScopes[0].id + '|/announce|{"id":"' + s.id + '"}');
-    s.to(altScopes[0].id).announce();
-  });
+    function handleAnnounce(data) {
+      var idx = expected.indexOf(data.id);
 
-  test('targetted announce captured at the scope level', function(t) {
-    t.plan(2);
+      if (idx >= 0) {
+        expected.splice(idx, 1);
+      }
 
-    function announceOne(data) {
-      t.deepEqual({ id: s.id }, data);
+      if (expected.length === 0) {
+        t.pass(sig.id + ' has received all expected ennounce messages');
+        sig.removeListener('peer:announce', handleAnnounce);
+      }
     }
 
-    function announceTwo(data) {
-      t.fail('should not have captured data');
-    }
+    sig.on('peer:announce', handleAnnounce);
+    sig.announce({ room: roomId });
+  });
+});
 
-    altScopes[0].once('announce', announceOne);
-    altScopes[1].once('announce', announceTwo);
+test('/to tests: send message from 0 --> 1', function(t) {
+  var timer = setTimeout(function() {
+    signallers.slice(2).forEach(function(s) {
+      s.removeListener('message:hello', handleBadMessage);
+    });
 
-    setTimeout(function() {
-      altScopes[1].removeListener('announce', announceTwo);
-      t.pass('did not capture announce event at second scope');
-    }, 500);
+    t.pass('no other signallers received the message');
+  }, 500);
 
-    s.to(altScopes[0].id).announce();
+  function handleBadMessage() {
+    t.fail('received hello when should not have');
+  }
+
+  t.plan(2);
+
+  signallers[1].once('message:hello', function() {
+    t.pass('signaller:1 received hello');
   });
 
-  test('disconnect', function(t) {
-    t.plan(2);
-    peers.expect(t, '/leave|{"id":"' + s.id + '"}');
-    s.leave();
+  signallers.slice(2).forEach(function(s) {
+    s.on('message:hello', handleBadMessage);
   });
-};
 
-if (typeof document == 'undefined' && (! module.parent)) {
-  var peers = require('./helpers/createPeers')(3);
-  runTest(peers.shift(), peers);
-}
+  signallers[0].to(signallers[1].id).send('/hello');
+});
+

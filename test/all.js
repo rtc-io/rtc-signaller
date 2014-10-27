@@ -9,6 +9,7 @@ require('./announce-debounce');
 require('./peer-filter');
 require('./set-id');
 require('./events');
+require('./to');
 
 // inspect generated messages
 require('./announce-raw')(createGroup(3));
