@@ -11,14 +11,14 @@ test('create signaller:0', function(t) {
   t.plan(3);
   t.ok(signallers[0] = require('../')(signallingServer, { id: 1 }), 'created');
   t.equal(signallers[0].id, 1, 'id === 1');
-  signallers[0].once('init', t.pass.bind(t, 'initialized'));
+  signallers[0].once('connected', t.pass.bind(t, 'connected'));
 });
 
 test('create signaller:1', function(t) {
   t.plan(3);
   t.ok(signallers[1] = require('../')(signallingServer, { id: 2 }), 'created');
   t.equal(signallers[1].id, 2, 'id === 2');
-  signallers[1].once('init', t.pass.bind(t, 'initialized'));
+  signallers[1].once('connected', t.pass.bind(t, 'connected'));
 });
 
 test('announce via primus, custom ids', function(t) {

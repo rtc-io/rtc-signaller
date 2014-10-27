@@ -10,13 +10,13 @@ var signallingServer = require('./helpers/signalling-server');
 test('create signaller:0', function(t) {
   t.plan(2);
   t.ok(signallers[0] = require('../')(signallingServer), 'created');
-  signallers[0].once('init', t.pass.bind(t, 'initialized'));
+  signallers[0].once('connected', t.pass.bind(t, 'connected'));
 });
 
 test('create signaller:1', function(t) {
   t.plan(2);
   t.ok(signallers[1] = require('../')(signallingServer), 'created');
-  signallers[1].once('init', t.pass.bind(t, 'initialized'));
+  signallers[1].once('connected', t.pass.bind(t, 'connected'));
 });
 
 test('concurrent announce via primus', function(t) {
