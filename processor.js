@@ -75,6 +75,7 @@ module.exports = function(signaller, opts) {
     }
 
     // chop the data into parts
+    signaller('rawdata', data);
     parts = parts || data.split('|').map(jsonparse);
 
     // if we have a specific handler for the action, then invoke
