@@ -111,6 +111,7 @@ module.exports = function(messenger, opts) {
       // pass messages to the processor
       pull(
         source,
+
         // monitor disconnection
         pull.through(null, function() {
           console.log('ended');
@@ -118,10 +119,7 @@ module.exports = function(messenger, opts) {
           // trigger the disconnected event
           signaller('disconnected');
         }),
-        pull.drain(function(data) {
-          // process the message
-          console.log('need to process the message: ', data);
-        })
+        pull.drain(processor)
       )
 
       // pass the queue to the sink
