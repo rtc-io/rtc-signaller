@@ -98,6 +98,11 @@ module.exports = function(messenger, opts) {
   }
 
   function connect() {
+    // if we are already connecting then do nothing
+    if (readyState === RS_CONNECTING) {
+      return;
+    }
+
     // initiate the messenger
     readyState = RS_CONNECTING;
     messenger(function(err, source, sink) {
