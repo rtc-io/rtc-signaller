@@ -114,9 +114,6 @@ module.exports = function(messenger, opts) {
 
         // monitor disconnection
         pull.through(null, function() {
-          console.log('ended');
-
-          // trigger the disconnected event
           signaller('disconnected');
         }),
         pull.drain(processor)
