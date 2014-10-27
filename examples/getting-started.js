@@ -13,5 +13,5 @@ signaller.once('connected', function() {
 });
 
 // send through an announce message
-// this will occur once the primus socket has been opened and active
+// this will occur once the websocket has been opened and active
 signaller.announce({ room: 'signaller-getting-started' });

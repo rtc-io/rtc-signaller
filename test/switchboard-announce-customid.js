@@ -21,7 +21,7 @@ test('create signaller:1', function(t) {
   signallers[1].once('connected', t.pass.bind(t, 'connected'));
 });
 
-test('announce via primus, custom ids', function(t) {
+test('announce via websocket, custom ids', function(t) {
   t.plan(5);
 
   signallers[1].on('peer:announce', function(data) {

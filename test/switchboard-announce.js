@@ -19,7 +19,7 @@ test('create signaller:1', function(t) {
   signallers[1].once('connected', t.pass.bind(t, 'connected'));
 });
 
-test('concurrent announce via primus', function(t) {
+test('concurrent announce via websockets', function(t) {
   t.plan(5);
 
   signallers[1].on('peer:announce', function(data) {

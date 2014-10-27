@@ -4,7 +4,7 @@ var uuid = require('cuid');
 var sig;
 var signallingServer = require('./helpers/signalling-server');
 
-test('can create a signalling instance that automatically connects via primus', function(t) {
+test('can create a signalling instance that automatically connects via websockets', function(t) {
   t.plan(1);
   t.ok(sig = signaller(signallingServer), 'signaller created');
 });
