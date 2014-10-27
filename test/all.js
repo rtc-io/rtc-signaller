@@ -1,6 +1,6 @@
+var createGroup = require('./helpers/messenger-group');
 // test signalling logic
 // require('./to')(messenger, peers);
-require('./message-announce');
 
 require('./announce-event-local');
 require('./announce-concurrent');
@@ -9,11 +9,12 @@ require('./announce-debounce');
 require('./peer-filter');
 require('./set-id');
 require('./events');
-require('./send-falsey-parts');
 
 // inspect generated messages
-require('./announce-raw')(require('./helpers/messenger-group')(3));
-require('./custom-metadata')(require('./helpers/messenger-group')(3));
+require('./announce-raw')(createGroup(3));
+require('./custom-metadata')(createGroup(3));
+require('./send-falsey-parts')(createGroup(2));
+require('./message-announce')(createGroup(2));
 
 // test automatic messenger implementation
 require('./switchboard-auto');
