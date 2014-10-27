@@ -123,7 +123,7 @@ module.exports = function(messenger, opts) {
           signaller('disconnected');
         }),
         pull.drain(processor)
-      )
+      );
 
       // pass the queue to the sink
       pull(queue, sink);
@@ -139,10 +139,6 @@ module.exports = function(messenger, opts) {
 
   function createMetadata() {
     return extend({}, localMeta, { id: signaller.id });
-  }
-
-  function extractProp(name) {
-    return messenger[name];
   }
 
   function prepareArg(arg) {
