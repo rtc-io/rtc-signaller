@@ -112,12 +112,12 @@ module.exports = function(messenger, opts) {
       pull(
         source,
         // monitor disconnection
-        pull.through(function(null, function() {
+        pull.through(null, function() {
           console.log('ended');
 
           // trigger the disconnected event
           signaller('disconnected');
-        })),
+        }),
         pull.drain(function(data) {
           // process the message
           console.log('need to process the message: ', data);
