@@ -1,7 +1,3 @@
-var createPeers = require('./helpers/createPeers');
-var peers = createPeers(3);
-var messenger = peers.shift();
-
 // test signalling logic
 // require('./to')(messenger, peers);
 require('./message-announce');
@@ -16,8 +12,8 @@ require('./events');
 require('./send-falsey-parts');
 
 // inspect generated messages
-require('./announce-raw')(messenger, peers);
-require('./custom-metadata')(messenger, peers);
+require('./announce-raw')(require('./helpers/messenger-group')(3));
+require('./custom-metadata')(require('./helpers/messenger-group')(3));
 
 // test automatic messenger implementation
 require('./switchboard-auto');

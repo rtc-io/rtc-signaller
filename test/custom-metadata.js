@@ -2,18 +2,18 @@ var test = require('tape');
 var createSignaller = require('../signaller');
 var uuid = require('cuid');
 
-var runTest = module.exports = function(messenger, peers) {
+var runTest = module.exports = function(group) {
   var s;
   var token = uuid();
 
   test('create', function(t) {
     t.plan(2);
-    t.ok(s = createSignaller(messenger), 'created');
+    t.ok(s = createSignaller(group.messenger), 'created');
     t.ok(s.id, 'have id');
   });
 
   test('announce', function(t) {
-    peers.expect(t, ['/announce', { id: s.id } ]);
+    group.peers.expect(t, ['/announce', { id: s.id } ]);
     s.announce();
   });
 
@@ -24,7 +24,7 @@ var runTest = module.exports = function(messenger, peers) {
   });
 
   test('announce with updated metadata', function(t) {
-    peers.expect(t, ['/announce', { id: s.id, token: token } ]);
+    group.peers.expect(t, ['/announce', { id: s.id, token: token } ]);
     s.announce();
   });
 
@@ -35,17 +35,16 @@ var runTest = module.exports = function(messenger, peers) {
   });
 
   test('announce with updated metadata', function(t) {
-    peers.expect(t, ['/announce', { id: s.id, foo: 'bar' } ]);
+    group.peers.expect(t, ['/announce', { id: s.id, foo: 'bar' } ]);
     s.announce();
   });
 
   test('disconnect', function(t) {
-    peers.expect(t, ['/leave', { id: s.id, foo: 'bar' } ]);
+    group.peers.expect(t, ['/leave', { id: s.id, foo: 'bar' } ]);
     s.leave();
   });
 };
 
 if  (! module.parent) {
-  var peers = require('./helpers/createPeers')(3);
-  runTest(peers.shift(), peers);
+  runTest(require('./helpers/messenger-group')(3));
 }

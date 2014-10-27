@@ -4,7 +4,7 @@ var createSignaller = require('../signaller');
 var version = require('../package.json').version;
 var detect = require('rtc-core/detect');
 
-var runTest = module.exports = function(messenger, peers) {
+var runTest = module.exports = function(group) {
   var s;
 
   function genAnnounce(data) {
@@ -19,43 +19,42 @@ var runTest = module.exports = function(messenger, peers) {
 
   test('create', function(t) {
     t.plan(2);
-    t.ok(s = createSignaller(messenger), 'created');
+    t.ok(s = createSignaller(group.messenger), 'created');
     t.ok(s.id, 'have id');
   });
 
   test('announce', function(t) {
-    peers.expect(t, ['/announce', {id: s.id } ]);
+    group.peers.expect(t, ['/announce', {id: s.id } ]);
     s.announce();
   });
 
   test('disconnect', function(t) {
-    peers.expect(t, ['/leave', { id: s.id } ]);
+    group.peers.expect(t, ['/leave', { id: s.id } ]);
     s.leave();
   });
 
   test('recreate', function(t) {
     t.plan(2);
-    t.ok(s = createSignaller(messenger), 'created');
+    t.ok(s = createSignaller(group.messenger), 'created');
     t.ok(s.id, 'have id');
   });
 
   test('announce with attributes', function(t) {
-    peers.expect(t, ['/announce', { id: s.id }, genAnnounce({ name: 'Bob' }) ]);
+    group.peers.expect(t, ['/announce', { id: s.id }, genAnnounce({ name: 'Bob' }) ]);
     s.announce({ name: 'Bob' });
   });
 
   test('announce with different attributes', function(t) {
-    peers.expect(t, ['/announce', { id: s.id }, genAnnounce({ name: 'Fred' }) ]);
+    group.peers.expect(t, ['/announce', { id: s.id }, genAnnounce({ name: 'Fred' }) ]);
     s.announce({ name: 'Fred' });
   });
 
   test('disconnect', function(t) {
-    peers.expect(t, ['/leave', { id: s.id } ]);
+    group.peers.expect(t, ['/leave', { id: s.id } ]);
     s.leave();
   });
 };
 
 if (! module.parent) {
-  var peers = require('./helpers/createPeers')(3);
-  runTest(peers.shift(), peers);
+  runTest(require('./helpers/messenger-group')(3));
 }
