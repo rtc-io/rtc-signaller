@@ -102,6 +102,7 @@ module.exports = function(messenger, opts) {
     readyState = RS_CONNECTING;
     messenger(function(err, source, sink) {
       if (err) {
+        readyState = RS_DISCONNECTED;
         return signaller('error', err);
       }
 
