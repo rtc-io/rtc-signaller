@@ -34,3 +34,10 @@ notifications:
   - damon.oehlman@nicta.com.au
 
   irc: irc.freenode.org#rtc.io
+
+matrix:
+  fast_finish: true
+
+  allow_failures:
+    - env: BROWSER=chrome  BVER=unstable
+    - env: BROWSER=firefox BVER=nightly
