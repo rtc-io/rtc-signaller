@@ -65,6 +65,7 @@ var metadata = {
 module.exports = function(messenger, opts) {
   // get the autoreply setting
   var autoreply = (opts || {}).autoreply;
+  var autoconnect = (opts || {}).autoconnect;
 
   // initialise the metadata
   var localMeta = {};
@@ -97,7 +98,43 @@ module.exports = function(messenger, opts) {
     signaller.announce();
   }
 
-  function connect() {
+  function bufferMessage(args) {
+    queue.push(createDataLine(args));
+
+    // if we are not connected (and should autoconnect), then attempt connection
+    if (readyState === RS_DISCONNECTED && (autoconnect === undefined || autoconnect)) {
+      connect();
+    }
+  }
+
+  function createDataLine(args) {
+    return args.map(prepareArg).join('|');
+  }
+
+  function createMetadata() {
+    return extend({}, localMeta, { id: signaller.id });
+  }
+
+  function prepareArg(arg) {
+    if (typeof arg == 'object' && (! (arg instanceof String))) {
+      return JSON.stringify(arg);
+    }
+    else if (typeof arg == 'function') {
+      return null;
+    }
+
+    return arg;
+  }
+
+  /**
+    ### `signaller.connect()`
+
+    Manually connect the signaller using the supplied messenger.
+
+    __NOTE:__ This should never have to be called if the default setting
+    for `autoconnect` is used.
+  **/
+  var connect = signaller.connect = function() {
     // if we are already connecting then do nothing
     if (readyState === RS_CONNECTING) {
       return;
@@ -131,26 +168,7 @@ module.exports = function(messenger, opts) {
       // trigger the connected event
       signaller('connected');
     });
-  }
-
-  function createDataLine(args) {
-    return args.map(prepareArg).join('|');
-  }
-
-  function createMetadata() {
-    return extend({}, localMeta, { id: signaller.id });
-  }
-
-  function prepareArg(arg) {
-    if (typeof arg == 'object' && (! (arg instanceof String))) {
-      return JSON.stringify(arg);
-    }
-    else if (typeof arg == 'function') {
-      return null;
-    }
-
-    return arg;
-  }
+  };
 
   /**
     ### signaller#send(message, data*)
@@ -167,9 +185,7 @@ module.exports = function(messenger, opts) {
 
     // inject the metadata
     args.splice(1, 0, createMetadata());
-
-    // queue the dataline for sending
-    queue.push(createDataLine(args));
+    bufferMessage(args);
   };
 
   /**
@@ -382,7 +398,7 @@ module.exports = function(messenger, opts) {
 
       // inject metadata
       args.splice(3, 0, createMetadata());
-      queue.push(createDataLine(args));
+      bufferMessage(args);
     };
 
     return {
@@ -403,6 +419,5 @@ module.exports = function(messenger, opts) {
   // create the processor
   signaller.process = processor = require('./processor')(signaller, opts);
 
-  connect();
   return signaller;
 };
