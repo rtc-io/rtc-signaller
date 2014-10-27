@@ -22,13 +22,3 @@ require('./switchboard-announce');
 require('./switchboard-announce-customid');
 require('./switchboard-manualclose');
 require('./switchboard-announce-concurrent');
-
-if (typeof window != 'undefined') {
-  // test primus loading
-//   require('./primus-load');
-//   require('./primus-announce-payload');
-//   require('./primus-reconnect');
-
-  // test native browser websocket support
-  require('./browser-websockets');
-}
