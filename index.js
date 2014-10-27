@@ -7,10 +7,8 @@ var extend = require('cog/extend');
 var mbus = require('mbus');
 var getable = require('cog/getable');
 var uuid = require('cuid');
-
-// initialise the list of valid "write" methods
-var WRITE_METHODS = ['write', 'send'];
-var CLOSE_METHODS = ['close', 'end'];
+var pull = require('pull-stream');
+var pushable = require('pull-pushable');
 
 // ready state constants
 var RS_DISCONNECTED = 0;
@@ -67,7 +65,6 @@ var metadata = {
 module.exports = function(messenger, opts) {
   // get the autoreply setting
   var autoreply = (opts || {}).autoreply;
-  var connect = (opts || {}).connect || require('./connect');
 
   // initialise the metadata
   var localMeta = {};
@@ -89,48 +86,49 @@ module.exports = function(messenger, opts) {
   // create the peers map
   var peers = signaller.peers = getable({});
 
-  // initialise the ready state to disconnected
-  var readyState = 0;
+  // create the outbound message queue
+  var queue = require('pull-pushable')();
 
-  var write;
-  var close;
   var processor;
   var announceTimer = 0;
+  var readyState = RS_DISCONNECTED;
 
   function announceOnReconnect() {
     signaller.announce();
   }
 
-  function bindBrowserEvents() {
-    messenger.addEventListener('message', function(evt) {
-      processor(evt.data);
-    });
-
-    messenger.addEventListener('open', handleMessengerOpen);
-    messenger.addEventListener('close', handleMessengerClose);
-  }
-
-  function bindEvents() {
-    // handle message data events
-    messenger.on(opts.dataEvent, processor);
-    messenger.on(opts.openEvent, handleMessengerOpen);
-    messenger.on(opts.closeEvent, handleMessengerClose);
-    messenger.on(opts.errorEvent, handleMessengerClose);
-  }
-
-  function connectToHost(url) {
-    connect(url, opts, function(err, socket) {
+  function connect() {
+    // initiate the messenger
+    readyState = RS_CONNECTING;
+    messenger(function(err, source, sink) {
       if (err) {
         return signaller('error', err);
       }
 
-      // create the actual messenger from a primus connection
-      signaller._messenger = messenger = socket.connect(url);
+      // flag as connected
+      readyState = RS_CONNECTED;
 
-      // if the socket has a ready state, check for connected
+      // pass messages to the processor
+      pull(
+        source,
+        // monitor disconnection
+        pull.through(function(null, function() {
+          console.log('ended');
 
-      // now init
-      init();
+          // trigger the disconnected event
+          signaller('disconnected');
+        })),
+        pull.drain(function(data) {
+          // process the message
+          console.log('need to process the message: ', data);
+        })
+      )
+
+      // pass the queue to the sink
+      pull(queue, sink);
+
+      // trigger the connected event
+      signaller('connected');
     });
   }
 
@@ -144,84 +142,6 @@ module.exports = function(messenger, opts) {
 
   function extractProp(name) {
     return messenger[name];
-  }
-
-  function handleMessengerClose(err) {
-    if (err instanceof Error) {
-      console.log('socket closed with error: ', err);
-    }
-
-    readyState = RS_DISCONNECTED;
-    signaller('disconnected');
-  }
-
-  function handleMessengerOpen() {
-    readyState = RS_CONNECTED;
-    signaller('open');
-    signaller('connected');
-  }
-
-  // attempt to detect whether the underlying messenger is closing
-  // this can be tough as we deal with both native (or simulated native)
-  // sockets or an abstraction layer such as primus
-  function isClosing() {
-    var isAbstraction = messenger &&
-        // a primus socket has a socket attribute
-        typeof messenger.socket != 'undefined';
-
-    return isAbstraction ? false : (
-      messenger &&
-      typeof messenger.readyState != 'undefined' &&
-      messenger.readyState >= 2
-    );
-  }
-
-  function isF(target) {
-    return typeof target == 'function';
-  }
-
-  function init() {
-    var initEvents = ['init'];
-
-    // extract the write and close function references
-    write = [opts.writeMethod].concat(WRITE_METHODS).map(extractProp).filter(isF)[0];
-    close = [opts.closeMethod].concat(CLOSE_METHODS).map(extractProp).filter(isF)[0];
-
-    // create the processor
-    signaller.process = processor = require('./processor')(signaller, opts);
-
-    // if the messenger doesn't provide a valid write method, then complain
-    if (typeof write != 'function') {
-      throw new Error('provided messenger does not implement a "' +
-        opts.writeMethod + '" write method');
-    }
-
-    // handle core browser messenging apis
-    if (typeof messenger.addEventListener == 'function') {
-      bindBrowserEvents();
-    }
-    else if (typeof messenger.on == 'function') {
-      bindEvents();
-    }
-
-    // determine if we are connected or not
-    readyState = messenger.connected ? RS_CONNECTED : RS_DISCONNECTED;
-    if (readyState !== RS_CONNECTED) {
-      signaller.once('connected', function() {
-        // always announce on reconnect
-        signaller.on('connected', announceOnReconnect);
-      });
-    }
-    else {
-      initEvents = initEvents.concat(['open', 'connected']);
-    }
-
-    // emit the initialized event
-    setTimeout(function() {
-      initEvents.forEach(function(name) {
-        signaller(name);
-      });
-    }, 0);
   }
 
   function prepareArg(arg) {
@@ -247,26 +167,12 @@ module.exports = function(messenger, opts) {
     // iterate over the arguments and stringify as required
     // var metadata = { id: signaller.id };
     var args = [].slice.call(arguments);
-    var dataline;
 
     // inject the metadata
     args.splice(1, 0, createMetadata());
-    dataline = createDataLine(args);
 
-    // perform an isclosing check
-    if (isClosing()) {
-      return;
-    }
-
-    // if we are not initialized, then wait until we are
-    if (readyState !== RS_CONNECTED) {
-      return signaller.once('connected', function() {
-        write.call(messenger, dataline);
-      });
-    }
-
-    // send the data over the messenger
-    return write.call(messenger, dataline);
+    // queue the dataline for sending
+    queue.push(createDataLine(args));
   };
 
   /**
@@ -339,8 +245,7 @@ module.exports = function(messenger, opts) {
     // update internal attributes
     extend(attributes, data, { id: signaller.id });
 
-    // if we are already connected, then ensure we announce on
-    // reconnect
+    // if we are already connected, then ensure we announce on reconnect
     if (readyState === RS_CONNECTED) {
       // always announce on reconnect
       signaller.removeListener('connected', announceOnReconnect);
@@ -399,10 +304,11 @@ module.exports = function(messenger, opts) {
     // stop announcing on reconnect
     signaller.removeListener('connected', announceOnReconnect);
 
-    // call the close method
-    if (typeof close == 'function') {
-      close.call(messenger);
-    }
+    // end our current queue
+    queue.end();
+
+    // create a new queue to buffer new messages
+    queue = pushable();
 
     // set connected to false
     readyState = RS_DISCONNECTED;
@@ -479,12 +385,7 @@ module.exports = function(messenger, opts) {
 
       // inject metadata
       args.splice(3, 0, createMetadata());
-
-      setTimeout(function() {
-        if (readyState === RS_CONNECTED) {
-          write.call(messenger, createDataLine(args));
-        }
-      }, 0);
+      queue.push(createDataLine(args));
     };
 
     return {
@@ -502,21 +403,9 @@ module.exports = function(messenger, opts) {
   // set the autoreply flag
   signaller.autoreply = autoreply === undefined || autoreply;
 
-  // if the messenger is a string, then we are going to attach to a
-  // ws endpoint and automatically set up primus
-  if (typeof messenger == 'string' || (messenger instanceof String)) {
-    connectToHost(messenger);
-  }
-  // otherwise, initialise the connection
-  else {
-    init();
-  }
+  // create the processor
+  signaller.process = processor = require('./processor')(signaller, opts);
 
-  // connect an instance of the messenger to the signaller
-  signaller._messenger = messenger;
-
-  // expose the process as a process function
-  signaller.process = processor;
-
+  connect();
   return signaller;
 };
