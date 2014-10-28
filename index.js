@@ -253,11 +253,6 @@ module.exports = function(messenger, opts) {
       signaller('local:announce', attributes);
     }
 
-    clearTimeout(announceTimer);
-
-    // update internal attributes
-    extend(attributes, data, { id: signaller.id });
-
     // if we are already connected, then ensure we announce on reconnect
     if (readyState === RS_CONNECTED) {
       // always announce on reconnect
@@ -265,14 +260,13 @@ module.exports = function(messenger, opts) {
       signaller.on('connected', announceOnReconnect);
     }
 
-    // send the attributes over the network
-    return announceTimer = setTimeout(function() {
-      if (readyState !== RS_CONNECTED) {
-        return signaller.once('connected', sendAnnounce);
-      }
+    clearTimeout(announceTimer);
 
-      sendAnnounce();
-    }, (opts || {}).announceDelay || 10);
+    // update internal attributes
+    extend(attributes, data, { id: signaller.id });
+
+    // send the attributes over the network
+    return announceTimer = setTimeout(sendAnnounce, (opts || {}).announceDelay || 10);
   };
 
   /**
@@ -418,6 +412,11 @@ module.exports = function(messenger, opts) {
 
   // create the processor
   signaller.process = processor = require('./processor')(signaller, opts);
+
+  // autoconnect
+  if (autoconnect === undefined || autoconnect) {
+    connect();
+  }
 
   return signaller;
 };
