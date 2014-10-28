@@ -160,6 +160,13 @@ As demonstrated in the getting started guide, you can also pass through
 a string value instead of a messenger instance if you simply want to
 connect to an existing `rtc-switchboard` instance.
 
+### `signaller.connect()`
+
+Manually connect the signaller using the supplied messenger.
+
+__NOTE:__ This should never have to be called if the default setting
+for `autoconnect` is used.
+
 ### signaller#send(message, data*)
 
 Use the send function to send a message to other peers in the current
