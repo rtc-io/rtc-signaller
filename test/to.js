@@ -1,6 +1,6 @@
 var test = require('tape');
 var messenger = require('messenger-memory')();
-var signaller = require('../signaller');
+var signaller = require('./helpers/signaller');
 var times = require('whisk/times');
 var pluck = require('whisk/pluck');
 var roomId = require('cuid')();

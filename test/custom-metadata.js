@@ -1,5 +1,5 @@
 var test = require('tape');
-var createSignaller = require('../signaller');
+var createSignaller = require('./helpers/signaller');
 var uuid = require('cuid');
 
 var runTest = module.exports = function(group) {

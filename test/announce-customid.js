@@ -1,7 +1,7 @@
 var test = require('tape');
 var messenger = require('messenger-memory')({ delay: Math.random() * 200 });
 var peers = [ messenger, messenger ];
-var signaller = require('../signaller');
+var signaller = require('./helpers/signaller');
 var signallers;
 
 test('create signallers', function(t) {

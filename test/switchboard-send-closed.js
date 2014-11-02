@@ -1,6 +1,6 @@
 var test = require('tape');
 var messenger = require('messenger-memory');
-var signaller = require('..');
+var signaller = require('./helpers/signaller');
 var uuid = require('cuid');
 var scope = [];
 var signallers = [];

@@ -1,5 +1,5 @@
 var test = require('tape');
-var signaller = require('..');
+var signaller = require('./helpers/signaller');
 var uuid = require('cuid');
 var sigA;
 var sigB;

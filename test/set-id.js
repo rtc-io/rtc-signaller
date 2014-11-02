@@ -1,6 +1,6 @@
 var test = require('tape');
 var messenger = require('messenger-memory');
-var signaller = require('../signaller');
+var signaller = require('./helpers/signaller');
 
 test('a new signaller without an id specified will initialize an id', function(t) {
   t.plan(1);

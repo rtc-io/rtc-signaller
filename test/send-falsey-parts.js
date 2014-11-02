@@ -1,6 +1,6 @@
 var extend = require('cog/extend');
 var test = require('tape');
-var createSignaller = require('../signaller');
+var createSignaller = require('./helpers/signaller');
 
 var runTest = module.exports = function(group) {
   var s;

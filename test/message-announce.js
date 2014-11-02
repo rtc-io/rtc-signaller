@@ -5,7 +5,7 @@ var runTest = module.exports = function(group) {
 
   test('create a signaller', function(t) {
     t.plan(1);
-    t.ok(signaller = require('../signaller')(group.messenger));
+    t.ok(signaller = require('./helpers/signaller')(group.messenger));
   });
 
   test('announce with no additional data matches expected', function(t) {
