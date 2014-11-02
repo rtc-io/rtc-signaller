@@ -173,6 +173,10 @@ module.exports = function(messenger, opts) {
       // pass the queue to the sink
       pull(queue, sink);
 
+      // handle disconnection
+      signaller.removeListener('disconnected', handleDisconnect);
+      signaller.once('disconnected', handleDisconnect);
+
       // trigger the connected event
       signaller('connected');
     });
@@ -317,6 +321,7 @@ module.exports = function(messenger, opts) {
     send('/leave', { id: id });
 
     // stop announcing on reconnect
+    signaller.removeListener('disconnected', handleDisconnect);
     signaller.removeListener('connected', announceOnReconnect);
 
     // end our current queue
@@ -425,9 +430,6 @@ module.exports = function(messenger, opts) {
   if (autoconnect === undefined || autoconnect) {
     connect();
   }
-
-  // handle disconnection
-  signaller.on('disconnected', handleDisconnect);
 
   return signaller;
 };
