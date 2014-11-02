@@ -66,6 +66,7 @@ module.exports = function(messenger, opts) {
   // get the autoreply setting
   var autoreply = (opts || {}).autoreply;
   var autoconnect = (opts || {}).autoconnect;
+  var reconnect = (opts || {}).reconnect;
 
   // initialise the metadata
   var localMeta = {};
@@ -113,6 +114,12 @@ module.exports = function(messenger, opts) {
 
   function createMetadata() {
     return extend({}, localMeta, { id: signaller.id });
+  }
+
+  function handleDisconnect() {
+    if (reconnect === undefined || reconnect) {
+      setTimeout(connect, 50);
+    }
   }
 
   function prepareArg(arg) {
@@ -418,6 +425,9 @@ module.exports = function(messenger, opts) {
   if (autoconnect === undefined || autoconnect) {
     connect();
   }
+
+  // handle disconnection
+  signaller.on('disconnected', handleDisconnect);
 
   return signaller;
 };
