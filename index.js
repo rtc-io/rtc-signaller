@@ -157,6 +157,7 @@ module.exports = function(messenger, opts) {
 
         // monitor disconnection
         pull.through(null, function() {
+          readyState = RS_DISCONNECTED;
           signaller('disconnected');
         }),
         pull.drain(processor)
