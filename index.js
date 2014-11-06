@@ -175,7 +175,7 @@ module.exports = function(messenger, opts) {
 
       // handle disconnection
       signaller.removeListener('disconnected', handleDisconnect);
-      signaller.once('disconnected', handleDisconnect);
+      signaller.on('disconnected', handleDisconnect);
 
       // trigger the connected event
       signaller('connected');
