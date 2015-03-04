@@ -25,7 +25,7 @@
     "whisk": "^1.0.0"
   },
   "scripts": {
-    "test": "node test/all.js && testling -x ./.travis/start-$BROWSER.sh",
+    "test": "node test/all-node.js && testling -x ./.travis/start-$BROWSER.sh",
     "gendocs": "gendocs > README.md",
     "hint": "jshint index.js handlers/*.js"
   },

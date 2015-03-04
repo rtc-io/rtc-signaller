@@ -24,7 +24,6 @@ before_install:
 before_script:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
-  - node test/server.js &
 
 after_failure:
   - for file in *.log; do echo $file; echo "======================"; cat $file; done || true
