@@ -100,17 +100,13 @@ module.exports = function(messenger, opts) {
     signaller.announce();
   }
 
-  function bufferMessage(args) {
-    queue.push(prepare(args));
+  function bufferMessage(message) {
+    queue.push(message);
 
     // if we are not connected (and should autoconnect), then attempt connection
     if (readyState === RS_DISCONNECTED && (autoconnect === undefined || autoconnect)) {
       connect();
     }
-  }
-
-  function createMetadata() {
-    return extend({}, localMeta, { id: signaller.id });
   }
 
   function handleDisconnect() {
@@ -176,15 +172,7 @@ module.exports = function(messenger, opts) {
     broadcast to all peers connected to the signalling server).
 
   **/
-  var send = signaller.send = function() {
-    // iterate over the arguments and stringify as required
-    // var metadata = { id: signaller.id };
-    var args = [].slice.call(arguments);
-
-    // inject the metadata
-    args.splice(1, 0, createMetadata());
-    bufferMessage(args);
-  };
+  var send = signaller.send = require('rtc-signal/send')(signaller, bufferMessage);
 
   /**
     ### announce(data?)
@@ -393,11 +381,11 @@ module.exports = function(messenger, opts) {
 
       // inject metadata
       args.splice(3, 0, createMetadata());
-      bufferMessage(args);
+      bufferMessage(prepare(args));
     };
 
     return {
-      send: sender,
+      send: sender
     };
   };
 
