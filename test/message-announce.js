@@ -15,9 +15,7 @@ var runTest = module.exports = function(group) {
 
       t.equal(parts.length, 3);
       t.equal(parts[0], '/announce');
-      t.doesNotThrow(function() {
-        JSON.parse(parts[1]);
-      });
+      t.equal(parts[1], signaller.id);
       t.doesNotThrow(function() {
         JSON.parse(parts[2]);
       });
@@ -34,9 +32,7 @@ var runTest = module.exports = function(group) {
 
       t.equal(parts.length, 3);
       t.equal(parts[0], '/announce');
-      t.doesNotThrow(function() {
-        JSON.parse(parts[1]);
-      });
+      t.equal(parts[1], signaller.id);
       t.doesNotThrow(function() {
         payload = JSON.parse(parts[2]);
       });

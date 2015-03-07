@@ -63,7 +63,7 @@ test('second peer:0 announce triggers peer:update event only', function(t) {
     t.equal(data.name, 'Fred', 'name retransmitted');
     t.equal(data.age, 30, 'age transmitted also');
     t.ok(src, 'have source data');
-    t.equal(src.id, signallers[0].id, 'src == signaller:0');
+    t.equal(src, signallers[0].id, 'src == signaller:0');
   });
 
   signallers[0].announce({ age: 30 });

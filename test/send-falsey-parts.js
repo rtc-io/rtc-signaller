@@ -12,27 +12,27 @@ var runTest = module.exports = function(group) {
   });
 
   test('announce', function(t) {
-    group.peers.expect(t, ['/announce', {id: s.id } ]);
+    group.peers.expect(t, ['/announce', s.id ]);
     s.announce();
   });
 
   test('can send simple message', function(t) {
-    group.peers.expect(t, ['/hi', { id: s.id } ]);
+    group.peers.expect(t, ['/hi', s.id ]);
     s.send('/hi');
   });
 
   test('can send message with 0 as arguments', function(t) {
-    group.peers.expect(t, ['/value', { id: s.id }, 0]);
+    group.peers.expect(t, ['/value', s.id, 0]);
     s.send('/value', 0);
   });
 
   test('can send message with empty string as arguments', function(t) {
-    group.peers.expect(t, ['/message', { id: s.id }, '']);
+    group.peers.expect(t, ['/message', s.id, '']);
     s.send('/message', '');
   });
 
   test('can send message with value false as argument', function(t) {
-    group.peers.expect(t, ['/connected', { id: s.id }, false ]);
+    group.peers.expect(t, ['/connected', s.id, false ]);
     s.send('/connected', false);
   });
 };

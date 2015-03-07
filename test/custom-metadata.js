@@ -13,7 +13,7 @@ var runTest = module.exports = function(group) {
   });
 
   test('announce', function(t) {
-    group.peers.expect(t, ['/announce', { id: s.id } ]);
+    group.peers.expect(t, ['/announce', s.id ]);
     s.announce();
   });
 
@@ -24,7 +24,7 @@ var runTest = module.exports = function(group) {
   });
 
   test('announce with updated metadata', function(t) {
-    group.peers.expect(t, ['/announce', { id: s.id, token: token } ]);
+    group.peers.expect(t, ['/announce', s.id ]);
     s.announce();
   });
 
@@ -35,12 +35,12 @@ var runTest = module.exports = function(group) {
   });
 
   test('announce with updated metadata', function(t) {
-    group.peers.expect(t, ['/announce', { id: s.id, foo: 'bar' } ]);
+    group.peers.expect(t, ['/announce', s.id ]);
     s.announce();
   });
 
   test('disconnect', function(t) {
-    group.peers.expect(t, ['/leave', { id: s.id, foo: 'bar' } ]);
+    group.peers.expect(t, ['/leave', s.id ]);
     s.leave();
   });
 };

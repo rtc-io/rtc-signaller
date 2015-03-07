@@ -24,12 +24,12 @@ var runTest = module.exports = function(group) {
   });
 
   test('announce', function(t) {
-    group.peers.expect(t, ['/announce', {id: s.id } ]);
+    group.peers.expect(t, ['/announce', s.id ]);
     s.announce();
   });
 
   test('disconnect', function(t) {
-    group.peers.expect(t, ['/leave', { id: s.id } ]);
+    group.peers.expect(t, ['/leave', s.id ]);
     s.leave();
   });
 
@@ -40,17 +40,17 @@ var runTest = module.exports = function(group) {
   });
 
   test('announce with attributes', function(t) {
-    group.peers.expect(t, ['/announce', { id: s.id }, genAnnounce({ name: 'Bob' }) ]);
+    group.peers.expect(t, ['/announce', s.id, genAnnounce({ name: 'Bob' }) ]);
     s.announce({ name: 'Bob' });
   });
 
   test('announce with different attributes', function(t) {
-    group.peers.expect(t, ['/announce', { id: s.id }, genAnnounce({ name: 'Fred' }) ]);
+    group.peers.expect(t, ['/announce', s.id, genAnnounce({ name: 'Fred' }) ]);
     s.announce({ name: 'Fred' });
   });
 
   test('disconnect', function(t) {
-    group.peers.expect(t, ['/leave', { id: s.id } ]);
+    group.peers.expect(t, ['/leave', s.id ]);
     s.leave();
   });
 };
