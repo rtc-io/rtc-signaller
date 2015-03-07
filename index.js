@@ -244,10 +244,10 @@ module.exports = function(messenger, opts) {
     ```
 
   **/
-  signaller.announce = function(data, sender) {
+  signaller.announce = function(data) {
 
     function sendAnnounce() {
-      (sender || send)('/announce', attributes);
+      send('/announce', attributes);
       signaller('local:announce', attributes);
     }
 
