@@ -397,10 +397,6 @@ module.exports = function(messenger, opts) {
     };
 
     return {
-      announce: function(data) {
-        return signaller.announce(data, sender);
-      },
-
       send: sender,
     };
   };
