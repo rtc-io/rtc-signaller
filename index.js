@@ -345,6 +345,8 @@ module.exports = function(messenger, opts) {
     and this cannot be modified.
   **/
   signaller.metadata = function(data) {
+    console.warn('metadata is deprecated, please do not use');
+
     if (arguments.length === 0) {
       return extend({}, localMeta);
     }
