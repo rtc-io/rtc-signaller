@@ -9,6 +9,7 @@ var getable = require('cog/getable');
 var uuid = require('cuid');
 var pull = require('pull-stream');
 var pushable = require('pull-pushable');
+var prepare = require('rtc-signal/prepare');
 
 // ready state constants
 var RS_DISCONNECTED = 0;
@@ -100,16 +101,12 @@ module.exports = function(messenger, opts) {
   }
 
   function bufferMessage(args) {
-    queue.push(createDataLine(args));
+    queue.push(prepare(args));
 
     // if we are not connected (and should autoconnect), then attempt connection
     if (readyState === RS_DISCONNECTED && (autoconnect === undefined || autoconnect)) {
       connect();
     }
-  }
-
-  function createDataLine(args) {
-    return args.map(prepareArg).join('|');
   }
 
   function createMetadata() {
@@ -120,17 +117,6 @@ module.exports = function(messenger, opts) {
     if (reconnect === undefined || reconnect) {
       setTimeout(connect, 50);
     }
-  }
-
-  function prepareArg(arg) {
-    if (typeof arg == 'object' && (! (arg instanceof String))) {
-      return JSON.stringify(arg);
-    }
-    else if (typeof arg == 'function') {
-      return null;
-    }
-
-    return arg;
   }
 
   /**
@@ -426,7 +412,7 @@ module.exports = function(messenger, opts) {
   signaller.autoreply = autoreply === undefined || autoreply;
 
   // create the processor
-  signaller.process = processor = require('./processor')(signaller, opts);
+  signaller.process = processor = require('rtc-signal/process')(signaller, opts);
 
   // autoconnect
   if (autoconnect === undefined || autoconnect) {
