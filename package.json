@@ -18,6 +18,7 @@
     "async": "~0.9",
     "fdom": "^1.2.0",
     "messenger-memory": "^2.0.0",
+    "rtc-signaller-testrun": "^1.2.0",
     "rtc-switchboard": "^2.0.0",
     "rtc-switchboard-messenger": "^1.0.0",
     "tape": "^3.0.0",
@@ -44,7 +45,7 @@
     "url": "https://github.com/rtc-io/rtc-signaller/issues"
   },
   "testling": {
-    "files": "test/all.js",
+    "files": "test/browser.js",
     "server": "test/server.js"
   }
 }
