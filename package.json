@@ -13,7 +13,7 @@
     "pull-pushable": "^1.1.4",
     "pull-stream": "^2.26.0",
     "rtc-core": "^4.0.0",
-    "rtc-signal": "^1.0.0"
+    "rtc-signal": "rtc-io/rtc-signal"
   },
   "devDependencies": {
     "async": "~0.9",
