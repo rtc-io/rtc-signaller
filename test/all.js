@@ -13,7 +13,6 @@ require('./to');
 
 // inspect generated messages
 require('./announce-raw')(createGroup(3));
-require('./custom-metadata')(createGroup(3));
 require('./send-falsey-parts')(createGroup(2));
 require('./message-announce')(createGroup(2));
 
