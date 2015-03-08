@@ -380,7 +380,7 @@ module.exports = function(messenger, opts) {
       ].concat([].slice.call(arguments));
 
       // inject metadata
-      args.splice(3, 0, createMetadata());
+      args.splice(3, 0, signaller.id);
       bufferMessage(prepare(args));
     };
 
