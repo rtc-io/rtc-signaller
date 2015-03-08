@@ -64,8 +64,6 @@ var metadata = {
 
 **/
 module.exports = function(messenger, opts) {
-  // get the autoreply setting
-  var autoreply = (opts || {}).autoreply;
   var autoconnect = (opts || {}).autoconnect;
   var reconnect = (opts || {}).reconnect;
 
@@ -240,9 +238,6 @@ module.exports = function(messenger, opts) {
     // set connected to false
     readyState = RS_DISCONNECTED;
   };
-
-  // set the autoreply flag
-  signaller.autoreply = autoreply === undefined || autoreply;
 
   // update the signaller agent
   signaller._update({ agent: 'signaller@' + metadata.version });
