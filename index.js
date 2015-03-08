@@ -338,36 +338,7 @@ module.exports = function(messenger, opts) {
     ```
 
   **/
-  signaller.to = function(targetId) {
-    // create a sender that will prepend messages with /to|targetId|
-    var sender = function() {
-      // get the peer (yes when send is called to make sure it hasn't left)
-      var peer = signaller.peers.get(targetId);
-      var args;
-
-      if (! peer) {
-        throw new Error('Unknown peer: ' + targetId);
-      }
-
-      // if the peer is inactive, then abort
-      if (peer.inactive) {
-        return;
-      }
-
-      args = [
-        '/to',
-        targetId
-      ].concat([].slice.call(arguments));
-
-      // inject metadata
-      args.splice(3, 0, signaller.id);
-      bufferMessage(prepare(args));
-    };
-
-    return {
-      send: sender
-    };
-  };
+  signaller.to = require('rtc-signal/send-to')(signaller, bufferMessage);
 
   // initialise opts defaults
   opts = defaults({}, opts, require('./defaults'));
