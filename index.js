@@ -69,36 +69,14 @@ module.exports = function(messenger, opts) {
   var autoconnect = (opts || {}).autoconnect;
   var reconnect = (opts || {}).reconnect;
 
-  // initialise the metadata
-  var localMeta = {};
-
   // create the signaller
-  var signaller = mbus('', (opts || {}).logger);
-
-  // initialise the id
-  var id = signaller.id = (opts || {}).id || uuid();
-
-  // initialise the attributes
-  var attributes = signaller.attributes = {
-    browser: detect.browser,
-    browserVersion: detect.browserVersion,
-    id: id,
-    agent: 'signaller@' + metadata.version
-  };
-
-  // create the peers map
-  var peers = signaller.peers = getable({});
+  var signaller = require('rtc-signal/signaller')(opts, bufferMessage);
 
   // create the outbound message queue
   var queue = require('pull-pushable')();
 
-  var processor;
   var announceTimer = 0;
   var readyState = RS_DISCONNECTED;
-
-  function announceOnReconnect() {
-    signaller.announce();
-  }
 
   function bufferMessage(message) {
     queue.push(message);
@@ -149,7 +127,7 @@ module.exports = function(messenger, opts) {
           readyState = RS_DISCONNECTED;
           signaller('disconnected');
         }),
-        pull.drain(processor)
+        pull.drain(signaller._process)
       );
 
       // pass the queue to the sink
@@ -163,16 +141,6 @@ module.exports = function(messenger, opts) {
       signaller('connected');
     });
   };
-
-  /**
-    ### signaller#send(message, data*)
-
-    Use the send function to send a message to other peers in the current
-    signalling scope (if announced in a room this will be a room, otherwise
-    broadcast to all peers connected to the signalling server).
-
-  **/
-  var send = signaller.send = require('rtc-signal/send')(signaller, bufferMessage);
 
   /**
     ### announce(data?)
@@ -233,53 +201,18 @@ module.exports = function(messenger, opts) {
 
   **/
   signaller.announce = function(data) {
-
-    function sendAnnounce() {
-      send('/announce', attributes);
-      signaller('local:announce', attributes);
-    }
-
     // if we are already connected, then ensure we announce on reconnect
     if (readyState === RS_CONNECTED) {
       // always announce on reconnect
-      signaller.removeListener('connected', announceOnReconnect);
-      signaller.on('connected', announceOnReconnect);
+      signaller.removeListener('connected', signaller._announce);
+      signaller.on('connected', signaller._announce);
     }
 
+    signaller._update(data);
     clearTimeout(announceTimer);
 
-    // update internal attributes
-    extend(attributes, data, { id: signaller.id });
-
     // send the attributes over the network
-    return announceTimer = setTimeout(sendAnnounce, (opts || {}).announceDelay || 10);
-  };
-
-  /**
-    ### isMaster(targetId)
-
-    A simple function that indicates whether the local signaller is the master
-    for it's relationship with peer signaller indicated by `targetId`.  Roles
-    are determined at the point at which signalling peers discover each other,
-    and are simply worked out by whichever peer has the lowest signaller id
-    when lexigraphically sorted.
-
-    For example, if we have two signaller peers that have discovered each
-    others with the following ids:
-
-    - `b11f4fd0-feb5-447c-80c8-c51d8c3cced2`
-    - `8a07f82e-49a5-4b9b-a02e-43d911382be6`
-
-    They would be assigned roles:
-
-    - `b11f4fd0-feb5-447c-80c8-c51d8c3cced2`
-    - `8a07f82e-49a5-4b9b-a02e-43d911382be6` (master)
-
-  **/
-  signaller.isMaster = function(targetId) {
-    var peer = peers.get(targetId);
-
-    return peer && peer.roleIdx !== 0;
+    return announceTimer = setTimeout(signaller._announce, (opts || {}).announceDelay || 10);
   };
 
   /**
@@ -292,11 +225,11 @@ module.exports = function(messenger, opts) {
   **/
   signaller.leave = signaller.close = function() {
     // send the leave signal
-    send('/leave', { id: id });
+    signaller.send('/leave', { id: signaller.id });
 
     // stop announcing on reconnect
     signaller.removeListener('disconnected', handleDisconnect);
-    signaller.removeListener('connected', announceOnReconnect);
+    signaller.removeListener('connected', signaller._announce);
 
     // end our current queue
     queue.end();
@@ -308,46 +241,11 @@ module.exports = function(messenger, opts) {
     readyState = RS_DISCONNECTED;
   };
 
-  /**
-    ### to(targetId)
-
-    Use the `to` function to send a message to the specified target peer.
-    A large parge of negotiating a WebRTC peer connection involves direct
-    communication between two parties which must be done by the signalling
-    server.  The `to` function provides a simple way to provide a logical
-    communication channel between the two parties:
-
-    ```js
-    var send = signaller.to('e95fa05b-9062-45c6-bfa2-5055bf6625f4').send;
-
-    // create an offer on a local peer connection
-    pc.createOffer(
-      function(desc) {
-        // set the local description using the offer sdp
-        // if this occurs successfully send this to our peer
-        pc.setLocalDescription(
-          desc,
-          function() {
-            send('/sdp', desc);
-          },
-          handleFail
-        );
-      },
-      handleFail
-    );
-    ```
-
-  **/
-  signaller.to = require('rtc-signal/send-to')(signaller, bufferMessage);
-
-  // initialise opts defaults
-  opts = defaults({}, opts, require('./defaults'));
-
   // set the autoreply flag
   signaller.autoreply = autoreply === undefined || autoreply;
 
-  // create the processor
-  signaller.process = processor = require('rtc-signal/process')(signaller, opts);
+  // update the signaller agent
+  signaller._update({ agent: 'signaller@' + metadata.version });
 
   // autoconnect
   if (autoconnect === undefined || autoconnect) {
