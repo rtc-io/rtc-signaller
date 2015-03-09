@@ -17,17 +17,21 @@
   },
   "devDependencies": {
     "async": "~0.9",
+    "broth": "^1.0.0",
+    "browserify": "^9.0.3",
     "fdom": "^1.2.0",
     "messenger-memory": "^2.0.0",
     "rtc-signaller-testrun": "^1.2.0",
     "rtc-switchboard": "^2.0.0",
     "rtc-switchboard-messenger": "^1.0.0",
+    "tap-spec": "^2.2.2",
     "tape": "^3.0.0",
     "testling": "^1",
     "whisk": "^1.0.0"
   },
   "scripts": {
-    "test": "node test/all-node.js && testling -x ./.travis/start-$BROWSER.sh",
+    "test": "node test/all-node.js && npm run test-browser",
+    "test-browser": "browserify test/all-browser.js | broth ./.travis/start-$BROWSER.sh | tap-spec",
     "gendocs": "gendocs > README.md",
     "hint": "jshint index.js handlers/*.js"
   },
