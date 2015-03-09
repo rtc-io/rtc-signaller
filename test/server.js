@@ -1,7 +1,5 @@
-var http = require('http');
-
-module.exports = function(callback) {
-  var server = http.createServer();
+module.exports = function() {
+  var server = require('http').createServer();
   var switchboard = require('rtc-switchboard')(server, { servelib: true });
 
   switchboard.on('fake:disconnect', function(msg, spark) {
@@ -12,6 +10,5 @@ module.exports = function(callback) {
     spark.end();
   });
 
-  server.listen(0, callback);
   return server;
 };
