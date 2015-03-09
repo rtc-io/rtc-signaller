@@ -26,7 +26,6 @@
     "rtc-switchboard-messenger": "^1.0.0",
     "tap-spec": "^2.2.2",
     "tape": "^3.0.0",
-    "testling": "^1",
     "whisk": "^1.0.0"
   },
   "scripts": {
@@ -48,9 +47,5 @@
   "license": "Apache 2.0",
   "bugs": {
     "url": "https://github.com/rtc-io/rtc-signaller/issues"
-  },
-  "testling": {
-    "files": "test/browser.js",
-    "server": "test/server.js"
   }
 }
