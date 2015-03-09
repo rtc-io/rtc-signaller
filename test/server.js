@@ -1,12 +1,8 @@
 var http = require('http');
 
-var start = module.exports = function(callback) {
-  var server;
-  var port = process.env.ZUUL_PORT || process.env.PORT;
-  var switchboard;
-
-  server = http.createServer();
-  switchboard = require('rtc-switchboard')(server, { servelib: true });
+module.exports = function(callback) {
+  var server = http.createServer();
+  var switchboard = require('rtc-switchboard')(server, { servelib: true });
 
   switchboard.on('fake:disconnect', function(msg, spark) {
     spark.end(null, { reconnect: true });
@@ -16,15 +12,6 @@ var start = module.exports = function(callback) {
     spark.end();
   });
 
-  server.listen(parseInt(port, 10) || 3000, function(err) {
-    callback(err, server);
-  });
+  server.listen(0, callback);
+  return server;
 };
-
-if (! module.parent) {
-  start(function(err) {
-    if (err) {
-      console.error('could not start testing server: ', err);
-    }
-  });
-}
