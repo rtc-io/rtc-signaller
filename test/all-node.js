@@ -1,9 +1,11 @@
 var test = require('tape');
-var server = require('./server')(function(err) {
-  test('server started without error', function(t) {
-    t.plan(1);
-    t.ifError(err);
-  });
+var server = require('./server')();
+
+server.listen(0, function(err) {
+  if (err) {
+    console.error('could not start server: ', err);
+    return process.exit(1);
+  }
 
   require('./all')('http://localhost:' + server.address().port);
 
