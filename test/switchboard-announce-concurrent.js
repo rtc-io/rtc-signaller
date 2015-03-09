@@ -3,7 +3,7 @@ var signaller = require('./helpers/signaller');
 var uuid = require('cuid');
 var signallers = [];
 var roomId = uuid();
-var signallerCount = typeof window != 'undefined' ? 10 : 100;
+var signallerCount = 100;
 var times = require('whisk/times');
 var pluck = require('whisk/pluck');
 
