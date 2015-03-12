@@ -2,7 +2,6 @@
 'use strict';
 
 var detect = require('rtc-core/detect');
-var defaults = require('cog/defaults');
 var extend = require('cog/extend');
 var mbus = require('mbus');
 var getable = require('cog/getable');
