@@ -147,6 +147,12 @@ This diagram illustrates the process of how peer `A` announces itself to peers `
 Each of the diagrams has been generated using [mscgen](http://www.mcternan.me.uk/mscgen/index.html) and the source for these documents can be found in the `docs/` folder of this repository.
 
 
+## Identifying Participants
+
+When working with `rtc-signaller` and upstream packages (such as `rtc-quickconnect`) there is a temptation to provide a custom `id` field when creating the signaller instance.  While this is supported in the API, it is __strongly discouraged and will likely be removed__ at some point in the future. The reason for this is that the signaller relies on this id field being unique in order to deliver messages that relate to a particular peer connection, to that peer connection.
+
+A better approach is to include an additional `uid` (or similar) field in the announce message that will be sent to peers as part of the data payload.  The value of this field can be unique for each session, or persist between sessions (consider saving the value to `localStorage` for example) and thus used to identify users within the context of WebRTC sessions.
+
 ## Reference
 
 The `rtc-signaller` module is designed to be used primarily in a functional

@@ -45,6 +45,8 @@ var metadata = {
   <<< docs/events.md
 
   <<< docs/signalflow-diagrams.md
+  
+  <<< docs/identifying-participants.md
 
   ## Reference
 
