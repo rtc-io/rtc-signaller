@@ -125,6 +125,18 @@ The following events relate to information that has been relayed to this signall
     console.log('data update from peer: ' + data.id, data);
   });
   ```
+  
+  `message:<command>`
+  
+  When a signaller receives a command that is not associated with a specific handler (such as announce) it emits an event for that command prefixed with `message:`.  For example:
+  
+  ```js
+  signallerA.on('message:greet', function(text) {
+    console.log('signallerB sends greeting: ' + text);
+  });
+
+  signallerB.send('/greet', 'hello friend');
+  ```
 
 
 ## Signal Flow Diagrams
