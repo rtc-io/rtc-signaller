@@ -126,7 +126,7 @@ The following events relate to information that has been relayed to this signall
   });
   ```
   
-  `message:<command>`
+- `message:<command>`
   
   When a signaller receives a command that is not associated with a specific handler (such as announce) it emits an event for that command prefixed with `message:`.  For example:
   
