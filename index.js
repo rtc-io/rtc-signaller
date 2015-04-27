@@ -72,6 +72,7 @@ module.exports = function(messenger, opts) {
   // create the outbound message queue
   var queue = require('pull-pushable')();
 
+  var announced = false;
   var announceTimer = 0;
   var readyState = RS_DISCONNECTED;
 
@@ -136,6 +137,12 @@ module.exports = function(messenger, opts) {
 
       // trigger the connected event
       signaller('connected');
+
+      // announce if previously announced (using the announce function)
+      if (announced) {
+        console.log('reannouncing as we have previously announced');
+        signaller._announce();
+      }
     });
   };
 
@@ -198,13 +205,7 @@ module.exports = function(messenger, opts) {
 
   **/
   signaller.announce = function(data) {
-    // if we are already connected, then ensure we announce on reconnect
-    if (readyState === RS_CONNECTED) {
-      // always announce on reconnect
-      signaller.removeListener('connected', signaller._announce);
-      signaller.on('connected', signaller._announce);
-    }
-
+    announced = true;
     signaller._update(data);
     clearTimeout(announceTimer);
 
