@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "async": "~0.9",
-    "broth": "^1.0.0",
+    "broth": "^2.0.0",
     "browserify": "^9.0.3",
     "fdom": "^1.2.0",
     "messenger-memory": "^2.0.0",
@@ -26,11 +26,12 @@
     "rtc-switchboard-messenger": "^1.0.0",
     "tap-spec": "^2.2.2",
     "tape": "^3.0.0",
+    "travis-multirunner": "^2.1.0",
     "whisk": "^1.0.0"
   },
   "scripts": {
     "test": "node test/all-node.js && npm run test-browser",
-    "test-browser": "browserify test/all-browser.js | broth ./.travis/start-$BROWSER.sh | tap-spec",
+    "test-browser": "browserify test/all-browser.js | broth ./node_modules/travis-multirunner/start-$BROWSER.sh | tap-spec",
     "gendocs": "gendocs > README.md",
     "hint": "jshint index.js handlers/*.js"
   },
