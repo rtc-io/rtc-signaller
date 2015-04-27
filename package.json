@@ -24,8 +24,8 @@
     "rtc-signaller-testrun": "^1.2.2",
     "rtc-switchboard": "^2.0.0",
     "rtc-switchboard-messenger": "^1.0.0",
-    "tap-spec": "^2.2.2",
-    "tape": "^3.0.0",
+    "tap-spec": "^3.0.0",
+    "tape": "^4.0.0",
     "travis-multirunner": "^2.1.0",
     "whisk": "^1.0.0"
   },
