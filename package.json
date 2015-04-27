@@ -21,7 +21,7 @@
     "browserify": "^9.0.3",
     "fdom": "^1.2.0",
     "messenger-memory": "^2.0.0",
-    "rtc-signaller-testrun": "^1.2.0",
+    "rtc-signaller-testrun": "^1.2.2",
     "rtc-switchboard": "^2.0.0",
     "rtc-switchboard-messenger": "^1.0.0",
     "tap-spec": "^2.2.2",
