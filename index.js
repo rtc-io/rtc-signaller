@@ -46,7 +46,7 @@ var metadata = {
   <<< docs/events.md
 
   <<< docs/signalflow-diagrams.md
-  
+
   <<< docs/identifying-participants.md
 
   ## Reference
@@ -69,6 +69,7 @@ module.exports = function(messenger, opts) {
   var autoconnect = (opts || {}).autoconnect;
   var reconnect = (opts || {}).reconnect;
   var queue = createQueue();
+  var connectionCount = 0;
 
   // create the signaller
   var signaller = require('rtc-signal/signaller')(opts, bufferMessage);
@@ -114,6 +115,9 @@ module.exports = function(messenger, opts) {
         return signaller('error', err);
       }
 
+      // increment the connection count
+      connectionCount += 1;
+
       // flag as connected
       readyState = RS_CONNECTED;
 
@@ -140,8 +144,8 @@ module.exports = function(messenger, opts) {
       // trigger the connected event
       signaller('connected');
 
-      // announce if previously announced (using the announce function)
-      if (announced) {
+      // if this is a reconnection, then reannounce
+      if (announced && connectionCount > 1) {
         signaller._announce();
       }
     });
