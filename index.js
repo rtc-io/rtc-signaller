@@ -9,6 +9,7 @@ var uuid = require('cuid');
 var pull = require('pull-stream');
 var pushable = require('pull-pushable');
 var prepare = require('rtc-signal/prepare');
+var createQueue = require('pull-pushable');
 
 // ready state constants
 var RS_DISCONNECTED = 0;
@@ -65,12 +66,10 @@ var metadata = {
 module.exports = function(messenger, opts) {
   var autoconnect = (opts || {}).autoconnect;
   var reconnect = (opts || {}).reconnect;
+  var queue = createQueue();
 
   // create the signaller
   var signaller = require('rtc-signal/signaller')(opts, bufferMessage);
-
-  // create the outbound message queue
-  var queue = require('pull-pushable')();
 
   var announced = false;
   var announceTimer = 0;
@@ -122,6 +121,7 @@ module.exports = function(messenger, opts) {
 
         // monitor disconnection
         pull.through(null, function() {
+          queue = createQueue();
           readyState = RS_DISCONNECTED;
           signaller('disconnected');
         }),
@@ -140,7 +140,6 @@ module.exports = function(messenger, opts) {
 
       // announce if previously announced (using the announce function)
       if (announced) {
-        console.log('reannouncing as we have previously announced');
         signaller._announce();
       }
     });
@@ -231,9 +230,6 @@ module.exports = function(messenger, opts) {
 
     // end our current queue
     queue.end();
-
-    // create a new queue to buffer new messages
-    queue = pushable();
 
     // set connected to false
     readyState = RS_DISCONNECTED;
