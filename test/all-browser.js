@@ -5,5 +5,5 @@ function createSignaller(opts) {
   return signaller(messenger(location.origin), opts);
 }
 
-// require('./all')(location.origin);
-require('rtc-signaller-testrun')(createSignaller);
+require('./all')(location.origin);
+// require('rtc-signaller-testrun')(createSignaller);
