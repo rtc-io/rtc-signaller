@@ -2,6 +2,8 @@ sudo: false
 language: node_js
 node_js:
 - 0.10
+- 4.1
+- stable
 
 env:
   matrix:
@@ -29,4 +31,4 @@ after_failure:
 
 notifications:
   email:
-  - damon.oehlman@nicta.com.au
+  - nathan.oehlman@nicta.com.au
