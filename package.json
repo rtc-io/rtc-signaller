@@ -23,10 +23,10 @@
     "messenger-memory": "^2.0.0",
     "rtc-signaller-testrun": "^1.2.2",
     "rtc-switchboard": "^3.0.0",
-    "rtc-switchboard-messenger": "^1.0.0",
+    "rtc-switchboard-messenger": "^2.0.3",
     "tap-spec": "^3.0.0",
     "tape": "^4.0.0",
-    "travis-multirunner": "^2.7.2",
+    "travis-multirunner": "^3.0.0",
     "whisk": "^1.0.0"
   },
   "scripts": {
@@ -45,7 +45,7 @@
     "signalling"
   ],
   "author": "Damon Oehlman <damon.oehlman@nicta.com.au>",
-  "license": "Apache 2.0",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/rtc-io/rtc-signaller/issues"
   }
